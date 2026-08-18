@@ -1,0 +1,3 @@
+artifacts/*.apk
+mixxx-android-build*.log
+mixxx-android-build.pid
