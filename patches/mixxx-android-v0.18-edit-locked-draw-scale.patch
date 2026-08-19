@@ -25,23 +25,23 @@ diff --git a/res/qml/WaveformDisplay.qml b/res/qml/WaveformDisplay.qml
 --- a/res/qml/WaveformDisplay.qml
 +++ b/res/qml/WaveformDisplay.qml
 @@ -15,13 +15,15 @@
- 
-     required property string group
+
+    required property string group
      property bool splitStemTracks: false
 -    property real visualGain: 1.0
 +    property real verticalDrawScale: 1.0
-     readonly property string zoomGroup: Mixxx.Config.waveformZoomSynchronization ? "[Channel1]" : group
- 
-     MixxxControls.WaveformDisplay {
+    readonly property string zoomGroup: Mixxx.Config.waveformZoomSynchronization ? "[Channel1]" : group
+
+    MixxxControls.WaveformDisplay {
 -        anchors.fill: parent
 +        anchors.centerIn: parent
          backgroundColor: "transparent"
          group: root.group
 +        height: parent.height * root.verticalDrawScale
 +        width: parent.width
-         zoom: zoomControl.value
- 
-         Behavior on zoom {
+        zoom: zoomControl.value
+
+        Behavior on zoom {
 @@ -70,7 +72,7 @@
          }
          Mixxx.WaveformRendererFiltered {
@@ -81,7 +81,7 @@ diff --git a/res/qml/main.qml b/res/qml/main.qml
                      implicitWidth: 72
 -                    text: "Wave -"
 +                    text: "Draw -"
- 
+
 -                    onClicked: root.waveformVisualGain = Math.max(1.0,
 -                            Math.round((root.waveformVisualGain - 0.1) * 10) / 10)
 +                    onClicked: root.waveformDrawScale = Math.max(0.35,
@@ -92,7 +92,7 @@ diff --git a/res/qml/main.qml b/res/qml/main.qml
                      implicitWidth: 72
 -                    text: "Wave +"
 +                    text: "Draw +"
- 
+
 -                    onClicked: root.waveformVisualGain = Math.min(2.5,
 -                            Math.round((root.waveformVisualGain + 0.1) * 10) / 10)
 +                    onClicked: root.waveformDrawScale = Math.min(1.0,
@@ -111,8 +111,8 @@ diff --git a/res/qml/main.qml b/res/qml/main.qml
 +            radius: 2
 +            width: 28
              y: root.toolbarExpanded ? toolbar.height : 0
-             z: 31
- 
+            z: 31
+
 @@ -243,11 +245,13 @@
                  anchors.centerIn: parent
                  color: Theme.white
@@ -135,8 +135,8 @@ diff --git a/res/qml/main.qml b/res/qml/main.qml
                                      group: deck3waveform.group
 -                                    visualGain: root.waveformVisualGain
 +                                    verticalDrawScale: root.waveformDrawScale
- 
-                                     FadeBehavior on visible {
+
+                                    FadeBehavior on visible {
                                          fadeTarget: deck3waveform
 @@ -431,7 +435,7 @@
                              anchors.bottomMargin: root.waveformLanePadding
@@ -162,8 +162,8 @@ diff --git a/res/qml/main.qml b/res/qml/main.qml
                                      group: deck4waveform.group
 -                                    visualGain: root.waveformVisualGain
 +                                    verticalDrawScale: root.waveformDrawScale
- 
-                                     FadeBehavior on visible {
+
+                                    FadeBehavior on visible {
                                          fadeTarget: deck4waveform
 @@ -479,6 +483,27 @@
                          }
@@ -206,8 +206,8 @@ diff --git a/res/qml/main.qml b/res/qml/main.qml
                          radius: 7
                          width: 46
 +                        opacity: root.editDeck ? 1.0 : 0.55
- 
-                         Text {
+
+                        Text {
                              anchors.centerIn: parent
                              color: Theme.white
                              font.bold: true
