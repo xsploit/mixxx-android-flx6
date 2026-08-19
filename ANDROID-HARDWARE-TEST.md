@@ -10,9 +10,9 @@ Mixxx. It is not an official Mixxx Android release.
 - Source commit: `86126792a3a11b493a74ea133dc1260890d9c200`
 - Minimum Android version: Android 9 / API 28
 - CPU architecture: ARM64
-- APK version: `0.14.0-clipped-waveform-lanes` (version code 14)
-- APK label: `Mixxx FLX6 v0.14`
-- APK SHA-256: `8d259fef26affc265ae7dc70d9ebd5d633cc645102e4ab2c9047195a8adef70f`
+- APK version: `0.15.0-layered-adjustable-waveforms` (version code 15)
+- APK label: `Mixxx FLX6 v0.15`
+- APK SHA-256: `69f09efa3d517cc48ce6fea117008ac4592a6cbafc385c5bb727896844802783`
 
 The APK's v3 signature verifies. It contains the ARM64 Mixxx and Qt native
 libraries. No Android device was attached to this machine, so installation,
@@ -23,9 +23,9 @@ panel. The complete toolbar is hidden behind a tiny top-center arrow and opens
 as an overlay without resizing the waveform view. Android safe-area margins
 keep Deck B above any system navigation bar, and the obsolete 320-logical-pixel
 minimum window height has been removed. The main waveform viewport begins below
-the track header and splits all remaining height equally around its blue divider,
-with no hidden translated canvas. Use Android's App Info screen to confirm
-version `0.14.0-clipped-waveform-lanes` and package
+the track header and splits all remaining height equally around its blue divider.
+The adjustable stack remains clipped inside that lower layer. Use Android's App Info screen to confirm
+version `0.15.0-layered-adjustable-waveforms` and package
 `org.mixxx.flx6standalone`.
 
 ## Correct hookup
@@ -90,6 +90,8 @@ Android may warn that this is an unknown or locally signed app. That is expected
 7. Confirm the black waveform viewport starts below the track-name/overview row,
    with no dark area bleeding behind it. Confirm Deck A and B are equal visible
    lanes, separated by the 2-pixel blue line, and Deck B's bottom edge is onscreen.
+   Drag the blue center grip and confirm the complete A+B stack moves while the
+   track-name/overview row stays fixed above the clipped waveform boundary.
    Open the toolbar and try `WAVE -` / `WAVE +`: only signal height should change;
    lane geometry, horizontal scroll, zoom, and playheads must remain fixed.
 

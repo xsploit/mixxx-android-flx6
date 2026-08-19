@@ -45,6 +45,10 @@
   oversized translated canvas. The track headers own their 62-pixel region;
   the remaining clipped viewport is split into equal A/B lanes around a 2-pixel
   divider, with 1-pixel compact-screen padding and adjustable visual waveform gain.
+- `patches/mixxx-android-v0.15-layered-adjustable-waveforms.patch` restores the
+  draggable A+B stack while separating its bounds from the header: the header
+  is an opaque high-z layer and the clipped waveform viewport explicitly starts
+  at the shared 62-pixel boundary beneath it.
 - `controller-mapping/` contains the bundled experimental DDJ-FLX6 mapping and
   its upstream license.
 
@@ -74,9 +78,12 @@ device.
   waveform viewport begins at the header's bottom edge and cannot render behind it.
 - Deck A and Deck B receive equal shares of the remaining visible height after
   the 2-pixel blue divider is subtracted. Each compact lane has 1-pixel top and
-  bottom padding; neither lane is translated or hidden beyond the screen.
+  bottom padding and its own clip boundary.
 - `WAVE -` and `WAVE +` in the collapsed toolbar adjust only the rendered signal
   gain from 1.0x to 2.5x (1.7x default), without changing lane size, zoom, or scroll.
+- Dragging the blue center grip moves the complete A+B waveform stack through
+  its previous 72-pixel/18% adjustment range. The opaque header remains above it
+  and the waveform viewport clips at the header boundary.
 
 ## Corresponding source and licensing
 
