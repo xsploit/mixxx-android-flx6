@@ -22,6 +22,8 @@
 - `patches/mixxx-android-v0.7-live-layout.patch` anchors the waveform region
   below the toolbar, makes the toolbar horizontally scrollable, and adds a live
   A/B waveform-height divider.
+- `patches/mixxx-android-v0.8-native-waveform-split.patch` makes that blue
+  divider the actual nested `SplitView` handle, directly resizing both waveform renderers.
 - `controller-mapping/` contains the bundled experimental DDJ-FLX6 mapping and
   its upstream license.
 
@@ -45,7 +47,7 @@ device.
 - Pressing the FLX6 browse encoder toggles the full-screen library; turning it
   continues to move through the track list.
 - Swipe the top toolbar sideways to reach controls on narrow screens. Drag the
-  `↕ DRAG` divider to resize Deck A and Deck B; double-tap it to restore 50/50.
+  blue `↕ DRAG` line to resize the actual Deck A and Deck B waveform panes.
 
 ## Corresponding source and licensing
 

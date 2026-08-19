@@ -12,7 +12,7 @@ test -n "$apksigner"
 
 echo "== Package metadata =="
 "$aapt" dump badging "$apk" | head -8
-"$aapt" dump badging "$apk" | grep "versionCode='7' versionName='0.7.0-live-layout'" >/dev/null
+"$aapt" dump badging "$apk" | grep "versionCode='8' versionName='0.8.0-native-waveform-split'" >/dev/null
 echo "== Signature =="
 "$apksigner" verify --verbose --print-certs "$apk"
 echo "== Selected ARM64 native libraries =="
@@ -28,7 +28,9 @@ unzip -p "$apk" assets/qml/main.qml | grep 'text: "B"' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'id: toolbarFlick' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'id: waveformDivider' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'text: "↕ DRAG"' >/dev/null
-unzip -p "$apk" assets/qml/main.qml | grep 'property real waveformSplitRatio: 0.5' >/dev/null
+unzip -p "$apk" assets/qml/main.qml | grep 'id: upperWaveformPane' >/dev/null
+unzip -p "$apk" assets/qml/main.qml | grep 'id: lowerWaveformPane' >/dev/null
+unzip -p "$apk" assets/qml/main.qml | grep 'SplitView.minimumHeight: Math.max(48, waveformStack.height \* 0.2)' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'active: root.maximizeLibrary || (!root.compactScreen' >/dev/null
 unzip -p "$apk" assets/qml/Library/TrackList.qml | grep 'text: "Load 1"' >/dev/null
 unzip -p "$apk" assets/qml/Library/TrackList.qml | grep 'text: "Load 2"' >/dev/null

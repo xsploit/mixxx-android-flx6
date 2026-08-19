@@ -1,15 +1,15 @@
-# Experimental Mixxx Android ARM64 live layout v0.7
+# Experimental Mixxx Android ARM64 native waveform split v0.8
 
 This is an unofficial development build for testing Mixxx with a DDJ-FLX6 on
 an Android phone or tablet. It is locally signed and may be unstable.
 
 ## Install
 
-Download `mixxx-android-flx6-v0.7.apk` on an ARM64 device running Android 9 or
+Download `mixxx-android-flx6-v0.8.apk` on an ARM64 device running Android 9 or
 newer, allow installation from the selected file source, and open the APK.
 
 SHA-256:
-`205d73d021efde6907c9e6980ba5cbc0df2c0646c9031f1e290c1453dcd58d2a`
+`c487829a2ec3d2e1e835716b59b37c942310aeb9755be50e5e7a39b3ab564a43`
 
 v0.2 changed an unused LateNight skin, so Android's `--new-ui` screen looked
 unchanged. v0.3 corrects that mistake by patching the APK's real
@@ -35,8 +35,11 @@ unchanged. v0.3 corrects that mistake by patching the APK's real
 
 - The waveform region is anchored between the bottom of the toolbar and the
   bottom of the app, so toolbar height is deducted before sizing either deck.
-- Drag the visible `↕ DRAG` divider to give Deck A or Deck B between 20% and 80%
-  of the waveform space. Double-tap the divider to return to an even split.
+- The blue `↕ DRAG` line is now the real nested `SplitView` handle. Dragging it
+  directly resizes both native waveform panes instead of moving only QML overlays.
+- The nested split begins below both the top toolbar and compact deck headers,
+  so those offsets are removed before the A/B heights are calculated.
+- Each waveform pane keeps at least 20% of the available waveform space.
 - The top toolbar scrolls horizontally instead of cutting off its last controls
   on a narrow phone screen.
 
