@@ -1,19 +1,19 @@
-# Experimental Mixxx Android ARM64 edit-locked draw scale v0.18
+# Experimental Mixxx Android ARM64 independent waveform centers v0.19
 
 This is an unofficial development build for testing Mixxx with a DDJ-FLX6 on
 an Android phone or tablet. It is locally signed and may be unstable.
 
 ## Install
 
-Download `mixxx-android-flx6-v0.18-edit-locked-draw-scale.apk` on an ARM64 device running Android 9 or
+Download `mixxx-android-flx6-v0.19-independent-waveform-centers.apk` on an ARM64 device running Android 9 or
 newer, allow installation from the selected file source, and open the APK.
 
 This build uses package `org.mixxx.flx6standalone` and appears as
-`Mixxx FLX6 v0.18`. It upgrades v0.9-v0.17 and still installs beside the older
+`Mixxx FLX6 v0.19`. It upgrades v0.9-v0.18 and still installs beside the older
 `org.mixxx` previews.
 
 SHA-256:
-`5bb2f03d846ee4724812858a975d634a49fce33b4662c75470d16042743ca4cc`
+`9487bf0a396ca53e4c875db97db9e95ad80a5c0354d3d4f1ece9475802862207`
 
 v0.2 changed an unused LateNight skin, so Android's `--new-ui` screen looked
 unchanged. v0.3 corrects that mistake by patching the APK's real
@@ -85,6 +85,12 @@ unchanged. v0.3 corrects that mistake by patching the APK's real
 - The blue center grip retains the previous 72-pixel/18% whole-stack position
   adjustment, but it is movable only while `EDIT` is enabled. Pinch scaling is
   also edit-only, preventing accidental layout changes while mixing.
+- The `A` and `B` badges now mark the actual centers of their respective native
+  drawing surfaces instead of the fixed lane centers. In `EDIT`, drag `A` or
+  `B` vertically to position that renderer independently through the space made
+  available by draw scaling. Dragging is clamped at both lane edges, preserves
+  the initial finger offset without jumping, and cannot alter the blue divider,
+  the other deck, lane dimensions, zoom, or waveform gain.
 
 ## Android music folders
 

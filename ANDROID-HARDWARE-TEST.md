@@ -10,9 +10,9 @@ Mixxx. It is not an official Mixxx Android release.
 - Source commit: `86126792a3a11b493a74ea133dc1260890d9c200`
 - Minimum Android version: Android 9 / API 28
 - CPU architecture: ARM64
-- APK version: `0.18.0-edit-locked-draw-scale` (version code 18)
-- APK label: `Mixxx FLX6 v0.18`
-- APK SHA-256: `5bb2f03d846ee4724812858a975d634a49fce33b4662c75470d16042743ca4cc`
+- APK version: `0.19.0-independent-waveform-centers` (version code 19)
+- APK label: `Mixxx FLX6 v0.19`
+- APK SHA-256: `9487bf0a396ca53e4c875db97db9e95ad80a5c0354d3d4f1ece9475802862207`
 
 The APK's v3 signature verifies. It contains the ARM64 Mixxx and Qt native
 libraries. No Android device was attached to this machine, so installation,
@@ -25,7 +25,7 @@ keep Deck B above any system navigation bar, and the obsolete 320-logical-pixel
 minimum window height has been removed. The main waveform viewport begins below
 the track header and splits all remaining height equally around its blue divider.
 The adjustable stack remains clipped inside that lower layer. Use Android's App Info screen to confirm
-version `0.18.0-edit-locked-draw-scale` and package
+version `0.19.0-independent-waveform-centers` and package
 `org.mixxx.flx6standalone`.
 
 ## Correct hookup
@@ -97,6 +97,11 @@ Android may warn that this is an unknown or locally signed app. That is expected
    native drawing surfaces should become shorter or taller inside the unchanged
    lane containers. Audio/visual gain, lane geometry, horizontal scroll, zoom,
    and playheads must remain fixed.
+8. Leave `EDIT` enabled after shrinking the drawing surfaces. Drag the `A` badge
+   down toward the blue divider and confirm only A's renderer and badge move.
+   Drag the `B` badge up toward the divider and confirm only B's renderer and
+   badge move. Both must stop before their drawing surfaces leave their fixed
+   lanes. Disable `EDIT` and confirm both badges are locked again.
 
 Start at 48 kHz with a moderate buffer. Turn off Bluetooth audio and remove
 Android battery optimization for Mixxx while testing.

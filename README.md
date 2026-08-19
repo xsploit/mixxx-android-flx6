@@ -59,6 +59,9 @@
   containers fixed, adds edit-only vertical scaling of the centered native
   waveform drawing surfaces, locks stack movement outside edit mode, and makes
   the toolbar arrow visually smaller without shrinking its touch target.
+- `patches/mixxx-android-v0.19-independent-waveform-centers.patch` makes the A
+  and B badges track their actual renderer centers. In edit mode, each badge
+  independently drags its renderer through the unused space inside its fixed lane.
 - `controller-mapping/` contains the bundled experimental DDJ-FLX6 mapping and
   its upstream license.
 
@@ -97,6 +100,11 @@ device.
   stack through its previous 72-pixel/18% adjustment range. Outside `EDIT`, the
   grip and pinch scaling are locked. The opaque header remains fixed above the
   clipped waveform viewport.
+- After shrinking the drawing surfaces, drag the `A` or `B` badge vertically in
+  `EDIT` to position that renderer independently. The badge stays attached to
+  the renderer center, and movement is clamped so the complete drawing surface
+  remains inside its unchanged lane. This can close the A-bottom or B-top gap
+  without resizing the lane or moving the blue divider.
 - The toolbar arrow is 28 x 12 visible pixels with a centered 44 x 28 invisible
   touch target, keeping it clear of the cue controls without making it hard to tap.
 - A 5-pixel opaque guard separates the measured cue/overview header from the
