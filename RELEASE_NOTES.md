@@ -1,19 +1,19 @@
-# Experimental Mixxx Android ARM64 visible-window fix v0.11
+# Experimental Mixxx Android ARM64 fixed waveform stack v0.12
 
 This is an unofficial development build for testing Mixxx with a DDJ-FLX6 on
 an Android phone or tablet. It is locally signed and may be unstable.
 
 ## Install
 
-Download `mixxx-android-flx6-v0.11-visible-height.apk` on an ARM64 device running Android 9 or
+Download `mixxx-android-flx6-v0.12-fixed-stack.apk` on an ARM64 device running Android 9 or
 newer, allow installation from the selected file source, and open the APK.
 
 This build uses package `org.mixxx.flx6standalone` and appears as
-`Mixxx FLX6 v0.11`. It upgrades v0.9/v0.10 and still installs beside the older
+`Mixxx FLX6 v0.12`. It upgrades v0.9-v0.11 and still installs beside the older
 `org.mixxx` previews.
 
 SHA-256:
-`43e616db52fc3933f9dd48e1079449e21bb9b3909dc041fb8a78ea5e9dc4160b`
+`675226f7f6a6db4c655e01760f0d687c5ad2ca7172037a5e0123de2a2583fc75`
 
 v0.2 changed an unused LateNight skin, so Android's `--new-ui` screen looked
 unchanged. v0.3 corrects that mistake by patching the APK's real
@@ -23,11 +23,10 @@ unchanged. v0.3 corrects that mistake by patching the APK's real
 
 - Fits landscape screens down to 640x320 logical pixels.
 - Defaults to compact deck information above two large vertically stacked waveforms.
-- Uses an explicit zero-spacing waveform column so Deck A and Deck B each
-  receive exactly half of the available waveform area.
+- Uses an explicit zero-spacing waveform stack with equal fixed-height A and B renderers.
 - Adds large permanent `A` and `B` badges plus a visible divider between lanes.
-- The normal performance view contains no library panel, so the waveforms use
-  all remaining space below the toolbar and deck headers.
+- The normal performance view contains no library panel; a clipped viewport
+  below the deck headers shows the fixed waveform stack.
 - Restores every top toolbar control, including `4 DECKS` and `SETTINGS`.
 - `LIBRARY` opens the full browser; `LOAD 1`, `LOAD 2`, and `LOAD NEXT` remain visible.
 - Pressing the FLX6 browse encoder toggles the full-screen library; rotating it
@@ -41,8 +40,7 @@ unchanged. v0.3 corrects that mistake by patching the APK's real
   arrow tab.
 - Opening the toolbar places it over the waveform view. It does not consume
   layout height or push the bottom waveform offscreen.
-- Deck A and Deck B keep equal height and fill the full available screen behind
-  the overlay; the blue middle divider remains fixed between them.
+- Deck A and Deck B keep equal height behind the overlay.
 - The expanded toolbar scrolls horizontally so every control, including
   `4 DECKS`, `LIBRARY`, and `SETTINGS`, remains reachable.
 
@@ -51,9 +49,8 @@ unchanged. v0.3 corrects that mistake by patching the APK's real
 - Android's top, bottom, left, and right safe-area insets are removed before
   calculating the usable performance view, so a system navigation bar cannot
   cover the bottom of Deck B.
-- Deck A and Deck B default to exactly 50% each inside the visible safe area.
-- The blue divider is draggable from 20/80 through 80/20 using a 36-pixel touch
-  target. It changes each deck's viewport allocation; waveform zoom is untouched.
+- The performance viewport is calculated inside the visible safe area before
+  positioning the fixed waveform stack.
 
 ## Visible phone height
 
@@ -62,8 +59,17 @@ unchanged. v0.3 corrects that mistake by patching the APK's real
   at 2x scaling and placed the bottom roughly 49 physical pixels offscreen.
 - The QML window now accepts Android's real landscape height before subtracting
   the deck header and calculating the A/B split.
-- Moving the middle divider grows one viewport and shrinks the other; neither
-  viewport extends below the actual window.
+- The fixed waveform stack can translate within that real window without being rescaled.
+
+## Fixed waveform stack
+
+- Replaces the resizable A/B viewport split. Both native waveform renderers now
+  remain exactly half of the original 258-logical-pixel compact waveform stack.
+- The stack is bottom-aligned by default, clipping unused space above A so the
+  entire B waveform and B label remain visible.
+- Dragging the blue middle handle translates the complete stack between its
+  top- and bottom-aligned limits. A, B, their labels, grid, and scrolling
+  waveform content all move together; renderer height and waveform zoom do not change.
 
 ## Android music folders
 

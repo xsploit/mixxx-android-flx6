@@ -1,0 +1,142 @@
+diff --git a/packaging/android/AndroidManifest.xml b/packaging/android/AndroidManifest.xml
+--- a/packaging/android/AndroidManifest.xml
++++ b/packaging/android/AndroidManifest.xml
+@@ -2,8 +2,8 @@
+ <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+     package="org.mixxx.flx6standalone"
+     android:installLocation="auto"
+-    android:versionCode="11"
+-    android:versionName="0.11.0-visible-window-height">
++    android:versionCode="12"
++    android:versionName="0.12.0-fixed-waveform-stack">
+     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"  />
+     <uses-permission android:name="android.permission.INTERNET"  />
+     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
+@@ -22,7 +22,7 @@
+         android:name="org.qtproject.qt.android.bindings.QtApplication"
+         android:hardwareAccelerated="true"
+         android:icon="@mipmap/ic_launcher"
+-        android:label="Mixxx FLX6 v0.11"
++        android:label="Mixxx FLX6 v0.12"
+         android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+         android:requestLegacyExternalStorage="true"
+         android:allowBackup="true"
+diff --git a/res/qml/main.qml b/res/qml/main.qml
+--- a/res/qml/main.qml
++++ b/res/qml/main.qml
+@@ -23,7 +23,8 @@
+     property alias showEffects: showEffectsButton.checked
+     property alias showSamplers: showSamplersButton.checked
+     property bool toolbarExpanded: false
+-    property real waveformSplitRatio: 0.5
++    property real waveformStackAlignment: 1.0
++    readonly property real waveformDesignHeight: compactScreen ? 258 : height
+ 
+     color: Theme.backgroundColor
+     height: 450
+@@ -342,11 +343,18 @@
+                     clip: true
+ 
+                     Item {
+-                        id: upperWaveformPane
++                        id: waveformContent
+ 
+-                        height: Math.round(parent.height * root.waveformSplitRatio)
++                        height: Math.max(parent.height, root.waveformDesignHeight)
+                         width: parent.width
+-                        y: 0
++                        y: (parent.height - height) * root.waveformStackAlignment
++
++                        Item {
++                            id: upperWaveformPane
++
++                            height: parent.height / 2
++                            width: parent.width
++                            y: 0
+ 
+                         Loader {
+                             id: deck3waveform
+@@ -378,13 +386,13 @@
+                             anchors.top: deck3waveform.bottom
+                             group: "[Channel1]"
+                         }
+-                    }
+-                    Item {
+-                        id: lowerWaveformPane
++                        }
++                        Item {
++                            id: lowerWaveformPane
+ 
+-                        height: parent.height - upperWaveformPane.height
+-                        width: parent.width
+-                        y: upperWaveformPane.height
++                            height: parent.height - upperWaveformPane.height
++                            width: parent.width
++                            y: upperWaveformPane.height
+ 
+                         Skin.WaveformDisplay {
+                             id: deck2waveform
+@@ -416,6 +424,7 @@
+                                 }
+                             }
+                         }
++                        }
+                     }
+                 }
+                 Rectangle {
+@@ -424,7 +433,7 @@
+                     color: "#42A5F5"
+                     height: 2
+                     width: parent.width
+-                    y: waveformStack.y + upperWaveformPane.height - height / 2
++                    y: waveformStack.y + waveformContent.y + upperWaveformPane.height - height / 2
+                     z: 8
+ 
+                     MouseArea {
+@@ -434,17 +443,23 @@
+                         preventStealing: true
+                         width: parent.width
+ 
+-                        function updateViewportSplit(pointer) {
++                        function updateStackPosition(pointer) {
+                             const mapped = mapToItem(waveformStack, pointer.x, pointer.y);
+-                            root.waveformSplitRatio = Math.max(0.2, Math.min(0.8,
+-                                    mapped.y / waveformStack.height));
++                            const minimumY = waveformStack.height - waveformContent.height;
++                            if (minimumY < 0) {
++                                const desiredY = mapped.y - waveformContent.height / 2;
++                                root.waveformStackAlignment = Math.max(0, Math.min(1,
++                                        desiredY / minimumY));
++                            } else {
++                                root.waveformStackAlignment = 0;
++                            }
+                         }
+ 
+                         onPositionChanged: pointer => {
+                             if (pressed)
+-                                updateViewportSplit(pointer);
++                                updateStackPosition(pointer);
+                         }
+-                        onPressed: pointer => updateViewportSplit(pointer)
++                        onPressed: pointer => updateStackPosition(pointer)
+                     }
+                     Rectangle {
+                         anchors.centerIn: parent
+@@ -473,7 +488,7 @@
+                     height: 44
+                     radius: 4
+                     width: 38
+-                    y: waveformStack.y + upperWaveformPane.y + deck1waveform.y + deck1waveform.height / 2 - height / 2
++                    y: waveformStack.y + waveformContent.y + upperWaveformPane.y + deck1waveform.y + deck1waveform.height / 2 - height / 2
+                     z: 5
+ 
+                     Text {
+@@ -493,7 +508,7 @@
+                     height: 44
+                     radius: 4
+                     width: 38
+-                    y: waveformStack.y + lowerWaveformPane.y + deck2waveform.y + deck2waveform.height / 2 - height / 2
++                    y: waveformStack.y + waveformContent.y + lowerWaveformPane.y + deck2waveform.y + deck2waveform.height / 2 - height / 2
+                     z: 5
+ 
+                     Text {

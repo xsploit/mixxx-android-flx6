@@ -10,9 +10,9 @@ Mixxx. It is not an official Mixxx Android release.
 - Source commit: `86126792a3a11b493a74ea133dc1260890d9c200`
 - Minimum Android version: Android 9 / API 28
 - CPU architecture: ARM64
-- APK version: `0.11.0-visible-window-height` (version code 11)
-- APK label: `Mixxx FLX6 v0.11`
-- APK SHA-256: `43e616db52fc3933f9dd48e1079449e21bb9b3909dc041fb8a78ea5e9dc4160b`
+- APK version: `0.12.0-fixed-waveform-stack` (version code 12)
+- APK label: `Mixxx FLX6 v0.12`
+- APK SHA-256: `675226f7f6a6db4c655e01760f0d687c5ad2ca7172037a5e0123de2a2583fc75`
 
 The APK's v3 signature verifies. It contains the ARM64 Mixxx and Qt native
 libraries. No Android device was attached to this machine, so installation,
@@ -23,7 +23,7 @@ panel. The complete toolbar is hidden behind a tiny top-center arrow and opens
 as an overlay without resizing the waveform view. Android safe-area margins
 keep Deck B above any system navigation bar, and the obsolete 320-logical-pixel
 minimum window height has been removed. Use Android's App Info screen to
-confirm version `0.11.0-visible-window-height` and package
+confirm version `0.12.0-fixed-waveform-stack` and package
 `org.mixxx.flx6standalone`.
 
 ## Correct hookup
@@ -85,9 +85,9 @@ Android may warn that this is an unknown or locally signed app. That is expected
 6. Return to the waveform performance view. Press the FLX6 browse encoder and
    confirm that the full-screen library opens; rotate it to move through tracks,
    then press it again or tap **BACK TO MIX** to return to the waveforms.
-7. Confirm the initial screen shows an equal visible 50/50 split with Deck B's
-   label and bottom edge fully onscreen. Drag the blue grip and
-   confirm it changes the A/B viewport allocation from 20/80 through 80/20.
+7. Confirm Deck B's label and bottom edge are fully onscreen. Drag the blue
+   grip and confirm the entire A+B waveform stack, labels, grid, and scrolling
+   content move vertically together while the two waveform heights stay equal.
    Tap the tiny top-center arrow and confirm the toolbar overlays the view
    without changing that split, then collapse it again.
 

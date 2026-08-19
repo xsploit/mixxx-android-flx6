@@ -35,6 +35,9 @@
 - `patches/mixxx-android-v0.11-visible-window-height.patch` removes desktop
   minimum-window dimensions that made the QML scene taller than some phone
   screens and physically clipped the bottom of Deck B.
+- `patches/mixxx-android-v0.12-fixed-waveform-stack.patch` preserves the
+  original equal A/B renderer heights and changes the blue handle to translate
+  the complete waveform-and-label stack vertically inside a clipped viewport.
 - `controller-mapping/` contains the bundled experimental DDJ-FLX6 mapping and
   its upstream license.
 
@@ -60,8 +63,9 @@ device.
   continues to move through the track list.
 - The toolbar floats over the waveform screen instead of pushing either deck
   downward. Swipe it sideways when expanded to reach controls on narrow screens.
-- Deck A and Deck B start at a true visible 50/50 split after Android's system
-  insets are removed. Drag the blue middle grip to adjust their viewport share.
+- Deck A and Deck B keep equal fixed renderer height. On a short phone screen,
+  unused space above A is clipped so all of B is visible. Drag the blue middle
+  grip to move the complete A+B stack vertically without resizing either waveform.
 
 ## Corresponding source and licensing
 
