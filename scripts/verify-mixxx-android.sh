@@ -12,8 +12,8 @@ test -n "$apksigner"
 
 echo "== Package metadata =="
 "$aapt" dump badging "$apk" | head -8
-"$aapt" dump badging "$apk" | grep "package: name='org.mixxx.flx6standalone' versionCode='15' versionName='0.15.0-layered-adjustable-waveforms'" >/dev/null
-"$aapt" dump badging "$apk" | grep "application-label:'Mixxx FLX6 v0.15'" >/dev/null
+"$aapt" dump badging "$apk" | grep "package: name='org.mixxx.flx6standalone' versionCode='16' versionName='0.16.0-five-pixel-header-guard'" >/dev/null
+"$aapt" dump badging "$apk" | grep "application-label:'Mixxx FLX6 v0.16'" >/dev/null
 "$aapt" dump badging "$apk" | grep "launchable-activity: name='org.mixxx.MainActivity'" >/dev/null
 echo "== Signature =="
 "$apksigner" verify --verbose --print-certs "$apk"
@@ -37,6 +37,8 @@ unzip -p "$apk" assets/qml/main.qml | grep 'id: waveformContent' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'property real waveformStackPosition: 1.0' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'property real waveformVisualGain: compactScreen ? 1.7 : 1.0' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'readonly property int performanceHeaderHeight: compactScreen ? 62 : 0' >/dev/null
+unzip -p "$apk" assets/qml/main.qml | grep 'readonly property int waveformTopGuard: compactScreen ? 5 : 0' >/dev/null
+unzip -p "$apk" assets/qml/main.qml | grep 'readonly property int waveformViewportTop: performanceHeaderHeight + waveformTopGuard' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'readonly property int waveformDividerThickness: 2' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'readonly property int waveformLanePadding: compactScreen ? 1 : 0' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'text: "Wave -"' >/dev/null
@@ -45,8 +47,9 @@ unzip -p "$apk" assets/qml/main.qml | grep 'anchors.fill: parent' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'Math.floor((parent.height - root.waveformDividerThickness) / 2)' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'y: upperWaveformPane.height + root.waveformDividerThickness' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'id: performanceDeckHeaderMask' >/dev/null
-unzip -p "$apk" assets/qml/main.qml | grep 'height: Math.max(0, parent.height - root.performanceHeaderHeight)' >/dev/null
-unzip -p "$apk" assets/qml/main.qml | grep 'y: root.performanceHeaderHeight' >/dev/null
+unzip -p "$apk" assets/qml/main.qml | grep 'height: Math.max(0, parent.height - root.waveformViewportTop)' >/dev/null
+unzip -p "$apk" assets/qml/main.qml | grep 'y: root.waveformViewportTop' >/dev/null
+test "$(unzip -p "$apk" assets/qml/main.qml | grep -c 'topMargin: root.waveformTopGuard')" -eq 2
 unzip -p "$apk" assets/qml/main.qml | grep 'verticalTravel: Math.min(72, height \* 0.18)' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'function updateStackPosition(pointer)' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep -- '-desiredY / waveformStack.verticalTravel' >/dev/null

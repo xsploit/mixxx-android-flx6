@@ -1,19 +1,19 @@
-# Experimental Mixxx Android ARM64 layered adjustable waveforms v0.15
+# Experimental Mixxx Android ARM64 five-pixel header guard v0.16
 
 This is an unofficial development build for testing Mixxx with a DDJ-FLX6 on
 an Android phone or tablet. It is locally signed and may be unstable.
 
 ## Install
 
-Download `mixxx-android-flx6-v0.15-layered-adjustable-waveforms.apk` on an ARM64 device running Android 9 or
+Download `mixxx-android-flx6-v0.16-five-pixel-header-guard.apk` on an ARM64 device running Android 9 or
 newer, allow installation from the selected file source, and open the APK.
 
 This build uses package `org.mixxx.flx6standalone` and appears as
-`Mixxx FLX6 v0.15`. It upgrades v0.9-v0.14 and still installs beside the older
+`Mixxx FLX6 v0.16`. It upgrades v0.9-v0.15 and still installs beside the older
 `org.mixxx` previews.
 
 SHA-256:
-`69f09efa3d517cc48ce6fea117008ac4592a6cbafc385c5bb727896844802783`
+`fac9efe4bed3b9ec329cc71a48526147dfbcb56f0a8ace985f12ec605205ccc8`
 
 v0.2 changed an unused LateNight skin, so Android's `--new-ui` screen looked
 unchanged. v0.3 corrects that mistake by patching the APK's real
@@ -68,8 +68,10 @@ unchanged. v0.3 corrects that mistake by patching the APK's real
   at `y = 0`. It has an opaque background at z-level 20 and its controls render
   at z-level 21.
 - The black main waveform viewport is a separate lower layer at z-level 0. Its
-  explicit bounds are `y = 62` and `height = visible height - 62`, with clipping
+  explicit bounds are `y = 67` and `height = visible height - 67`, with clipping
   enabled, so it cannot paint over the labels or mini overview waveforms.
+- Pixels 62 through 66 form an opaque 5-pixel guard beneath the header. The left
+  and right waveform overlays begin at the same pixel-67 boundary.
 - The 2-pixel blue divider is subtracted first. Every remaining visible pixel is
   assigned to Deck A or Deck B, with A receiving `floor(remaining / 2)` and B
   receiving the remainder. No waveform viewport extends into the header bounds.

@@ -1,0 +1,82 @@
+diff --git a/packaging/android/AndroidManifest.xml b/packaging/android/AndroidManifest.xml
+--- a/packaging/android/AndroidManifest.xml
++++ b/packaging/android/AndroidManifest.xml
+@@ -2,8 +2,8 @@
+ <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+     package="org.mixxx.flx6standalone"
+     android:installLocation="auto"
+-    android:versionCode="15"
+-    android:versionName="0.15.0-layered-adjustable-waveforms">
++    android:versionCode="16"
++    android:versionName="0.16.0-five-pixel-header-guard">
+     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"  />
+     <uses-permission android:name="android.permission.INTERNET"  />
+     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
+@@ -22,7 +22,7 @@
+         android:name="org.qtproject.qt.android.bindings.QtApplication"
+         android:hardwareAccelerated="true"
+         android:icon="@mipmap/ic_launcher"
+-        android:label="Mixxx FLX6 v0.15"
++        android:label="Mixxx FLX6 v0.16"
+         android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+         android:requestLegacyExternalStorage="true"
+         android:allowBackup="true"
+diff --git a/res/qml/main.qml b/res/qml/main.qml
+--- a/res/qml/main.qml
++++ b/res/qml/main.qml
+@@ -26,6 +26,8 @@
+     property real waveformStackPosition: 1.0
+     property real waveformVisualGain: compactScreen ? 1.7 : 1.0
+     readonly property int performanceHeaderHeight: compactScreen ? 62 : 0
++    readonly property int waveformTopGuard: compactScreen ? 5 : 0
++    readonly property int waveformViewportTop: performanceHeaderHeight + waveformTopGuard
+     readonly property int waveformDividerThickness: 2
+     readonly property int waveformLanePadding: compactScreen ? 1 : 0
+ 
+@@ -295,7 +297,7 @@
+             Item {
+                 id: waveforms
+ 
+-                readonly property real waveformContentHeight: Math.max(0, height - performanceDeckHeaders.height)
++                readonly property real waveformContentHeight: Math.max(0, height - root.waveformViewportTop)
+ 
+                 SplitView.fillHeight: !root.maximizeLibrary
+                 SplitView.preferredHeight: root.maximizeLibrary ? 0 : undefined
+@@ -309,7 +311,7 @@
+                     id: performanceDeckHeaderMask
+ 
+                     color: Theme.backgroundColor
+-                    height: root.performanceHeaderHeight
++                    height: root.waveformViewportTop
+                     visible: root.compactScreen
+                     width: parent.width
+                     y: 0
+@@ -368,10 +370,10 @@
+                     readonly property real verticalTravel: Math.min(72, height * 0.18)
+ 
+                     clip: true
+-                    height: Math.max(0, parent.height - root.performanceHeaderHeight)
++                    height: Math.max(0, parent.height - root.waveformViewportTop)
+                     width: parent.width
+                     x: 0
+-                    y: root.performanceHeaderHeight
++                    y: root.waveformViewportTop
+                     z: 0
+ 
+                     Item {
+@@ -579,6 +581,7 @@
+                         bottom: parent.bottom
+                         left: parent.left
+                         top: performanceDeckHeaders.bottom
++                        topMargin: root.waveformTopGuard
+                     }
+                 }
+                 Rectangle {
+@@ -601,6 +604,7 @@
+                         bottom: parent.bottom
+                         right: parent.right
+                         top: performanceDeckHeaders.bottom
++                        topMargin: root.waveformTopGuard
+                     }
+                 }
+             }
