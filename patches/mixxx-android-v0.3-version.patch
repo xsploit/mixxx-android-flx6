@@ -1,0 +1,15 @@
+diff --git a/packaging/android/AndroidManifest.xml b/packaging/android/AndroidManifest.xml
+index b73d951..9e6dd38 100644
+--- a/packaging/android/AndroidManifest.xml
++++ b/packaging/android/AndroidManifest.xml
+@@ -2,8 +2,8 @@
+ <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+     package="org.mixxx"
+     android:installLocation="auto"
+-    android:versionCode="2"
+-    android:versionName="0.2.0-phone-preview">
++    android:versionCode="3"
++    android:versionName="0.3.0-active-phone-ui">
+     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"  />
+     <uses-permission android:name="android.permission.INTERNET"  />
+     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>

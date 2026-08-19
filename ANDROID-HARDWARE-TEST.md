@@ -10,13 +10,15 @@ Mixxx. It is not an official Mixxx Android release.
 - Source commit: `86126792a3a11b493a74ea133dc1260890d9c200`
 - Minimum Android version: Android 9 / API 28
 - CPU architecture: ARM64
-- APK version: `0.2.0-phone-preview` (version code 2)
-- APK SHA-256: `cbd003cac2484d393729a7a0764100205893822c6f4e37dc828a28964dbe5219`
+- APK version: `0.3.0-active-phone-ui` (version code 3)
+- APK SHA-256: `dee07671d57f2b9449cdf41402f40d3a0f304172b59668b5ec89238d66cb8e27`
 
 The APK's v3 signature verifies. It contains the ARM64 Mixxx and Qt native
 libraries. No Android device was attached to this machine, so installation,
 launch, touch layout, controller I/O, and live audio still need a physical test.
-The APK contains the phone QML skin and experimental FLX6 mapping.
+The APK contains the active phone QML interface and experimental FLX6 mapping.
+At compact sizes the top bar visibly says `FLX6 PHONE UI`; use that marker to
+confirm this is v0.3 rather than the visually unchanged v0.2 build.
 
 ## Correct hookup
 

@@ -4,8 +4,10 @@
 
 - Repository: https://github.com/mixxxdj/mixxx
 - Commit: `86126792a3a11b493a74ea133dc1260890d9c200`
-- Local changes: `patches/mixxx-android-wsl.patch` and
-  `patches/mixxx-android-phone-ui.patch`
+- Local changes: `patches/mixxx-android-wsl.patch`,
+  `patches/mixxx-android-phone-ui.patch`,
+  `patches/mixxx-android-v0.3-version.patch`, and
+  `patches/mixxx-android-active-phone-ui.patch`
 - License: GNU GPL v2 or later; see the upstream `LICENSE` file.
 
 ## Standalone/touchscreen layout references

@@ -1,0 +1,392 @@
+diff --git a/res/qml/Library.qml b/res/qml/Library.qml
+index 03adf99..ef9c3d6 100644
+--- a/res/qml/Library.qml
++++ b/res/qml/Library.qml
+@@ -13,6 +13,7 @@ import "Library" as LibraryComponent
+ Item {
+     id: root
+ 
++    readonly property bool compactMode: width < 1000 || height < 500
+     property var sidebar: librarySources.sidebar()
+ 
+     LibraryComponent.SourceTree {
+@@ -61,9 +62,9 @@ Item {
+         SplitView {
+             id: sideBarSplitView
+ 
+-            SplitView.maximumWidth: 550
+-            SplitView.minimumWidth: 150
+-            SplitView.preferredWidth: root.width * 0.15
++            SplitView.maximumWidth: root.compactMode ? 220 : 550
++            SplitView.minimumWidth: root.compactMode ? 120 : 150
++            SplitView.preferredWidth: root.compactMode ? 170 : root.width * 0.15
+             orientation: Qt.Vertical
+ 
+             handle: Rectangle {
+@@ -106,9 +107,10 @@ Item {
+                 model: root.sidebar
+             }
+             Skin.PreviewDeck {
+-                SplitView.maximumHeight: 200
+-                SplitView.minimumHeight: 100
+-                SplitView.preferredHeight: 100
++                SplitView.maximumHeight: root.compactMode ? 0 : 200
++                SplitView.minimumHeight: root.compactMode ? 0 : 100
++                SplitView.preferredHeight: root.compactMode ? 0 : 100
++                visible: !root.compactMode
+             }
+         }
+         LibraryComponent.TrackList {
+diff --git a/res/qml/Library/TrackList.qml b/res/qml/Library/TrackList.qml
+index ccc11b9..6b75d26 100644
+--- a/res/qml/Library/TrackList.qml
++++ b/res/qml/Library/TrackList.qml
+@@ -12,6 +12,7 @@ import "../Theme"
+ Rectangle {
+     id: root
+ 
++    readonly property bool compactMode: width < 900 || height < 400
+     required property var model
+ 
+     color: Theme.darkGray
+@@ -157,6 +158,42 @@ Rectangle {
+             }
+         }
+     }
++    RowLayout {
++        id: phoneLoadControls
++
++        anchors.bottom: parent.bottom
++        anchors.left: parent.left
++        anchors.margins: 5
++        anchors.right: parent.right
++        height: 42
++        spacing: 6
++        visible: root.compactMode
++
++        Skin.Button {
++            Layout.fillWidth: true
++            Layout.fillHeight: true
++            activeColor: Theme.white
++            text: "Load 1"
++
++            onClicked: view.loadSelectedTrack("[Channel1]", false)
++        }
++        Skin.Button {
++            Layout.fillWidth: true
++            Layout.fillHeight: true
++            activeColor: Theme.white
++            text: "Load 2"
++
++            onClicked: view.loadSelectedTrack("[Channel2]", false)
++        }
++        Skin.Button {
++            Layout.fillWidth: true
++            Layout.fillHeight: true
++            activeColor: Theme.white
++            text: "Load Next"
++
++            onClicked: view.loadSelectedTrackIntoNextAvailableDeck(false)
++        }
++    }
+     TableView {
+         id: view
+ 
+@@ -197,7 +234,7 @@ Rectangle {
+             return oldDynamicColumnCount != dynamicColumnCount || oldUsedWidth != usedWidth;
+         }
+ 
+-        anchors.bottom: parent.bottom
++        anchors.bottom: phoneLoadControls.visible ? phoneLoadControls.top : parent.bottom
+         anchors.left: parent.left
+         anchors.margins: 5
+         anchors.right: parent.right
+@@ -236,7 +273,7 @@ Rectangle {
+             required property bool selected
+             required property var track
+ 
+-            implicitHeight: 30
++            implicitHeight: root.compactMode ? 42 : 30
+ 
+             Loader {
+                 id: loader
+diff --git a/res/qml/Settings.qml b/res/qml/Settings.qml
+index 50188b1..01828ce 100644
+--- a/res/qml/Settings.qml
++++ b/res/qml/Settings.qml
+@@ -15,6 +15,7 @@ Popup {
+     property alias activeCategoryIndex: categoryList.currentIndex
+     readonly property var manager: managerItem
+     property alias sections: managerItem.data
++    readonly property bool compactMode: width < 900 || height < 600
+ 
+     function updateActiveCategory() {
+         root.activeCategory?.deactivated();
+@@ -22,8 +23,8 @@ Popup {
+         root.activeCategory?.activated();
+     }
+ 
+-    horizontalPadding: 20
+-    verticalPadding: 20
++    horizontalPadding: compactMode ? 8 : 20
++    verticalPadding: compactMode ? 8 : 20
+ 
+     background: Rectangle {
+         anchors.fill: parent
+@@ -33,8 +34,8 @@ Popup {
+     }
+     contentItem: Item {
+         anchors.centerIn: parent
+-        height: parent.height - 40
+-        width: parent.width - 40
++        height: parent.height - (root.compactMode ? 16 : 40)
++        width: parent.width - (root.compactMode ? 16 : 40)
+ 
+         RowLayout {
+             anchors.fill: parent
+@@ -42,7 +43,7 @@ Popup {
+ 
+             Rectangle {
+                 Layout.fillHeight: true
+-                Layout.preferredWidth: 280
++                Layout.preferredWidth: root.compactMode ? 180 : 280
+                 border.color: Theme.darkGray3
+                 border.width: 6
+                 color: Theme.darkGray
+@@ -198,13 +199,26 @@ Popup {
+                 Layout.fillHeight: true
+                 Layout.fillWidth: true
+ 
+-                Text {
+-                    Layout.alignment: Qt.AlignHCenter
++                RowLayout {
++                    Layout.fillWidth: true
+                     Layout.preferredHeight: 36
+-                    color: Theme.white
+-                    font.pixelSize: 16
+-                    font.weight: Font.DemiBold
+-                    text: "Settings"
++
++                    Text {
++                        Layout.fillWidth: true
++                        color: Theme.white
++                        font.pixelSize: 16
++                        font.weight: Font.DemiBold
++                        horizontalAlignment: Text.AlignHCenter
++                        text: "Settings"
++                    }
++                    Skin.Button {
++                        Layout.preferredHeight: 30
++                        Layout.preferredWidth: root.compactMode ? 72 : 90
++                        activeColor: Theme.white
++                        text: "Close"
++
++                        onClicked: root.close()
++                    }
+                 }
+                 Rectangle {
+                     id: tabBar
+diff --git a/res/qml/main.qml b/res/qml/main.qml
+index a84e747..6ecb968 100644
+--- a/res/qml/main.qml
++++ b/res/qml/main.qml
+@@ -11,6 +11,7 @@ import "Theme"
+ ApplicationWindow {
+     id: root
+ 
++    readonly property bool compactScreen: width < 1100 || height < 650
+     property alias editDeck: editDeckButton.checked
+     property var focusedDeck: null
+     property alias maximizeLibrary: maximizeLibraryButton.checked
+@@ -23,12 +24,12 @@ ApplicationWindow {
+     property alias showSamplers: showSamplersButton.checked
+ 
+     color: Theme.backgroundColor
+-    height: 1008
+-    minimumHeight: 300
+-    minimumWidth: 680
++    height: 450
++    minimumHeight: 320
++    minimumWidth: 640
+     visible: true
+     visibility: Mixxx.Config.configStartInFullscreenKey ? Window.FullScreen : Window.Windowed
+-    width: 1792
++    width: 800
+ 
+     Mixxx.ControlProxy {
+         group: "[App]"
+@@ -78,7 +79,7 @@ ApplicationWindow {
+             id: toolbar
+ 
+             color: Theme.toolbarBackgroundColor
+-            height: 36
++            height: root.compactScreen ? 46 : 36
+             radius: 1
+             width: parent.width
+ 
+@@ -91,14 +92,15 @@ ApplicationWindow {
+                     activeColor: Theme.white
+                     checkable: true
+                     text: "4 Decks"
+-                    visible: root.height > 515
++                    visible: !root.compactScreen && root.height > 515
+                 }
+                 Skin.Button {
+                     id: maximizeLibraryButton
+ 
+                     activeColor: Theme.white
+                     checkable: true
+-                    text: "Library"
++                    implicitWidth: root.compactScreen ? 86 : 52
++                    text: checked && root.compactScreen ? "Back to Mix" : "Library"
+ 
+                     onCheckedChanged: () => {
+                         showMaximizedLibrary.value = this.checked;
+@@ -121,6 +123,7 @@ ApplicationWindow {
+                     activeColor: Theme.white
+                     checkable: true
+                     text: "Effects"
++                    visible: !root.compactScreen
+                 }
+                 Skin.Button {
+                     id: showAuxButton
+@@ -128,6 +131,7 @@ ApplicationWindow {
+                     activeColor: Theme.white
+                     checkable: true
+                     text: "Aux"
++                    visible: !root.compactScreen
+                 }
+                 Skin.Button {
+                     id: showSamplersButton
+@@ -135,16 +139,30 @@ ApplicationWindow {
+                     activeColor: Theme.white
+                     checkable: true
+                     text: "Sampler"
++                    visible: !root.compactScreen
+                 }
+                 Item {
+                     Layout.fillWidth: true
+                 }
++                Text {
++                    Layout.alignment: Qt.AlignVCenter
++                    color: Theme.white
++                    font.bold: true
++                    font.pixelSize: 12
++                    text: "FLX6 PHONE UI"
++                    visible: root.compactScreen
++                }
++                Item {
++                    Layout.fillWidth: true
++                    visible: root.compactScreen
++                }
+                 Skin.Button {
+                     id: editDeckButton
+ 
+                     activeColor: Theme.white
+                     checkable: true
+                     text: "Edit"
++                    visible: !root.compactScreen
+                 }
+                 Skin.Button {
+                     id: showDevToolsButton
+@@ -153,6 +171,7 @@ ApplicationWindow {
+                     checkable: true
+                     checked: devToolsWindow.visible
+                     text: "Develop"
++                    visible: !root.compactScreen
+ 
+                     onClicked: {
+                         if (devToolsWindow.visible)
+@@ -173,10 +192,11 @@ ApplicationWindow {
+ 
+                     activeColor: Theme.white
+                     checked: settingsPopup.opened
+-                    icon.height: 16
++                    icon.height: root.compactScreen ? 0 : 16
+                     icon.source: "images/gear.svg"
+-                    icon.width: 16
+-                    implicitWidth: implicitHeight
++                    icon.width: root.compactScreen ? 0 : 16
++                    implicitWidth: root.compactScreen ? 86 : implicitHeight
++                    text: root.compactScreen ? "Settings" : null
+ 
+                     onClicked: {
+                         if (!settingsPopup.opened) {
+@@ -233,7 +253,7 @@ ApplicationWindow {
+                 id: waveforms
+ 
+                 SplitView.fillHeight: !library.active
+-                SplitView.preferredHeight: library.active ? 120 : undefined
++                SplitView.preferredHeight: root.compactScreen ? Math.min(120, splitView.height * 0.38) : library.active ? 120 : undefined
+                 visible: !root.maximizeLibrary
+ 
+                 FadeBehavior on visible {
+@@ -343,16 +363,16 @@ ApplicationWindow {
+             }
+             Item {
+                 SplitView.fillHeight: library.active
+-                SplitView.maximumHeight: library.active ? undefined : mixer.height
+-                SplitView.minimumHeight: mixer.height
++                SplitView.maximumHeight: library.active ? undefined : root.compactScreen ? 0 : mixer.height
++                SplitView.minimumHeight: root.compactScreen ? 0 : mixer.height
+ 
+                 Deck {
+                     id: deck1
+ 
+                     editMode: root.editDeck
+                     group: "[Channel1]"
+-                    height: root.maximizeLibrary ? 80 : root.show4decks ? mixer.height / 2 : mixer.height
+-                    minimized: root.maximizeLibrary
++                    height: root.compactScreen ? 62 : root.maximizeLibrary ? 80 : root.show4decks ? mixer.height / 2 : mixer.height
++                    minimized: root.compactScreen || root.maximizeLibrary
+ 
+                     Behavior on height {
+                         SpringAnimation {
+@@ -391,7 +411,8 @@ ApplicationWindow {
+                     anchors.top: parent.top
+                     groups: [deck1.group, deck2.group, deck3.group, deck4.group]
+                     show4decks: root.show4decks
+-                    visible: !root.maximizeLibrary
++                    visible: !root.compactScreen && !root.maximizeLibrary
++                    width: root.compactScreen ? 0 : implicitWidth
+ 
+                     Behavior on height {
+                         SpringAnimation {
+@@ -474,8 +495,8 @@ ApplicationWindow {
+ 
+                     editMode: root.editDeck
+                     group: "[Channel2]"
+-                    height: root.maximizeLibrary ? 80 : root.show4decks ? mixer.height / 2 : mixer.height
+-                    minimized: root.maximizeLibrary
++                    height: root.compactScreen ? 62 : root.maximizeLibrary ? 80 : root.show4decks ? mixer.height / 2 : mixer.height
++                    minimized: root.compactScreen || root.maximizeLibrary
+ 
+                     Behavior on height {
+                         SpringAnimation {
+@@ -615,7 +636,7 @@ ApplicationWindow {
+                 Loader {
+                     id: library
+ 
+-                    active: root.maximizeLibrary || root.height - mixer.height >= 400
++                    active: root.compactScreen || root.maximizeLibrary || root.height - mixer.height >= 400
+                     width: parent.width
+ 
+                     sourceComponent: Component {
+@@ -633,7 +654,7 @@ ApplicationWindow {
+                             }
+                         },
+                         State {
+-                            when: root.maximizeLibrary && !root.show4decks
++                            when: (root.compactScreen || root.maximizeLibrary) && !root.show4decks
+ 
+                             AnchorChanges {
+                                 anchors.top: deck1.bottom
+@@ -641,7 +662,7 @@ ApplicationWindow {
+                             }
+                         },
+                         State {
+-                            when: !root.maximizeLibrary && root.height - mixer.height < 400
++                            when: !root.compactScreen && !root.maximizeLibrary && root.height - mixer.height < 400
+ 
+                             PropertyChanges {
+                                 target: library

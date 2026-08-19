@@ -17,9 +17,11 @@ echo "== Signature =="
 echo "== Selected ARM64 native libraries =="
 unzip -l "$apk" | grep -E 'lib/arm64-v8a/(libmixxx|libQt6Core|libc\+\+_shared)'
 echo "== Phone UI resources =="
-unzip -l "$apk" | grep -E 'assets/skins/LateNightQML/(main.qml|Toolbar/Toolbar.qml|skin.ini)'
-unzip -p "$apk" assets/skins/LateNightQML/main.qml | grep 'minimumWidth: 640' >/dev/null
-unzip -p "$apk" assets/skins/LateNightQML/Toolbar/Toolbar.qml | grep 'text: "SETTINGS"' >/dev/null
-unzip -p "$apk" assets/skins/LateNightQML/Toolbar/Toolbar.qml | grep 'text: "LOAD 1"' >/dev/null
+unzip -l "$apk" | grep -E 'assets/qml/(main.qml|Library.qml|Library/TrackList.qml|Settings.qml)'
+unzip -p "$apk" assets/qml/main.qml | grep 'FLX6 PHONE UI' >/dev/null
+unzip -p "$apk" assets/qml/main.qml | grep 'text: root.compactScreen ? "Settings"' >/dev/null
+unzip -p "$apk" assets/qml/Library/TrackList.qml | grep 'text: "Load 1"' >/dev/null
+unzip -p "$apk" assets/qml/Library/TrackList.qml | grep 'text: "Load 2"' >/dev/null
+unzip -p "$apk" assets/qml/Settings.qml | grep 'text: "Close"' >/dev/null
 echo "== Experimental FLX6 mapping =="
 unzip -l "$apk" | grep -E 'assets/controllers/Pioneer-DDJ-FLX6(-script.js|.midi.xml)'

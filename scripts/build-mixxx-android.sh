@@ -27,7 +27,11 @@ apply_patch_if_needed() {
 }
 
 apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-wsl.patch"
-apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-phone-ui.patch"
+if ! grep -q 'android:versionName="0.3.0-active-phone-ui"' packaging/android/AndroidManifest.xml; then
+    apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-phone-ui.patch"
+    apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-v0.3-version.patch"
+    apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-active-phone-ui.patch"
+fi
 
 install -m 0644 \
     "${REPO_DIR}/controller-mapping/Pioneer-DDJ-FLX6.midi.xml" \

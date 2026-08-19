@@ -1,4 +1,5 @@
 artifacts/*.apk
+artifacts/*.idsig
 mixxx-android-build*.log
 mixxx-android-build.pid
 .codex-remote-attachments/
