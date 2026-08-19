@@ -12,7 +12,7 @@ test -n "$apksigner"
 
 echo "== Package metadata =="
 "$aapt" dump badging "$apk" | head -8
-"$aapt" dump badging "$apk" | grep "versionCode='4' versionName='0.4.0-performance-view'" >/dev/null
+"$aapt" dump badging "$apk" | grep "versionCode='5' versionName='0.5.0-waveform-fix'" >/dev/null
 echo "== Signature =="
 "$apksigner" verify --verbose --print-certs "$apk"
 echo "== Selected ARM64 native libraries =="
@@ -22,6 +22,9 @@ unzip -l "$apk" | grep -E 'assets/qml/(main.qml|Library.qml|Library/TrackList.qm
 unzip -p "$apk" assets/qml/main.qml | grep 'text: "4 Decks"' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'text: "Settings"' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'id: performanceDeckHeaders' >/dev/null
+unzip -p "$apk" assets/qml/main.qml | grep 'id: waveformStack' >/dev/null
+unzip -p "$apk" assets/qml/main.qml | grep 'text: "A"' >/dev/null
+unzip -p "$apk" assets/qml/main.qml | grep 'text: "B"' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'active: root.maximizeLibrary || (!root.compactScreen' >/dev/null
 unzip -p "$apk" assets/qml/Library/TrackList.qml | grep 'text: "Load 1"' >/dev/null
 unzip -p "$apk" assets/qml/Library/TrackList.qml | grep 'text: "Load 2"' >/dev/null

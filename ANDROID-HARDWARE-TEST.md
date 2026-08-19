@@ -10,8 +10,8 @@ Mixxx. It is not an official Mixxx Android release.
 - Source commit: `86126792a3a11b493a74ea133dc1260890d9c200`
 - Minimum Android version: Android 9 / API 28
 - CPU architecture: ARM64
-- APK version: `0.4.0-performance-view` (version code 4)
-- APK SHA-256: `d32c8256af3116f394bf9b2b36e0f3f5faaf5b67a21a1403e8ac47987213cd62`
+- APK version: `0.5.0-waveform-fix` (version code 5)
+- APK SHA-256: `836dac56e083788b6e05b15120355dc213a6846d4970cad4570daf8775ef21b1`
 
 The APK's v3 signature verifies. It contains the ARM64 Mixxx and Qt native
 libraries. No Android device was attached to this machine, so installation,
@@ -19,7 +19,7 @@ launch, touch layout, controller I/O, and live audio still need a physical test.
 The APK contains the active phone QML interface and experimental FLX6 mapping.
 The normal compact view has deck headers and stacked waveforms but no library
 panel. The complete toolbar remains visible. Use Android's App Info screen to
-confirm version `0.4.0-performance-view`.
+confirm version `0.5.0-waveform-fix`.
 
 ## Correct hookup
 

@@ -15,6 +15,8 @@
 - `patches/mixxx-android-v0.3-version.patch` sets APK version code 3.
 - `patches/mixxx-android-v0.4-performance-view.patch` keeps the full toolbar,
   expands the stacked waveforms, and makes the library a separate full-screen view.
+- `patches/mixxx-android-v0.5-waveform-fix.patch` gives both waveform lanes
+  deterministic equal height and adds permanent A/B deck markers.
 - `controller-mapping/` contains the bundled experimental DDJ-FLX6 mapping and
   its upstream license.
 
@@ -26,7 +28,8 @@ device.
 ## Phone layout
 
 - Performance view: compact deck/track information above two large vertically
-  stacked moving waveforms. The library is not shown in this view.
+  stacked moving waveforms, divided evenly and marked `A` and `B`. The library
+  is not shown in this view.
 - `LIBRARY`: full-screen browser. Select a track and use `LOAD 1` or `LOAD 2`.
 - `SETTINGS`: maximized preferences dialog for library folders, sound hardware,
   and controller configuration.

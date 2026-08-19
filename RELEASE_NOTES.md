@@ -1,15 +1,15 @@
-# Experimental Mixxx Android ARM64 performance view v0.4
+# Experimental Mixxx Android ARM64 waveform fix v0.5
 
 This is an unofficial development build for testing Mixxx with a DDJ-FLX6 on
 an Android phone or tablet. It is locally signed and may be unstable.
 
 ## Install
 
-Download `mixxx-android-flx6-v0.4.apk` on an ARM64 device running Android 9 or
+Download `mixxx-android-flx6-v0.5.apk` on an ARM64 device running Android 9 or
 newer, allow installation from the selected file source, and open the APK.
 
 SHA-256:
-`d32c8256af3116f394bf9b2b36e0f3f5faaf5b67a21a1403e8ac47987213cd62`
+`836dac56e083788b6e05b15120355dc213a6846d4970cad4570daf8775ef21b1`
 
 v0.2 changed an unused LateNight skin, so Android's `--new-ui` screen looked
 unchanged. v0.3 corrects that mistake by patching the APK's real
@@ -19,6 +19,9 @@ unchanged. v0.3 corrects that mistake by patching the APK's real
 
 - Fits landscape screens down to 640x320 logical pixels.
 - Defaults to compact deck information above two large vertically stacked waveforms.
+- Uses an explicit zero-spacing waveform column so Deck A and Deck B each
+  receive exactly half of the available waveform area.
+- Adds large permanent `A` and `B` badges plus a visible divider between lanes.
 - The normal performance view contains no library panel, so the waveforms use
   all remaining space below the toolbar and deck headers.
 - Restores every top toolbar control, including `4 DECKS` and `SETTINGS`.

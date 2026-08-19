@@ -7,8 +7,10 @@
 - Local changes: `patches/mixxx-android-wsl.patch`,
   `patches/mixxx-android-phone-ui.patch`,
   `patches/mixxx-android-v0.3-version.patch`,
-  `patches/mixxx-android-active-phone-ui.patch`, and
-  `patches/mixxx-android-v0.4-performance-view.patch`
+  `patches/mixxx-android-active-phone-ui.patch`,
+  `patches/mixxx-android-v0.4-performance-view.patch`,
+  `patches/mixxx-android-v0.5-version.patch`, and
+  `patches/mixxx-android-v0.5-waveform-fix.patch`
 - License: GNU GPL v2 or later; see the upstream `LICENSE` file.
 
 ## Standalone/touchscreen layout references

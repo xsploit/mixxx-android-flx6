@@ -1,0 +1,169 @@
+diff --git a/res/qml/main.qml b/res/qml/main.qml
+--- a/res/qml/main.qml
++++ b/res/qml/main.qml
+@@ -235,7 +235,7 @@
+             Item {
+                 id: waveforms
+ 
+-                readonly property real waveformContentHeight: height - performanceDeckHeaders.height
++                readonly property real waveformContentHeight: Math.max(0, height - performanceDeckHeaders.height)
+ 
+                 SplitView.fillHeight: !root.maximizeLibrary
+                 SplitView.preferredHeight: root.maximizeLibrary ? 0 : undefined
+@@ -290,63 +290,117 @@
+                         }
+                     }
+                 }
+-                Loader {
+-                    id: deck3waveform
++                Column {
++                    id: waveformStack
+ 
+-                    readonly property string group: "[Channel3]"
+-
+-                    active: root.show4decks
++                    anchors.bottom: parent.bottom
++                    anchors.left: parent.left
++                    anchors.right: parent.right
+                     anchors.top: performanceDeckHeaders.bottom
+-                    height: waveforms.waveformContentHeight / 4
+-                    width: root.width
++                    clip: true
++                    spacing: 0
++
++                    Loader {
++                        id: deck3waveform
++
++                        readonly property string group: "[Channel3]"
++
++                        active: root.show4decks
++                        height: active ? parent.height / 4 : 0
++                        width: parent.width
+ 
+-                    sourceComponent: Component {
+-                        Skin.WaveformDisplay {
+-                            group: deck3waveform.group
++                        sourceComponent: Component {
++                            Skin.WaveformDisplay {
++                                group: deck3waveform.group
+ 
+-                            FadeBehavior on visible {
+-                                fadeTarget: deck3waveform
++                                FadeBehavior on visible {
++                                    fadeTarget: deck3waveform
++                                }
+                             }
+                         }
+                     }
+-                }
+-                Skin.WaveformDisplay {
+-                    id: deck1waveform
++                    Skin.WaveformDisplay {
++                        id: deck1waveform
+ 
+-                    anchors.top: root.show4decks ? deck3waveform.bottom : performanceDeckHeaders.bottom
+-                    group: "[Channel1]"
+-                    height: waveforms.waveformContentHeight / (root.show4decks ? 4 : 2)
+-                    width: root.width
+-                }
+-                Skin.WaveformDisplay {
+-                    id: deck2waveform
++                        group: "[Channel1]"
++                        height: parent.height / (root.show4decks ? 4 : 2)
++                        width: parent.width
++                    }
++                    Skin.WaveformDisplay {
++                        id: deck2waveform
+ 
+-                    anchors.bottom: root.show4decks ? deck4waveform.top : parent.bottom
+-                    group: "[Channel2]"
+-                    height: waveforms.waveformContentHeight / (root.show4decks ? 4 : 2)
+-                    width: root.width
+-                }
+-                Loader {
+-                    id: deck4waveform
++                        group: "[Channel2]"
++                        height: parent.height / (root.show4decks ? 4 : 2)
++                        width: parent.width
++                    }
++                    Loader {
++                        id: deck4waveform
+ 
+-                    readonly property string group: "[Channel4]"
++                        readonly property string group: "[Channel4]"
+ 
+-                    active: root.show4decks
+-                    anchors.bottom: parent.bottom
+-                    height: waveforms.waveformContentHeight / 4
+-                    width: root.width
++                        active: root.show4decks
++                        height: active ? parent.height / 4 : 0
++                        width: parent.width
+ 
+-                    sourceComponent: Component {
+-                        Skin.WaveformDisplay {
+-                            group: deck4waveform.group
++                        sourceComponent: Component {
++                            Skin.WaveformDisplay {
++                                group: deck4waveform.group
+ 
+-                            FadeBehavior on visible {
+-                                fadeTarget: deck4waveform
++                                FadeBehavior on visible {
++                                    fadeTarget: deck4waveform
++                                }
+                             }
+                         }
+                     }
+                 }
+                 Rectangle {
++                    anchors.left: parent.left
++                    anchors.leftMargin: 8
++                    border.color: "#42A5F5"
++                    border.width: 2
++                    color: "#D0202630"
++                    height: 44
++                    radius: 4
++                    width: 38
++                    y: performanceDeckHeaders.height + waveforms.waveformContentHeight * (root.show4decks ? 0.375 : 0.25) - height / 2
++                    z: 5
++
++                    Text {
++                        anchors.centerIn: parent
++                        color: Theme.white
++                        font.bold: true
++                        font.pixelSize: 24
++                        text: "A"
++                    }
++                }
++                Rectangle {
++                    anchors.left: parent.left
++                    anchors.leftMargin: 8
++                    border.color: "#42A5F5"
++                    border.width: 2
++                    color: "#D0202630"
++                    height: 44
++                    radius: 4
++                    width: 38
++                    y: performanceDeckHeaders.height + waveforms.waveformContentHeight * (root.show4decks ? 0.625 : 0.75) - height / 2
++                    z: 5
++
++                    Text {
++                        anchors.centerIn: parent
++                        color: Theme.white
++                        font.bold: true
++                        font.pixelSize: 24
++                        text: "B"
++                    }
++                }
++                Rectangle {
++                    color: "#42A5F5"
++                    height: 2
++                    width: parent.width
++                    y: performanceDeckHeaders.height + waveforms.waveformContentHeight / 2 - height / 2
++                    z: 4
++                }
++                Rectangle {
+                     width: 125
+ 
+                     gradient: Gradient {
