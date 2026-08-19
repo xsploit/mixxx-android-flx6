@@ -1,0 +1,219 @@
+diff --git a/packaging/android/AndroidManifest.xml b/packaging/android/AndroidManifest.xml
+--- a/packaging/android/AndroidManifest.xml
++++ b/packaging/android/AndroidManifest.xml
+@@ -2,8 +2,8 @@
+ <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+     package="org.mixxx.flx6standalone"
+     android:installLocation="auto"
+-    android:versionCode="17"
+-    android:versionName="0.17.0-measured-header-layout">
++    android:versionCode="18"
++    android:versionName="0.18.0-edit-locked-draw-scale">
+     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"  />
+     <uses-permission android:name="android.permission.INTERNET"  />
+     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
+@@ -22,7 +22,7 @@
+         android:name="org.qtproject.qt.android.bindings.QtApplication"
+         android:hardwareAccelerated="true"
+         android:icon="@mipmap/ic_launcher"
+-        android:label="Mixxx FLX6 v0.17"
++        android:label="Mixxx FLX6 v0.18"
+         android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+         android:requestLegacyExternalStorage="true"
+         android:allowBackup="true"
+diff --git a/res/qml/WaveformDisplay.qml b/res/qml/WaveformDisplay.qml
+--- a/res/qml/WaveformDisplay.qml
++++ b/res/qml/WaveformDisplay.qml
+@@ -15,13 +15,15 @@
+ 
+     required property string group
+     property bool splitStemTracks: false
+-    property real visualGain: 1.0
++    property real verticalDrawScale: 1.0
+     readonly property string zoomGroup: Mixxx.Config.waveformZoomSynchronization ? "[Channel1]" : group
+ 
+     MixxxControls.WaveformDisplay {
+-        anchors.fill: parent
++        anchors.centerIn: parent
+         backgroundColor: "transparent"
+         group: root.group
++        height: parent.height * root.verticalDrawScale
++        width: parent.width
+         zoom: zoomControl.value
+ 
+         Behavior on zoom {
+@@ -70,7 +72,7 @@
+         }
+         Mixxx.WaveformRendererFiltered {
+             axesColor: '#a1a1a1a1'
+-            gainAll: root.visualGain
++            gainAll: 1.0
+             gainHigh: 1.0
+             gainLow: 1.0
+             gainMid: 1.0
+@@ -79,7 +81,7 @@
+             midColor: '#97632D'
+         }
+         Mixxx.WaveformRendererStem {
+-            gainAll: root.visualGain * (root.splitStemTracks ? 2.0 : 1.0)
++            gainAll: root.splitStemTracks ? 2.0 : 1.0
+             splitStemTracks: root.splitStemTracks
+         }
+         Mixxx.WaveformRendererBeat {
+diff --git a/res/qml/main.qml b/res/qml/main.qml
+--- a/res/qml/main.qml
++++ b/res/qml/main.qml
+@@ -23,8 +23,8 @@
+     property alias showEffects: showEffectsButton.checked
+     property alias showSamplers: showSamplersButton.checked
+     property bool toolbarExpanded: false
++    property real waveformDrawScale: 1.0
+     property real waveformStackPosition: 1.0
+-    property real waveformVisualGain: compactScreen ? 1.7 : 1.0
+     readonly property int waveformTopGuard: compactScreen ? 5 : 0
+     readonly property real waveformViewportTop: performanceDeckHeaders.height + waveformTopGuard
+     readonly property int waveformDividerThickness: 2
+@@ -158,18 +158,20 @@
+                     text: "Sampler"
+                 }
+                 Skin.Button {
++                    enabled: root.editDeck
+                     implicitWidth: 72
+-                    text: "Wave -"
++                    text: "Draw -"
+ 
+-                    onClicked: root.waveformVisualGain = Math.max(1.0,
+-                            Math.round((root.waveformVisualGain - 0.1) * 10) / 10)
++                    onClicked: root.waveformDrawScale = Math.max(0.35,
++                            Math.round((root.waveformDrawScale - 0.05) * 100) / 100)
+                 }
+                 Skin.Button {
++                    enabled: root.editDeck
+                     implicitWidth: 72
+-                    text: "Wave +"
++                    text: "Draw +"
+ 
+-                    onClicked: root.waveformVisualGain = Math.min(2.5,
+-                            Math.round((root.waveformVisualGain + 0.1) * 10) / 10)
++                    onClicked: root.waveformDrawScale = Math.min(1.0,
++                            Math.round((root.waveformDrawScale + 0.05) * 100) / 100)
+                 }
+                 Item {
+                     Layout.fillWidth: true
+@@ -233,9 +235,9 @@
+             border.color: "#42A5F5"
+             border.width: 1
+             color: "#D0202630"
+-            height: 18
+-            radius: 3
+-            width: 42
++            height: 12
++            radius: 2
++            width: 28
+             y: root.toolbarExpanded ? toolbar.height : 0
+             z: 31
+ 
+@@ -243,11 +245,13 @@
+                 anchors.centerIn: parent
+                 color: Theme.white
+                 font.bold: true
+-                font.pixelSize: 13
++                font.pixelSize: 9
+                 text: root.toolbarExpanded ? "▲" : "▼"
+             }
+             MouseArea {
+-                anchors.fill: parent
++                anchors.centerIn: parent
++                height: 28
++                width: 44
+                 onClicked: root.toolbarExpanded = !root.toolbarExpanded
+             }
+         }
+@@ -413,7 +417,7 @@
+                             sourceComponent: Component {
+                                 Skin.WaveformDisplay {
+                                     group: deck3waveform.group
+-                                    visualGain: root.waveformVisualGain
++                                    verticalDrawScale: root.waveformDrawScale
+ 
+                                     FadeBehavior on visible {
+                                         fadeTarget: deck3waveform
+@@ -431,7 +435,7 @@
+                             anchors.bottomMargin: root.waveformLanePadding
+                             anchors.topMargin: root.waveformLanePadding
+                             group: "[Channel1]"
+-                            visualGain: root.waveformVisualGain
++                            verticalDrawScale: root.waveformDrawScale
+                         }
+                         }
+                         Item {
+@@ -452,7 +456,7 @@
+                             anchors.bottomMargin: root.waveformLanePadding
+                             anchors.topMargin: root.waveformLanePadding
+                             group: "[Channel2]"
+-                            visualGain: root.waveformVisualGain
++                            verticalDrawScale: root.waveformDrawScale
+                         }
+                         Loader {
+                             id: deck4waveform
+@@ -469,7 +473,7 @@
+                             sourceComponent: Component {
+                                 Skin.WaveformDisplay {
+                                     group: deck4waveform.group
+-                                    visualGain: root.waveformVisualGain
++                                    verticalDrawScale: root.waveformDrawScale
+ 
+                                     FadeBehavior on visible {
+                                         fadeTarget: deck4waveform
+@@ -479,6 +483,27 @@
+                         }
+                         }
+                     }
++                    PinchHandler {
++                        id: waveformDrawPinch
++
++                        property real gestureStartScale: 1.0
++
++                        enabled: root.editDeck
++                        maximumPointCount: 2
++                        minimumPointCount: 2
++                        target: null
++
++                        onActiveChanged: {
++                            if (active)
++                                gestureStartScale = root.waveformDrawScale;
++                        }
++                        onActiveScaleChanged: {
++                            if (active) {
++                                root.waveformDrawScale = Math.max(0.35, Math.min(1.0,
++                                        gestureStartScale * activeScale));
++                            }
++                        }
++                    }
+                 }
+                 Rectangle {
+                     id: waveformDivider
+@@ -492,6 +517,7 @@
+                     MouseArea {
+                         anchors.horizontalCenter: parent.horizontalCenter
+                         anchors.verticalCenter: parent.verticalCenter
++                        enabled: root.editDeck
+                         height: 36
+                         preventStealing: true
+                         width: parent.width
+@@ -517,13 +543,14 @@
+                         height: 14
+                         radius: 7
+                         width: 46
++                        opacity: root.editDeck ? 1.0 : 0.55
+ 
+                         Text {
+                             anchors.centerIn: parent
+                             color: Theme.white
+                             font.bold: true
+                             font.pixelSize: 11
+-                            text: "↕"
++                            text: root.editDeck ? "↕" : "•"
+                         }
+                     }
+                 }

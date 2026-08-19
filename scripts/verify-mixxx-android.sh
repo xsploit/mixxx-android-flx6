@@ -12,8 +12,8 @@ test -n "$apksigner"
 
 echo "== Package metadata =="
 "$aapt" dump badging "$apk" | head -8
-"$aapt" dump badging "$apk" | grep "package: name='org.mixxx.flx6standalone' versionCode='17' versionName='0.17.0-measured-header-layout'" >/dev/null
-"$aapt" dump badging "$apk" | grep "application-label:'Mixxx FLX6 v0.17'" >/dev/null
+"$aapt" dump badging "$apk" | grep "package: name='org.mixxx.flx6standalone' versionCode='18' versionName='0.18.0-edit-locked-draw-scale'" >/dev/null
+"$aapt" dump badging "$apk" | grep "application-label:'Mixxx FLX6 v0.18'" >/dev/null
 "$aapt" dump badging "$apk" | grep "launchable-activity: name='org.mixxx.MainActivity'" >/dev/null
 echo "== Signature =="
 "$apksigner" verify --verbose --print-certs "$apk"
@@ -35,7 +35,7 @@ unzip -p "$apk" assets/qml/main.qml | grep 'visible: root.toolbarExpanded' >/dev
 unzip -p "$apk" assets/qml/main.qml | grep 'parent.SafeArea.margins.bottom' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'id: waveformContent' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'property real waveformStackPosition: 1.0' >/dev/null
-unzip -p "$apk" assets/qml/main.qml | grep 'property real waveformVisualGain: compactScreen ? 1.7 : 1.0' >/dev/null
+unzip -p "$apk" assets/qml/main.qml | grep 'property real waveformDrawScale: 1.0' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'readonly property int waveformTopGuard: compactScreen ? 5 : 0' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'readonly property real waveformViewportTop: performanceDeckHeaders.height + waveformTopGuard' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'readonly property real measuredHeight: Math.max(performanceDeck1.implicitHeight,' >/dev/null
@@ -50,8 +50,13 @@ unzip -p "$apk" assets/qml/Deck.qml | grep 'minimizedGrid.implicitHeight + layou
 unzip -p "$apk" assets/qml/Deck.qml | grep 'implicitHeight: Math.ceil(measuredContentHeight)' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'readonly property int waveformDividerThickness: 2' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'readonly property int waveformLanePadding: compactScreen ? 1 : 0' >/dev/null
-unzip -p "$apk" assets/qml/main.qml | grep 'text: "Wave -"' >/dev/null
-unzip -p "$apk" assets/qml/main.qml | grep 'text: "Wave +"' >/dev/null
+unzip -p "$apk" assets/qml/main.qml | grep 'text: "Draw -"' >/dev/null
+unzip -p "$apk" assets/qml/main.qml | grep 'text: "Draw +"' >/dev/null
+unzip -p "$apk" assets/qml/main.qml | grep 'id: waveformDrawPinch' >/dev/null
+unzip -p "$apk" assets/qml/main.qml | grep 'gestureStartScale \* activeScale' >/dev/null
+unzip -p "$apk" assets/qml/main.qml | grep 'text: root.editDeck ? "↕" : "•"' >/dev/null
+unzip -p "$apk" assets/qml/main.qml | grep 'height: 12' >/dev/null
+unzip -p "$apk" assets/qml/main.qml | grep 'width: 28' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'anchors.fill: parent' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'Math.floor((parent.height - root.waveformDividerThickness) / 2)' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'y: upperWaveformPane.height + root.waveformDividerThickness' >/dev/null
@@ -68,9 +73,14 @@ if unzip -p "$apk" assets/qml/main.qml | grep -q 'minimumHeight: 320'; then
 fi
 unzip -p "$apk" assets/qml/main.qml | grep 'id: upperWaveformPane' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'id: lowerWaveformPane' >/dev/null
-unzip -p "$apk" assets/qml/WaveformDisplay.qml | grep 'property real visualGain: 1.0' >/dev/null
-unzip -p "$apk" assets/qml/WaveformDisplay.qml | grep 'gainAll: root.visualGain' >/dev/null
-unzip -p "$apk" assets/qml/WaveformDisplay.qml | grep 'gainAll: root.visualGain \* (root.splitStemTracks ? 2.0 : 1.0)' >/dev/null
+unzip -p "$apk" assets/qml/WaveformDisplay.qml | grep 'property real verticalDrawScale: 1.0' >/dev/null
+unzip -p "$apk" assets/qml/WaveformDisplay.qml | grep 'height: parent.height \* root.verticalDrawScale' >/dev/null
+unzip -p "$apk" assets/qml/WaveformDisplay.qml | grep 'gainAll: 1.0' >/dev/null
+unzip -p "$apk" assets/qml/WaveformDisplay.qml | grep 'gainAll: root.splitStemTracks ? 2.0 : 1.0' >/dev/null
+if unzip -p "$apk" assets/qml/main.qml assets/qml/WaveformDisplay.qml | grep -q 'waveformVisualGain\|visualGain:'; then
+    echo "Obsolete waveform visual-gain control is still packaged" >&2
+    exit 1
+fi
 unzip -p "$apk" assets/qml/main.qml | grep 'active: root.maximizeLibrary || (!root.compactScreen' >/dev/null
 unzip -p "$apk" assets/qml/Library/TrackList.qml | grep 'text: "Load 1"' >/dev/null
 unzip -p "$apk" assets/qml/Library/TrackList.qml | grep 'text: "Load 2"' >/dev/null

@@ -1,19 +1,19 @@
-# Experimental Mixxx Android ARM64 measured header layout v0.17
+# Experimental Mixxx Android ARM64 edit-locked draw scale v0.18
 
 This is an unofficial development build for testing Mixxx with a DDJ-FLX6 on
 an Android phone or tablet. It is locally signed and may be unstable.
 
 ## Install
 
-Download `mixxx-android-flx6-v0.17-measured-header-layout.apk` on an ARM64 device running Android 9 or
+Download `mixxx-android-flx6-v0.18-edit-locked-draw-scale.apk` on an ARM64 device running Android 9 or
 newer, allow installation from the selected file source, and open the APK.
 
 This build uses package `org.mixxx.flx6standalone` and appears as
-`Mixxx FLX6 v0.17`. It upgrades v0.9-v0.16 and still installs beside the older
+`Mixxx FLX6 v0.18`. It upgrades v0.9-v0.17 and still installs beside the older
 `org.mixxx` previews.
 
 SHA-256:
-`3812ba2e17f580c488086339c8ea53e897ccbac90ca13d8e4dada55b822306f4`
+`5bb2f03d846ee4724812858a975d634a49fce33b4662c75470d16042743ca4cc`
 
 v0.2 changed an unused LateNight skin, so Android's `--new-ui` screen looked
 unchanged. v0.3 corrects that mistake by patching the APK's real
@@ -36,8 +36,8 @@ unchanged. v0.3 corrects that mistake by patching the APK's real
 
 ## Collapsible overlay toolbar
 
-- The complete toolbar is hidden by default behind a tiny 42 x 18 top-center
-  arrow tab.
+- The complete toolbar is hidden by default behind a 28 x 12 top-center arrow
+  tab. Its invisible touch target remains 44 x 28 for reliable tapping.
 - Opening the toolbar places it over the waveform view. It does not consume
   layout height or push the bottom waveform offscreen.
 - Deck A and Deck B keep equal height behind the overlay.
@@ -76,12 +76,15 @@ unchanged. v0.3 corrects that mistake by patching the APK's real
   assigned to Deck A or Deck B, with A receiving `floor(remaining / 2)` and B
   receiving the remainder. No waveform viewport extends into the header bounds.
 - Each compact lane has 1 pixel of top and bottom padding and its own clip boundary.
-- The colored waveform signal defaults to 1.7x visual gain to use more of each
-  lane. `WAVE -` and `WAVE +` adjust it between 1.0x and 2.5x without resizing
-  the lanes or changing waveform zoom, horizontal scrolling, or the playhead.
-- The blue center grip and the previous 72-pixel/18% A+B stack adjustment are
-  restored. Dragging moves both waveform lanes, labels, grids, and playheads
-  together inside the lower clipped viewport; it does not move the header layer.
+- The A/B lane containers remain fixed and equal. The renderer gain is fixed at
+  its normal value; this build does not stretch or compress sample amplitudes.
+- Turn on `EDIT`, then pinch vertically over the stack or use `DRAW -` and
+  `DRAW +` to resize only each centered native waveform drawing surface from
+  35% to 100% of its unchanged lane height. Horizontal zoom, scrolling,
+  playheads, lane bounds, and audio gain remain unchanged.
+- The blue center grip retains the previous 72-pixel/18% whole-stack position
+  adjustment, but it is movable only while `EDIT` is enabled. Pinch scaling is
+  also edit-only, preventing accidental layout changes while mixing.
 
 ## Android music folders
 

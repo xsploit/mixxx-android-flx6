@@ -55,6 +55,10 @@
 - `patches/mixxx-android-v0.17-measured-header-layout.patch` removes the fixed
   header height. Each minimized deck reports its actual layout implicit height,
   including margins; the waveform viewport follows the measured header bottom.
+- `patches/mixxx-android-v0.18-edit-locked-draw-scale.patch` keeps both lane
+  containers fixed, adds edit-only vertical scaling of the centered native
+  waveform drawing surfaces, locks stack movement outside edit mode, and makes
+  the toolbar arrow visually smaller without shrinking its touch target.
 - `controller-mapping/` contains the bundled experimental DDJ-FLX6 mapping and
   its upstream license.
 
@@ -85,11 +89,16 @@ device.
 - Deck A and Deck B receive equal shares of the remaining visible height after
   the 2-pixel blue divider is subtracted. Each compact lane has 1-pixel top and
   bottom padding and its own clip boundary.
-- `WAVE -` and `WAVE +` in the collapsed toolbar adjust only the rendered signal
-  gain from 1.0x to 2.5x (1.7x default), without changing lane size, zoom, or scroll.
-- Dragging the blue center grip moves the complete A+B waveform stack through
-  its previous 72-pixel/18% adjustment range. The opaque header remains above it
-  and the waveform viewport clips at the header boundary.
+- Turn on `EDIT`, then pinch vertically over the waveform stack or use `DRAW -`
+  and `DRAW +`. This scales each native waveform drawing surface from 35% to
+  100%, centered inside its unchanged lane. It does not alter audio gain, visual
+  sample amplitude, horizontal zoom, scroll position, or A/B lane dimensions.
+- In `EDIT`, dragging the blue center grip moves the complete fixed-size A+B
+  stack through its previous 72-pixel/18% adjustment range. Outside `EDIT`, the
+  grip and pinch scaling are locked. The opaque header remains fixed above the
+  clipped waveform viewport.
+- The toolbar arrow is 28 x 12 visible pixels with a centered 44 x 28 invisible
+  touch target, keeping it clear of the cue controls without making it hard to tap.
 - A 5-pixel opaque guard separates the measured cue/overview header from the
   black waveform viewport, preventing edge bleed over those controls. The same
   calculation responds to different phone, tablet, density, and font layouts.
