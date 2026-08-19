@@ -1,0 +1,146 @@
+--- a/res/qml/main.qml
++++ b/res/qml/main.qml
+@@ -22,6 +22,7 @@
+     readonly property bool show4decks: show4DecksButton.checked && show4DecksButton.visible
+     property alias showEffects: showEffectsButton.checked
+     property alias showSamplers: showSamplersButton.checked
++    property bool toolbarExpanded: false
+ 
+     color: Theme.backgroundColor
+     height: 450
+@@ -77,6 +78,8 @@
+             color: Theme.toolbarBackgroundColor
+             height: root.compactScreen ? 46 : 36
+             radius: 1
++            visible: root.toolbarExpanded
++            z: 30
+ 
+             Flickable {
+                 id: toolbarFlick
+@@ -201,13 +204,38 @@
+                 }
+             }
+         }
++        Rectangle {
++            id: toolbarTab
++
++            anchors.horizontalCenter: parent.horizontalCenter
++            border.color: "#42A5F5"
++            border.width: 1
++            color: "#D0202630"
++            height: 18
++            radius: 3
++            width: 42
++            y: root.toolbarExpanded ? toolbar.height : 0
++            z: 31
++
++            Text {
++                anchors.centerIn: parent
++                color: Theme.white
++                font.bold: true
++                font.pixelSize: 13
++                text: root.toolbarExpanded ? "▲" : "▼"
++            }
++            MouseArea {
++                anchors.fill: parent
++                onClicked: root.toolbarExpanded = !root.toolbarExpanded
++            }
++        }
+         SplitView {
+             id: splitView
+ 
+             anchors.bottom: parent.bottom
+             anchors.left: parent.left
+             anchors.right: parent.right
+-            anchors.top: toolbar.bottom
++            anchors.top: parent.top
+             orientation: Qt.Vertical
+ 
+             handle: Rectangle {
+@@ -301,7 +329,7 @@
+                         }
+                     }
+                 }
+-                SplitView {
++                Item {
+                     id: waveformStack
+ 
+                     anchors.bottom: parent.bottom
+@@ -309,46 +337,13 @@
+                     anchors.right: parent.right
+                     anchors.top: performanceDeckHeaders.bottom
+                     clip: true
+-                    orientation: Qt.Vertical
+-
+-                    handle: Rectangle {
+-                        id: waveformDivider
+-
+-                        color: "#42A5F5"
+-                        implicitHeight: 4
+-                        z: 8
+-
+-                        containmentMask: Item {
+-                            height: 40
+-                            width: waveformStack.width
+-                            x: (waveformDivider.width - width) / 2
+-                            y: (waveformDivider.height - height) / 2
+-                        }
+-
+-                        Rectangle {
+-                            anchors.centerIn: parent
+-                            border.color: "#42A5F5"
+-                            border.width: 2
+-                            color: "#D0202630"
+-                            height: 28
+-                            radius: 14
+-                            width: 72
+-
+-                            Text {
+-                                anchors.centerIn: parent
+-                                color: Theme.white
+-                                font.bold: true
+-                                font.pixelSize: 16
+-                                text: "↕ DRAG"
+-                            }
+-                        }
+-                    }
+ 
+                     Item {
+                         id: upperWaveformPane
+ 
+-                        SplitView.fillHeight: true
+-                        SplitView.minimumHeight: Math.max(48, waveformStack.height * 0.2)
++                        height: parent.height / 2
++                        width: parent.width
++                        y: 0
+ 
+                         Loader {
+                             id: deck3waveform
+@@ -384,8 +379,9 @@
+                     Item {
+                         id: lowerWaveformPane
+ 
+-                        SplitView.minimumHeight: Math.max(48, waveformStack.height * 0.2)
+-                        SplitView.preferredHeight: waveformStack.height / 2
++                        height: parent.height - upperWaveformPane.height
++                        width: parent.width
++                        y: upperWaveformPane.height
+ 
+                         Skin.WaveformDisplay {
+                             id: deck2waveform
+@@ -420,6 +416,15 @@
+                     }
+                 }
+                 Rectangle {
++                    id: waveformDivider
++
++                    color: "#42A5F5"
++                    height: 2
++                    width: parent.width
++                    y: waveformStack.y + waveformStack.height / 2 - height / 2
++                    z: 8
++                }
++                Rectangle {
+                     anchors.left: parent.left
+                     anchors.leftMargin: 8
+                     border.color: "#42A5F5"

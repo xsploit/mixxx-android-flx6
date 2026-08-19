@@ -1,0 +1,46 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -2382,7 +2382,7 @@
+     set_property(TARGET mixxx-lib PROPERTY ANDROID_ABIS "arm64-v8a")
+     target_compile_definitions(
+       mixxx-lib
+-      PUBLIC ANDROID_PACKAGE_NAME="org.mixxx"
++      PUBLIC ANDROID_PACKAGE_NAME="org.mixxx.flx6standalone"
+     )
+     qt_add_executable(mixxx src/main.cpp MANUAL_FINALIZATION)
+     set_property(
+@@ -2391,7 +2391,7 @@
+         QT_ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_SOURCE_DIR}/packaging/android"
+     )
+     set_target_properties(mixxx PROPERTIES QT_ANDROID_ABIS "${ANDROID_ABI}")
+-    set_target_properties(mixxx PROPERTIES QT_ANDROID_PACKAGE_NAME "org.mixxx")
++    set_target_properties(mixxx PROPERTIES QT_ANDROID_PACKAGE_NAME "org.mixxx.flx6standalone")
+     set_target_properties(
+       mixxx
+       PROPERTIES QT_ANDROID_VERSION_NAME "${MIXXX_VERSION}"
+diff --git a/packaging/android/AndroidManifest.xml b/packaging/android/AndroidManifest.xml
+--- a/packaging/android/AndroidManifest.xml
++++ b/packaging/android/AndroidManifest.xml
+@@ -1,9 +1,9 @@
+ <?xml version="1.0"?>
+ <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+-    package="org.mixxx"
++    package="org.mixxx.flx6standalone"
+     android:installLocation="auto"
+-    android:versionCode="8"
+-    android:versionName="0.8.0-native-waveform-split">
++    android:versionCode="9"
++    android:versionName="0.9.0-collapsible-toolbar">
+     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"  />
+     <uses-permission android:name="android.permission.INTERNET"  />
+     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
+@@ -22,7 +22,7 @@
+         android:name="org.qtproject.qt.android.bindings.QtApplication"
+         android:hardwareAccelerated="true"
+         android:icon="@mipmap/ic_launcher"
+-        android:label="Mixxx FLX6 Preview"
++        android:label="Mixxx FLX6 v0.9 NEW"
+         android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+         android:requestLegacyExternalStorage="true"
+         android:allowBackup="true"

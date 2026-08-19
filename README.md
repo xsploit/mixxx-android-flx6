@@ -24,6 +24,11 @@
   A/B waveform-height divider.
 - `patches/mixxx-android-v0.8-native-waveform-split.patch` makes that blue
   divider the actual nested `SplitView` handle, directly resizing both waveform renderers.
+- `patches/mixxx-android-v0.9-version-and-package.patch` gives the repaired
+  build a new Android package ID so it installs beside older previews.
+- `patches/mixxx-android-v0.9-collapsible-toolbar.patch` keeps the two
+  waveform lanes fixed at equal height and moves the complete toolbar into a
+  collapsible overlay that never changes the waveform layout.
 - `controller-mapping/` contains the bundled experimental DDJ-FLX6 mapping and
   its upstream license.
 
@@ -43,11 +48,13 @@ device.
 - In `SETTINGS > Library`, tap `ALLOW FILES`, enable Mixxx in Android's file
   access screen, then add `Downloads`, `Music`, or any full `/storage/...` path.
 - The complete top toolbar remains available, including `4 DECKS`, effects,
-  auxiliary, sampler, edit, developer, library, and settings controls.
+  auxiliary, sampler, edit, developer, library, and settings controls. Tap the
+  tiny top-center arrow to show or hide it.
 - Pressing the FLX6 browse encoder toggles the full-screen library; turning it
   continues to move through the track list.
-- Swipe the top toolbar sideways to reach controls on narrow screens. Drag the
-  blue `↕ DRAG` line to resize the actual Deck A and Deck B waveform panes.
+- The toolbar floats over the waveform screen instead of pushing either deck
+  downward. Swipe it sideways when expanded to reach controls on narrow screens.
+- Deck A and Deck B remain equal-height and the blue middle line stays centered.
 
 ## Corresponding source and licensing
 

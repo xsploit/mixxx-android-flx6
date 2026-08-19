@@ -1,15 +1,19 @@
-# Experimental Mixxx Android ARM64 native waveform split v0.8
+# Experimental Mixxx Android ARM64 collapsible toolbar v0.9
 
 This is an unofficial development build for testing Mixxx with a DDJ-FLX6 on
 an Android phone or tablet. It is locally signed and may be unstable.
 
 ## Install
 
-Download `mixxx-android-flx6-v0.8.apk` on an ARM64 device running Android 9 or
+Download `mixxx-android-flx6-v0.9-fresh.apk` on an ARM64 device running Android 9 or
 newer, allow installation from the selected file source, and open the APK.
 
+This build uses the new package `org.mixxx.flx6standalone` and appears as
+`Mixxx FLX6 v0.9 NEW`, so it installs beside the old `org.mixxx` previews. You
+do not need to uninstall the old app to test this one.
+
 SHA-256:
-`c487829a2ec3d2e1e835716b59b37c942310aeb9755be50e5e7a39b3ab564a43`
+`48fe1ee22adf1015938ec38557e513fd17a00243faa958ee8bf4e32d4d379522`
 
 v0.2 changed an unused LateNight skin, so Android's `--new-ui` screen looked
 unchanged. v0.3 corrects that mistake by patching the APK's real
@@ -31,17 +35,16 @@ unchanged. v0.3 corrects that mistake by patching the APK's real
 - `SETTINGS` opens the native settings screen with a visible `CLOSE` button.
 - Android visual updates target 30 FPS to reduce heat and battery use.
 
-## Live screen adjustment
+## Collapsible overlay toolbar
 
-- The waveform region is anchored between the bottom of the toolbar and the
-  bottom of the app, so toolbar height is deducted before sizing either deck.
-- The blue `↕ DRAG` line is now the real nested `SplitView` handle. Dragging it
-  directly resizes both native waveform panes instead of moving only QML overlays.
-- The nested split begins below both the top toolbar and compact deck headers,
-  so those offsets are removed before the A/B heights are calculated.
-- Each waveform pane keeps at least 20% of the available waveform space.
-- The top toolbar scrolls horizontally instead of cutting off its last controls
-  on a narrow phone screen.
+- The complete toolbar is hidden by default behind a tiny 42 x 18 top-center
+  arrow tab.
+- Opening the toolbar places it over the waveform view. It does not consume
+  layout height or push the bottom waveform offscreen.
+- Deck A and Deck B keep equal height and fill the full available screen behind
+  the overlay; the blue middle divider remains fixed between them.
+- The expanded toolbar scrolls horizontally so every control, including
+  `4 DECKS`, `LIBRARY`, and `SETTINGS`, remains reachable.
 
 ## Android music folders
 
