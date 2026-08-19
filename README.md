@@ -32,6 +32,9 @@
 - `patches/mixxx-android-v0.10-safe-area-viewports.patch` keeps the waveform
   view inside Android's reported safe area and restores a draggable blue
   divider that allocates viewport height without changing waveform zoom.
+- `patches/mixxx-android-v0.11-visible-window-height.patch` removes desktop
+  minimum-window dimensions that made the QML scene taller than some phone
+  screens and physically clipped the bottom of Deck B.
 - `controller-mapping/` contains the bundled experimental DDJ-FLX6 mapping and
   its upstream license.
 

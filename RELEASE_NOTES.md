@@ -1,19 +1,19 @@
-# Experimental Mixxx Android ARM64 safe-area viewports v0.10
+# Experimental Mixxx Android ARM64 visible-window fix v0.11
 
 This is an unofficial development build for testing Mixxx with a DDJ-FLX6 on
 an Android phone or tablet. It is locally signed and may be unstable.
 
 ## Install
 
-Download `mixxx-android-flx6-v0.10-safe-area.apk` on an ARM64 device running Android 9 or
+Download `mixxx-android-flx6-v0.11-visible-height.apk` on an ARM64 device running Android 9 or
 newer, allow installation from the selected file source, and open the APK.
 
 This build uses package `org.mixxx.flx6standalone` and appears as
-`Mixxx FLX6 v0.10`. It upgrades v0.9 and still installs beside the older
+`Mixxx FLX6 v0.11`. It upgrades v0.9/v0.10 and still installs beside the older
 `org.mixxx` previews.
 
 SHA-256:
-`bbb712a8ed3a9f541078b34d0cd503df48ae30c37b30aca73b0a6b68477bcfbd`
+`43e616db52fc3933f9dd48e1079449e21bb9b3909dc041fb8a78ea5e9dc4160b`
 
 v0.2 changed an unused LateNight skin, so Android's `--new-ui` screen looked
 unchanged. v0.3 corrects that mistake by patching the APK's real
@@ -54,6 +54,16 @@ unchanged. v0.3 corrects that mistake by patching the APK's real
 - Deck A and Deck B default to exactly 50% each inside the visible safe area.
 - The blue divider is draggable from 20/80 through 80/20 using a 36-pixel touch
   target. It changes each deck's viewport allocation; waveform zoom is untouched.
+
+## Visible phone height
+
+- Removes the desktop-oriented 640x320 minimum window size. On the reported
+  1280x591 screen, that minimum produced an approximately 640-pixel-tall scene
+  at 2x scaling and placed the bottom roughly 49 physical pixels offscreen.
+- The QML window now accepts Android's real landscape height before subtracting
+  the deck header and calculating the A/B split.
+- Moving the middle divider grows one viewport and shrinks the other; neither
+  viewport extends below the actual window.
 
 ## Android music folders
 

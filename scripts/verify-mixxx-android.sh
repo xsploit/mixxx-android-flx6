@@ -12,8 +12,8 @@ test -n "$apksigner"
 
 echo "== Package metadata =="
 "$aapt" dump badging "$apk" | head -8
-"$aapt" dump badging "$apk" | grep "package: name='org.mixxx.flx6standalone' versionCode='10' versionName='0.10.0-safe-area-viewports'" >/dev/null
-"$aapt" dump badging "$apk" | grep "application-label:'Mixxx FLX6 v0.10'" >/dev/null
+"$aapt" dump badging "$apk" | grep "package: name='org.mixxx.flx6standalone' versionCode='11' versionName='0.11.0-visible-window-height'" >/dev/null
+"$aapt" dump badging "$apk" | grep "application-label:'Mixxx FLX6 v0.11'" >/dev/null
 "$aapt" dump badging "$apk" | grep "launchable-activity: name='org.mixxx.MainActivity'" >/dev/null
 echo "== Signature =="
 "$apksigner" verify --verbose --print-certs "$apk"
@@ -35,6 +35,10 @@ unzip -p "$apk" assets/qml/main.qml | grep 'visible: root.toolbarExpanded' >/dev
 unzip -p "$apk" assets/qml/main.qml | grep 'parent.SafeArea.margins.bottom' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'property real waveformSplitRatio: 0.5' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'function updateViewportSplit(pointer)' >/dev/null
+if unzip -p "$apk" assets/qml/main.qml | grep -q 'minimumHeight: 320'; then
+    echo "Obsolete 320-pixel minimum height is still packaged" >&2
+    exit 1
+fi
 unzip -p "$apk" assets/qml/main.qml | grep 'id: upperWaveformPane' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'id: lowerWaveformPane' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'height: parent.height / 2' >/dev/null

@@ -10,9 +10,9 @@ Mixxx. It is not an official Mixxx Android release.
 - Source commit: `86126792a3a11b493a74ea133dc1260890d9c200`
 - Minimum Android version: Android 9 / API 28
 - CPU architecture: ARM64
-- APK version: `0.10.0-safe-area-viewports` (version code 10)
-- APK label: `Mixxx FLX6 v0.10`
-- APK SHA-256: `bbb712a8ed3a9f541078b34d0cd503df48ae30c37b30aca73b0a6b68477bcfbd`
+- APK version: `0.11.0-visible-window-height` (version code 11)
+- APK label: `Mixxx FLX6 v0.11`
+- APK SHA-256: `43e616db52fc3933f9dd48e1079449e21bb9b3909dc041fb8a78ea5e9dc4160b`
 
 The APK's v3 signature verifies. It contains the ARM64 Mixxx and Qt native
 libraries. No Android device was attached to this machine, so installation,
@@ -21,8 +21,9 @@ The APK contains the active phone QML interface and experimental FLX6 mapping.
 The normal compact view has deck headers and stacked waveforms but no library
 panel. The complete toolbar is hidden behind a tiny top-center arrow and opens
 as an overlay without resizing the waveform view. Android safe-area margins
-keep Deck B above any system navigation bar. Use Android's App Info screen to
-confirm version `0.10.0-safe-area-viewports` and package
+keep Deck B above any system navigation bar, and the obsolete 320-logical-pixel
+minimum window height has been removed. Use Android's App Info screen to
+confirm version `0.11.0-visible-window-height` and package
 `org.mixxx.flx6standalone`.
 
 ## Correct hookup
@@ -84,8 +85,8 @@ Android may warn that this is an unknown or locally signed app. That is expected
 6. Return to the waveform performance view. Press the FLX6 browse encoder and
    confirm that the full-screen library opens; rotate it to move through tracks,
    then press it again or tap **BACK TO MIX** to return to the waveforms.
-7. Confirm the initial screen shows an equal visible 50/50 split with all of
-   Deck B above Android's navigation/gesture area. Drag the blue grip and
+7. Confirm the initial screen shows an equal visible 50/50 split with Deck B's
+   label and bottom edge fully onscreen. Drag the blue grip and
    confirm it changes the A/B viewport allocation from 20/80 through 80/20.
    Tap the tiny top-center arrow and confirm the toolbar overlays the view
    without changing that split, then collapse it again.
