@@ -1,0 +1,228 @@
+diff --git a/packaging/android/AndroidManifest.xml b/packaging/android/AndroidManifest.xml
+--- a/packaging/android/AndroidManifest.xml
++++ b/packaging/android/AndroidManifest.xml
+@@ -2,8 +2,8 @@
+ <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+     package="org.mixxx"
+     android:installLocation="auto"
+-    android:versionCode="3"
+-    android:versionName="0.3.0-active-phone-ui">
++    android:versionCode="4"
++    android:versionName="0.4.0-performance-view">
+     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"  />
+     <uses-permission android:name="android.permission.INTERNET"  />
+     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
+diff --git a/res/qml/main.qml b/res/qml/main.qml
+--- a/res/qml/main.qml
++++ b/res/qml/main.qml
+@@ -92,7 +92,7 @@
+                     activeColor: Theme.white
+                     checkable: true
+                     text: "4 Decks"
+-                    visible: !root.compactScreen && root.height > 515
++                    visible: root.height > 315
+                 }
+                 Skin.Button {
+                     id: maximizeLibraryButton
+@@ -123,7 +123,6 @@
+                     activeColor: Theme.white
+                     checkable: true
+                     text: "Effects"
+-                    visible: !root.compactScreen
+                 }
+                 Skin.Button {
+                     id: showAuxButton
+@@ -131,7 +130,6 @@
+                     activeColor: Theme.white
+                     checkable: true
+                     text: "Aux"
+-                    visible: !root.compactScreen
+                 }
+                 Skin.Button {
+                     id: showSamplersButton
+@@ -139,30 +137,16 @@
+                     activeColor: Theme.white
+                     checkable: true
+                     text: "Sampler"
+-                    visible: !root.compactScreen
+                 }
+                 Item {
+                     Layout.fillWidth: true
+                 }
+-                Text {
+-                    Layout.alignment: Qt.AlignVCenter
+-                    color: Theme.white
+-                    font.bold: true
+-                    font.pixelSize: 12
+-                    text: "FLX6 PHONE UI"
+-                    visible: root.compactScreen
+-                }
+-                Item {
+-                    Layout.fillWidth: true
+-                    visible: root.compactScreen
+-                }
+                 Skin.Button {
+                     id: editDeckButton
+ 
+                     activeColor: Theme.white
+                     checkable: true
+                     text: "Edit"
+-                    visible: !root.compactScreen
+                 }
+                 Skin.Button {
+                     id: showDevToolsButton
+@@ -171,7 +155,6 @@
+                     checkable: true
+                     checked: devToolsWindow.visible
+                     text: "Develop"
+-                    visible: !root.compactScreen
+ 
+                     onClicked: {
+                         if (devToolsWindow.visible)
+@@ -192,11 +175,11 @@
+ 
+                     activeColor: Theme.white
+                     checked: settingsPopup.opened
+-                    icon.height: root.compactScreen ? 0 : 16
++                    icon.height: 0
+                     icon.source: "images/gear.svg"
+-                    icon.width: root.compactScreen ? 0 : 16
+-                    implicitWidth: root.compactScreen ? 86 : implicitHeight
+-                    text: root.compactScreen ? "Settings" : null
++                    icon.width: 0
++                    implicitWidth: 76
++                    text: "Settings"
+ 
+                     onClicked: {
+                         if (!settingsPopup.opened) {
+@@ -252,22 +235,69 @@
+             Item {
+                 id: waveforms
+ 
+-                SplitView.fillHeight: !library.active
+-                SplitView.preferredHeight: root.compactScreen ? Math.min(120, splitView.height * 0.38) : library.active ? 120 : undefined
++                readonly property real waveformContentHeight: height - performanceDeckHeaders.height
++
++                SplitView.fillHeight: !root.maximizeLibrary
++                SplitView.preferredHeight: root.maximizeLibrary ? 0 : undefined
+                 visible: !root.maximizeLibrary
+ 
+                 FadeBehavior on visible {
+                     fadeTarget: waveforms
+                 }
+ 
++                Row {
++                    id: performanceDeckHeaders
++
++                    height: root.compactScreen ? 62 : 0
++                    visible: root.compactScreen
++                    width: parent.width
++                    z: 2
++
++                    Deck {
++                        group: "[Channel1]"
++                        height: parent.height
++                        minimized: true
++                        width: parent.width / (root.show4decks ? 4 : 2)
++                    }
++                    Deck {
++                        group: "[Channel2]"
++                        height: parent.height
++                        minimized: true
++                        width: parent.width / (root.show4decks ? 4 : 2)
++                    }
++                    Loader {
++                        active: root.show4decks
++                        height: parent.height
++                        width: active ? parent.width / 4 : 0
++
++                        sourceComponent: Component {
++                            Deck {
++                                group: "[Channel3]"
++                                minimized: true
++                            }
++                        }
++                    }
++                    Loader {
++                        active: root.show4decks
++                        height: parent.height
++                        width: active ? parent.width / 4 : 0
++
++                        sourceComponent: Component {
++                            Deck {
++                                group: "[Channel4]"
++                                minimized: true
++                            }
++                        }
++                    }
++                }
+                 Loader {
+                     id: deck3waveform
+ 
+                     readonly property string group: "[Channel3]"
+ 
+                     active: root.show4decks
+-                    anchors.top: parent.top
+-                    height: parent.height / 4
++                    anchors.top: performanceDeckHeaders.bottom
++                    height: waveforms.waveformContentHeight / 4
+                     width: root.width
+ 
+                     sourceComponent: Component {
+@@ -283,9 +313,9 @@
+                 Skin.WaveformDisplay {
+                     id: deck1waveform
+ 
+-                    anchors.top: root.show4decks ? deck3waveform.bottom : parent.top
++                    anchors.top: root.show4decks ? deck3waveform.bottom : performanceDeckHeaders.bottom
+                     group: "[Channel1]"
+-                    height: parent.height / (root.show4decks ? 4 : 2)
++                    height: waveforms.waveformContentHeight / (root.show4decks ? 4 : 2)
+                     width: root.width
+                 }
+                 Skin.WaveformDisplay {
+@@ -293,7 +323,7 @@
+ 
+                     anchors.bottom: root.show4decks ? deck4waveform.top : parent.bottom
+                     group: "[Channel2]"
+-                    height: parent.height / (root.show4decks ? 4 : 2)
++                    height: waveforms.waveformContentHeight / (root.show4decks ? 4 : 2)
+                     width: root.width
+                 }
+                 Loader {
+@@ -303,7 +333,7 @@
+ 
+                     active: root.show4decks
+                     anchors.bottom: parent.bottom
+-                    height: parent.height / 4
++                    height: waveforms.waveformContentHeight / 4
+                     width: root.width
+ 
+                     sourceComponent: Component {
+@@ -335,7 +365,7 @@
+                     anchors {
+                         bottom: parent.bottom
+                         left: parent.left
+-                        top: parent.top
++                        top: performanceDeckHeaders.bottom
+                     }
+                 }
+                 Rectangle {
+@@ -357,7 +387,7 @@
+                     anchors {
+                         bottom: parent.bottom
+                         right: parent.right
+-                        top: parent.top
++                        top: performanceDeckHeaders.bottom
+                     }
+                 }
+             }
+@@ -636,7 +666,7 @@
+                 Loader {
+                     id: library
+ 
+-                    active: root.compactScreen || root.maximizeLibrary || root.height - mixer.height >= 400
++                    active: root.maximizeLibrary || (!root.compactScreen && root.height - mixer.height >= 400)
+                     width: parent.width
+ 
+                     sourceComponent: Component {

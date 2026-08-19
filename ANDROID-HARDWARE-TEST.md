@@ -10,15 +10,16 @@ Mixxx. It is not an official Mixxx Android release.
 - Source commit: `86126792a3a11b493a74ea133dc1260890d9c200`
 - Minimum Android version: Android 9 / API 28
 - CPU architecture: ARM64
-- APK version: `0.3.0-active-phone-ui` (version code 3)
-- APK SHA-256: `dee07671d57f2b9449cdf41402f40d3a0f304172b59668b5ec89238d66cb8e27`
+- APK version: `0.4.0-performance-view` (version code 4)
+- APK SHA-256: `d32c8256af3116f394bf9b2b36e0f3f5faaf5b67a21a1403e8ac47987213cd62`
 
 The APK's v3 signature verifies. It contains the ARM64 Mixxx and Qt native
 libraries. No Android device was attached to this machine, so installation,
 launch, touch layout, controller I/O, and live audio still need a physical test.
 The APK contains the active phone QML interface and experimental FLX6 mapping.
-At compact sizes the top bar visibly says `FLX6 PHONE UI`; use that marker to
-confirm this is v0.3 rather than the visually unchanged v0.2 build.
+The normal compact view has deck headers and stacked waveforms but no library
+panel. The complete toolbar remains visible. Use Android's App Info screen to
+confirm version `0.4.0-performance-view`.
 
 ## Correct hookup
 
@@ -74,6 +75,9 @@ Android may warn that this is an unknown or locally signed app. That is expected
 5. Tap **SETTINGS**, open **Controllers**, confirm that the FLX6 is listed,
    select the bundled Pioneer DDJ-FLX6 mapping if it is not auto-selected, and
    confirm that moving a control produces input activity.
+6. Return to the waveform performance view. Press the FLX6 browse encoder and
+   confirm that the full-screen library opens; rotate it to move through tracks,
+   then press it again or tap **BACK TO MIX** to return to the waveforms.
 
 Start at 48 kHz with a moderate buffer. Turn off Bluetooth audio and remove
 Android battery optimization for Mixxx while testing.

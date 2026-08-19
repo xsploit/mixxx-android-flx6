@@ -13,6 +13,8 @@
 - `patches/mixxx-android-active-phone-ui.patch` patches Android's actual
   `qml/main.qml` entry point, native library, and native settings screens.
 - `patches/mixxx-android-v0.3-version.patch` sets APK version code 3.
+- `patches/mixxx-android-v0.4-performance-view.patch` keeps the full toolbar,
+  expands the stacked waveforms, and makes the library a separate full-screen view.
 - `controller-mapping/` contains the bundled experimental DDJ-FLX6 mapping and
   its upstream license.
 
@@ -23,13 +25,15 @@ device.
 
 ## Phone layout
 
-- Performance view: two vertically stacked moving waveforms, compact deck/track
-  information, and a small library area.
+- Performance view: compact deck/track information above two large vertically
+  stacked moving waveforms. The library is not shown in this view.
 - `LIBRARY`: full-screen browser. Select a track and use `LOAD 1` or `LOAD 2`.
 - `SETTINGS`: maximized preferences dialog for library folders, sound hardware,
   and controller configuration.
-- Desktop mixer/effects/sampler controls are hidden below the phone breakpoint;
-  the connected FLX6 provides those physical controls.
+- The complete top toolbar remains available, including `4 DECKS`, effects,
+  auxiliary, sampler, edit, developer, library, and settings controls.
+- Pressing the FLX6 browse encoder toggles the full-screen library; turning it
+  continues to move through the track list.
 
 ## Corresponding source and licensing
 

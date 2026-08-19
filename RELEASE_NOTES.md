@@ -1,15 +1,15 @@
-# Experimental Mixxx Android ARM64 active phone UI v0.3
+# Experimental Mixxx Android ARM64 performance view v0.4
 
 This is an unofficial development build for testing Mixxx with a DDJ-FLX6 on
 an Android phone or tablet. It is locally signed and may be unstable.
 
 ## Install
 
-Download `mixxx-android-flx6-v0.3.apk` on an ARM64 device running Android 9 or
+Download `mixxx-android-flx6-v0.4.apk` on an ARM64 device running Android 9 or
 newer, allow installation from the selected file source, and open the APK.
 
 SHA-256:
-`dee07671d57f2b9449cdf41402f40d3a0f304172b59668b5ec89238d66cb8e27`
+`d32c8256af3116f394bf9b2b36e0f3f5faaf5b67a21a1403e8ac47987213cd62`
 
 v0.2 changed an unused LateNight skin, so Android's `--new-ui` screen looked
 unchanged. v0.3 corrects that mistake by patching the APK's real
@@ -18,10 +18,14 @@ unchanged. v0.3 corrects that mistake by patching the APK's real
 ## New phone interface
 
 - Fits landscape screens down to 640x320 logical pixels.
-- Defaults to two vertically stacked waveforms with compact deck information.
+- Defaults to compact deck information above two large vertically stacked waveforms.
+- The normal performance view contains no library panel, so the waveforms use
+  all remaining space below the toolbar and deck headers.
+- Restores every top toolbar control, including `4 DECKS` and `SETTINGS`.
 - `LIBRARY` opens the full browser; `LOAD 1`, `LOAD 2`, and `LOAD NEXT` remain visible.
+- Pressing the FLX6 browse encoder toggles the full-screen library; rotating it
+  scrolls through the library as before.
 - `SETTINGS` opens the native settings screen with a visible `CLOSE` button.
-- Mixer, effects, sampler, and four-deck toolbar clutter is hidden in phone mode.
 - Android visual updates target 30 FPS to reduce heat and battery use.
 
 ## DDJ-FLX6 status

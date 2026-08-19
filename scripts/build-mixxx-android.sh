@@ -27,10 +27,13 @@ apply_patch_if_needed() {
 }
 
 apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-wsl.patch"
-if ! grep -q 'android:versionName="0.3.0-active-phone-ui"' packaging/android/AndroidManifest.xml; then
+if ! grep -qE 'android:versionName="0\.(3\.0-active-phone-ui|4\.0-performance-view)"' packaging/android/AndroidManifest.xml; then
     apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-phone-ui.patch"
     apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-v0.3-version.patch"
     apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-active-phone-ui.patch"
+fi
+if ! grep -q 'android:versionName="0.4.0-performance-view"' packaging/android/AndroidManifest.xml; then
+    apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-v0.4-performance-view.patch"
 fi
 
 install -m 0644 \
