@@ -17,6 +17,8 @@
   expands the stacked waveforms, and makes the library a separate full-screen view.
 - `patches/mixxx-android-v0.5-waveform-fix.patch` gives both waveform lanes
   deterministic equal height and adds permanent A/B deck markers.
+- `patches/mixxx-android-v0.6-storage-access.patch` replaces Android's unusable
+  desktop folder dialog with file-access, Downloads/Music, and custom-path controls.
 - `controller-mapping/` contains the bundled experimental DDJ-FLX6 mapping and
   its upstream license.
 
@@ -33,6 +35,8 @@ device.
 - `LIBRARY`: full-screen browser. Select a track and use `LOAD 1` or `LOAD 2`.
 - `SETTINGS`: maximized preferences dialog for library folders, sound hardware,
   and controller configuration.
+- In `SETTINGS > Library`, tap `ALLOW FILES`, enable Mixxx in Android's file
+  access screen, then add `Downloads`, `Music`, or any full `/storage/...` path.
 - The complete top toolbar remains available, including `4 DECKS`, effects,
   auxiliary, sampler, edit, developer, library, and settings controls.
 - Pressing the FLX6 browse encoder toggles the full-screen library; turning it

@@ -1,0 +1,205 @@
+--- a/src/qml/qmllibraryproxy.h
++++ b/src/qml/qmllibraryproxy.h
+@@ -145,6 +145,8 @@
+     Q_INVOKABLE AddResult addSource(const QUrl& newPath);
+     Q_INVOKABLE RemoveResult removeSource(const QUrl& oldPath, SourceRemovalType type);
+     Q_INVOKABLE RelocateResult relinkSource(const QUrl& oldPath, const QUrl& newPath);
++    Q_INVOKABLE bool hasAndroidAllFilesAccess() const;
++    Q_INVOKABLE void requestAndroidAllFilesAccess() const;
+ 
+     static void registerKeyboardEventFilter(std::shared_ptr<KeyboardEventFilter> pKeyboard) {
+         s_pKeyboard = std::move(pKeyboard);
+--- a/src/qml/qmllibraryproxy.cpp
++++ b/src/qml/qmllibraryproxy.cpp
+@@ -4,6 +4,11 @@
+ #include <QQmlEngine>
+ #include <cmath>
+ 
++#if defined(Q_OS_ANDROID)
++#include <QJniObject>
++#include <QtCore/private/qandroidextras_p.h>
++#endif
++
+ #include "control/controlobject.h"
+ #include "library/library.h"
+ #include "library/librarytablemodel.h"
+@@ -330,6 +335,45 @@
+                     mixxx::FileInfo(newPath.toLocalFile())));
+ }
+ 
++bool QmlLibraryProxy::hasAndroidAllFilesAccess() const {
++#if defined(Q_OS_ANDROID)
++    const jint sdkVersion = QJniObject::getStaticField<jint>(
++            "android/os/Build$VERSION", "SDK_INT");
++    if (sdkVersion < 30) {
++        return true;
++    }
++    return QJniObject::callStaticMethod<jboolean>(
++            "android/os/Environment", "isExternalStorageManager");
++#else
++    return true;
++#endif
++}
++
++void QmlLibraryProxy::requestAndroidAllFilesAccess() const {
++#if defined(Q_OS_ANDROID)
++    const QJniObject action = QJniObject::getStaticObjectField(
++            "android/provider/Settings",
++            "ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION",
++            "Ljava/lang/String;");
++    QJniObject intent("android/content/Intent",
++            "(Ljava/lang/String;)V",
++            action.object());
++    const QJniObject activity = QtAndroidPrivate::activity();
++    const QJniObject packageName = activity.callObjectMethod<jstring>("getPackageName");
++    const QJniObject packageUri = QJniObject::fromString(
++            QStringLiteral("package:%1").arg(packageName.toString()));
++    const QJniObject uri = QJniObject::callStaticObjectMethod(
++            "android/net/Uri",
++            "parse",
++            "(Ljava/lang/String;)Landroid/net/Uri;",
++            packageUri.object<jstring>());
++    const QJniObject configuredIntent = intent.callObjectMethod("setData",
++            "(Landroid/net/Uri;)Landroid/content/Intent;",
++            uri.object<jobject>());
++    QtAndroidPrivate::startActivity(intent, 0);
++#endif
++}
++
+ QmlLibraryProxy::RemoveResult QmlLibraryProxy::removeSource(
+         const QUrl& oldPath, SourceRemovalType removalType) {
+     VERIFY_OR_DEBUG_ASSERT(s_pLibrary) {
+--- a/res/qml/Settings/Library.qml
++++ b/res/qml/Settings/Library.qml
+@@ -15,6 +15,33 @@
+     id: root
+ 
+     property bool dirty: false
++    property bool androidStorageGranted: Qt.platform.os !== "android"
++
++    function addAndroidPath(path) {
++        let cleanPath = path.trim().replace(/^file:\/{2,3}/, "");
++        cleanPath = decodeURIComponent(cleanPath).replace(/\/$/, "");
++        if (!cleanPath.startsWith("/")) {
++            errorMessage.text = qsTr("Enter a full Android folder path beginning with /storage/.");
++            return;
++        }
++        if (!Mixxx.Library.hasAndroidAllFilesAccess()) {
++            errorMessage.text = qsTr("Allow file access first, then return here and add the folder.");
++            Mixxx.Library.requestAndroidAllFilesAccess();
++            return;
++        }
++
++        let model = [...sourceListView.model];
++        for (let source of model) {
++            if (source.path.replace(/\/$/, "") === cleanPath) {
++                errorMessage.text = qsTr("That folder is already listed.");
++                return;
++            }
++        }
++        model.push({ path: cleanPath });
++        sourceListView.model = model;
++        root.dirty = true;
++        errorMessage.text = qsTr("Folder added. Press Save to scan it.");
++    }
+ 
+     function load() {
+         loadSources();
+@@ -149,6 +176,16 @@
+ 
+     Component.onCompleted: {
+         root.load();
++        if (Qt.platform.os === "android") {
++            root.androidStorageGranted = Mixxx.Library.hasAndroidAllFilesAccess();
++        }
++    }
++
++    Timer {
++        interval: 1000
++        repeat: true
++        running: Qt.platform.os === "android"
++        onTriggered: root.androidStorageGranted = Mixxx.Library.hasAndroidAllFilesAccess()
+     }
+ 
+     ScrollView {
+@@ -238,10 +275,80 @@
+                                     backgroundColor: "#3F3F3F"
+                                     opacity: enabled ? 1.0 : 0.5
+                                     text: qsTr("Add")
++                                    visible: Qt.platform.os !== "android"
+ 
+                                     onPressed: addDialog.open()
+                                 }
+                             }
++                            ColumnLayout {
++                                Layout.fillWidth: true
++                                Layout.leftMargin: 8
++                                Layout.rightMargin: 8
++                                Layout.bottomMargin: 10
++                                spacing: 8
++                                visible: Qt.platform.os === "android"
++
++                                RowLayout {
++                                    Layout.fillWidth: true
++
++                                    Text {
++                                        Layout.fillWidth: true
++                                        color: root.androidStorageGranted ? "#78D78B" : "#FFCB6B"
++                                        font.pixelSize: 13
++                                        text: root.androidStorageGranted
++                                                ? qsTr("Android file access: allowed")
++                                                : qsTr("Android file access is required")
++                                    }
++                                    SettingComponents.FormButton {
++                                        activeColor: "#999999"
++                                        backgroundColor: "#3a60be"
++                                        text: root.androidStorageGranted ? qsTr("Access settings") : qsTr("Allow files")
++                                        onPressed: Mixxx.Library.requestAndroidAllFilesAccess()
++                                    }
++                                }
++                                Text {
++                                    Layout.fillWidth: true
++                                    color: Theme.white
++                                    opacity: 0.75
++                                    font.pixelSize: 12
++                                    wrapMode: Text.Wrap
++                                    text: qsTr("Pick a common folder or enter any full folder path. Then press Save below to scan it.")
++                                }
++                                RowLayout {
++                                    Layout.fillWidth: true
++
++                                    TextField {
++                                        id: androidFolderPath
++                                        Layout.fillWidth: true
++                                        color: Theme.white
++                                        placeholderText: qsTr("/storage/emulated/0/Download")
++                                        text: "/storage/emulated/0/Download"
++                                    }
++                                    SettingComponents.FormButton {
++                                        activeColor: "#999999"
++                                        backgroundColor: "#3F3F3F"
++                                        text: qsTr("Add path")
++                                        onPressed: root.addAndroidPath(androidFolderPath.text)
++                                    }
++                                }
++                                RowLayout {
++                                    Layout.fillWidth: true
++
++                                    SettingComponents.FormButton {
++                                        activeColor: "#999999"
++                                        backgroundColor: "#3F3F3F"
++                                        text: qsTr("Downloads")
++                                        onPressed: root.addAndroidPath("/storage/emulated/0/Download")
++                                    }
++                                    SettingComponents.FormButton {
++                                        activeColor: "#999999"
++                                        backgroundColor: "#3F3F3F"
++                                        text: qsTr("Music")
++                                        onPressed: root.addAndroidPath("/storage/emulated/0/Music")
++                                    }
++                                    Item { Layout.fillWidth: true }
++                                }
++                            }
+                             ListView {
+                                 id: sourceListView
+ 

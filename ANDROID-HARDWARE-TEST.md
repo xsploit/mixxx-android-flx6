@@ -10,8 +10,8 @@ Mixxx. It is not an official Mixxx Android release.
 - Source commit: `86126792a3a11b493a74ea133dc1260890d9c200`
 - Minimum Android version: Android 9 / API 28
 - CPU architecture: ARM64
-- APK version: `0.5.0-waveform-fix` (version code 5)
-- APK SHA-256: `836dac56e083788b6e05b15120355dc213a6846d4970cad4570daf8775ef21b1`
+- APK version: `0.6.0-android-storage` (version code 6)
+- APK SHA-256: `263c8918df5bf8dadaa7d16d08715df97e38e1b273e0050cd02f08e5d48a676e`
 
 The APK's v3 signature verifies. It contains the ARM64 Mixxx and Qt native
 libraries. No Android device was attached to this machine, so installation,
@@ -19,7 +19,7 @@ launch, touch layout, controller I/O, and live audio still need a physical test.
 The APK contains the active phone QML interface and experimental FLX6 mapping.
 The normal compact view has deck headers and stacked waveforms but no library
 panel. The complete toolbar remains visible. Use Android's App Info screen to
-confirm version `0.5.0-waveform-fix`.
+confirm version `0.6.0-android-storage`.
 
 ## Correct hookup
 
@@ -58,8 +58,10 @@ Android may warn that this is an unknown or locally signed app. That is expected
 
 ## Test order
 
-1. Launch Mixxx without the controller. Tap **SETTINGS**, open **Library**, add
-   the phone music folder, and grant requested music/file access. Close settings,
+1. Launch Mixxx without the controller. Tap **SETTINGS**, open **Library**, tap
+   **ALLOW FILES**, and enable Mixxx in Android's file-access screen. Return to
+   Mixxx, tap **DOWNLOADS** (or enter any full `/storage/...` path and tap
+   **ADD PATH**), then press **SAVE**. Close settings,
    tap **LIBRARY**, select one track, tap **LOAD 1**, press Play, and confirm
    audio from the phone.
 2. Close Mixxx. Connect charger, hub, and FLX6 in the diagram above. Wait until

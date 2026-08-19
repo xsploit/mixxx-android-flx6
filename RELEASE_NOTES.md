@@ -1,15 +1,15 @@
-# Experimental Mixxx Android ARM64 waveform fix v0.5
+# Experimental Mixxx Android ARM64 storage fix v0.6
 
 This is an unofficial development build for testing Mixxx with a DDJ-FLX6 on
 an Android phone or tablet. It is locally signed and may be unstable.
 
 ## Install
 
-Download `mixxx-android-flx6-v0.5.apk` on an ARM64 device running Android 9 or
+Download `mixxx-android-flx6-v0.6.apk` on an ARM64 device running Android 9 or
 newer, allow installation from the selected file source, and open the APK.
 
 SHA-256:
-`836dac56e083788b6e05b15120355dc213a6846d4970cad4570daf8775ef21b1`
+`263c8918df5bf8dadaa7d16d08715df97e38e1b273e0050cd02f08e5d48a676e`
 
 v0.2 changed an unused LateNight skin, so Android's `--new-ui` screen looked
 unchanged. v0.3 corrects that mistake by patching the APK's real
@@ -30,6 +30,14 @@ unchanged. v0.3 corrects that mistake by patching the APK's real
   scrolls through the library as before.
 - `SETTINGS` opens the native settings screen with a visible `CLOSE` button.
 - Android visual updates target 30 FPS to reduce heat and battery use.
+
+## Android music folders
+
+- `SETTINGS > Library` now has an Android-native `ALLOW FILES` shortcut instead
+  of relying on Qt's desktop folder dialog.
+- `DOWNLOADS` and `MUSIC` add the common phone folders directly.
+- `ADD PATH` accepts any full path such as `/storage/emulated/0/DJ Music`.
+- After adding a folder, press `SAVE` to register it and start the library scan.
 
 ## DDJ-FLX6 status
 

@@ -12,7 +12,7 @@ test -n "$apksigner"
 
 echo "== Package metadata =="
 "$aapt" dump badging "$apk" | head -8
-"$aapt" dump badging "$apk" | grep "versionCode='5' versionName='0.5.0-waveform-fix'" >/dev/null
+"$aapt" dump badging "$apk" | grep "versionCode='6' versionName='0.6.0-android-storage'" >/dev/null
 echo "== Signature =="
 "$apksigner" verify --verbose --print-certs "$apk"
 echo "== Selected ARM64 native libraries =="
@@ -29,6 +29,9 @@ unzip -p "$apk" assets/qml/main.qml | grep 'active: root.maximizeLibrary || (!ro
 unzip -p "$apk" assets/qml/Library/TrackList.qml | grep 'text: "Load 1"' >/dev/null
 unzip -p "$apk" assets/qml/Library/TrackList.qml | grep 'text: "Load 2"' >/dev/null
 unzip -p "$apk" assets/qml/Settings.qml | grep 'text: "Close"' >/dev/null
+unzip -p "$apk" assets/qml/Settings/Library.qml | grep 'text: qsTr("Downloads")' >/dev/null
+unzip -p "$apk" assets/qml/Settings/Library.qml | grep 'text: qsTr("Add path")' >/dev/null
+unzip -p "$apk" assets/qml/Settings/Library.qml | grep 'Mixxx.Library.requestAndroidAllFilesAccess()' >/dev/null
 echo "== Experimental FLX6 mapping =="
 unzip -l "$apk" | grep -E 'assets/controllers/Pioneer-DDJ-FLX6(-script.js|.midi.xml)'
 unzip -p "$apk" assets/controllers/Pioneer-DDJ-FLX6.midi.xml | grep 'BROWSE - press - Toggle full-screen library' >/dev/null
