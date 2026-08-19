@@ -12,15 +12,15 @@ test -n "$apksigner"
 
 echo "== Package metadata =="
 "$aapt" dump badging "$apk" | head -8
-"$aapt" dump badging "$apk" | grep "package: name='org.mixxx.flx6standalone' versionCode='13' versionName='0.13.0-draggable-waveform-stack'" >/dev/null
-"$aapt" dump badging "$apk" | grep "application-label:'Mixxx FLX6 v0.13'" >/dev/null
+"$aapt" dump badging "$apk" | grep "package: name='org.mixxx.flx6standalone' versionCode='14' versionName='0.14.0-clipped-waveform-lanes'" >/dev/null
+"$aapt" dump badging "$apk" | grep "application-label:'Mixxx FLX6 v0.14'" >/dev/null
 "$aapt" dump badging "$apk" | grep "launchable-activity: name='org.mixxx.MainActivity'" >/dev/null
 echo "== Signature =="
 "$apksigner" verify --verbose --print-certs "$apk"
 echo "== Selected ARM64 native libraries =="
 unzip -l "$apk" | grep -E 'lib/arm64-v8a/(libmixxx|libQt6Core|libc\+\+_shared)'
 echo "== Phone UI resources =="
-unzip -l "$apk" | grep -E 'assets/qml/(main.qml|Library.qml|Library/TrackList.qml|Settings.qml)'
+unzip -l "$apk" | grep -E 'assets/qml/(main.qml|WaveformDisplay.qml|Library.qml|Library/TrackList.qml|Settings.qml)'
 unzip -p "$apk" assets/qml/main.qml | grep 'text: "4 Decks"' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'text: "Settings"' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'id: performanceDeckHeaders' >/dev/null
@@ -33,18 +33,28 @@ unzip -p "$apk" assets/qml/main.qml | grep 'id: toolbarTab' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'property bool toolbarExpanded: false' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'visible: root.toolbarExpanded' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'parent.SafeArea.margins.bottom' >/dev/null
-unzip -p "$apk" assets/qml/main.qml | grep 'property real waveformStackPosition: 1.0' >/dev/null
-unzip -p "$apk" assets/qml/main.qml | grep 'verticalTravel: Math.min(72, height \* 0.18)' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'id: waveformContent' >/dev/null
-unzip -p "$apk" assets/qml/main.qml | grep 'function updateStackPosition(pointer)' >/dev/null
-unzip -p "$apk" assets/qml/main.qml | grep -- '-desiredY / waveformStack.verticalTravel' >/dev/null
+unzip -p "$apk" assets/qml/main.qml | grep 'property real waveformVisualGain: compactScreen ? 1.7 : 1.0' >/dev/null
+unzip -p "$apk" assets/qml/main.qml | grep 'readonly property int waveformDividerThickness: 2' >/dev/null
+unzip -p "$apk" assets/qml/main.qml | grep 'readonly property int waveformLanePadding: compactScreen ? 1 : 0' >/dev/null
+unzip -p "$apk" assets/qml/main.qml | grep 'text: "Wave -"' >/dev/null
+unzip -p "$apk" assets/qml/main.qml | grep 'text: "Wave +"' >/dev/null
+unzip -p "$apk" assets/qml/main.qml | grep 'anchors.fill: parent' >/dev/null
+unzip -p "$apk" assets/qml/main.qml | grep 'Math.floor((parent.height - root.waveformDividerThickness) / 2)' >/dev/null
+unzip -p "$apk" assets/qml/main.qml | grep 'y: upperWaveformPane.height + root.waveformDividerThickness' >/dev/null
+if unzip -p "$apk" assets/qml/main.qml | grep -q 'waveformStackPosition\|verticalTravel\|updateStackPosition'; then
+    echo "Obsolete translated waveform canvas is still packaged" >&2
+    exit 1
+fi
 if unzip -p "$apk" assets/qml/main.qml | grep -q 'minimumHeight: 320'; then
     echo "Obsolete 320-pixel minimum height is still packaged" >&2
     exit 1
 fi
 unzip -p "$apk" assets/qml/main.qml | grep 'id: upperWaveformPane' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'id: lowerWaveformPane' >/dev/null
-unzip -p "$apk" assets/qml/main.qml | grep 'height: parent.height / 2' >/dev/null
+unzip -p "$apk" assets/qml/WaveformDisplay.qml | grep 'property real visualGain: 1.0' >/dev/null
+unzip -p "$apk" assets/qml/WaveformDisplay.qml | grep 'gainAll: root.visualGain' >/dev/null
+unzip -p "$apk" assets/qml/WaveformDisplay.qml | grep 'gainAll: root.visualGain \* (root.splitStemTracks ? 2.0 : 1.0)' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'active: root.maximizeLibrary || (!root.compactScreen' >/dev/null
 unzip -p "$apk" assets/qml/Library/TrackList.qml | grep 'text: "Load 1"' >/dev/null
 unzip -p "$apk" assets/qml/Library/TrackList.qml | grep 'text: "Load 2"' >/dev/null

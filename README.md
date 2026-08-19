@@ -41,6 +41,10 @@
 - `patches/mixxx-android-v0.13-draggable-waveform-stack.patch` gives that
   translation an unconditional 72-pixel/18% range instead of disabling it when
   Qt reports a viewport taller than the earlier design constant.
+- `patches/mixxx-android-v0.14-clipped-waveform-lanes.patch` removes that
+  oversized translated canvas. The track headers own their 62-pixel region;
+  the remaining clipped viewport is split into equal A/B lanes around a 2-pixel
+  divider, with 1-pixel compact-screen padding and adjustable visual waveform gain.
 - `controller-mapping/` contains the bundled experimental DDJ-FLX6 mapping and
   its upstream license.
 
@@ -66,9 +70,13 @@ device.
   continues to move through the track list.
 - The toolbar floats over the waveform screen instead of pushing either deck
   downward. Swipe it sideways when expanded to reach controls on narrow screens.
-- Deck A and Deck B keep equal fixed renderer height. On a short phone screen,
-  unused space above A is clipped so all of B is visible. Drag the blue middle
-  grip to move the complete A+B stack vertically without resizing either waveform.
+- The track labels and overview waveforms occupy a fixed header. The black main
+  waveform viewport begins at the header's bottom edge and cannot render behind it.
+- Deck A and Deck B receive equal shares of the remaining visible height after
+  the 2-pixel blue divider is subtracted. Each compact lane has 1-pixel top and
+  bottom padding; neither lane is translated or hidden beyond the screen.
+- `WAVE -` and `WAVE +` in the collapsed toolbar adjust only the rendered signal
+  gain from 1.0x to 2.5x (1.7x default), without changing lane size, zoom, or scroll.
 
 ## Corresponding source and licensing
 

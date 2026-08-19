@@ -1,19 +1,19 @@
-# Experimental Mixxx Android ARM64 draggable waveform stack v0.13
+# Experimental Mixxx Android ARM64 clipped waveform lanes v0.14
 
 This is an unofficial development build for testing Mixxx with a DDJ-FLX6 on
 an Android phone or tablet. It is locally signed and may be unstable.
 
 ## Install
 
-Download `mixxx-android-flx6-v0.13-draggable-stack.apk` on an ARM64 device running Android 9 or
+Download `mixxx-android-flx6-v0.14-clipped-waveform-lanes.apk` on an ARM64 device running Android 9 or
 newer, allow installation from the selected file source, and open the APK.
 
 This build uses package `org.mixxx.flx6standalone` and appears as
-`Mixxx FLX6 v0.13`. It upgrades v0.9-v0.12 and still installs beside the older
+`Mixxx FLX6 v0.14`. It upgrades v0.9-v0.13 and still installs beside the older
 `org.mixxx` previews.
 
 SHA-256:
-`7b52ebfb77264e04ee85d682abd463053f167e83daeb9a474d2c9ff7fb1f570c`
+`8d259fef26affc265ae7dc70d9ebd5d633cc645102e4ab2c9047195a8adef70f`
 
 v0.2 changed an unused LateNight skin, so Android's `--new-ui` screen looked
 unchanged. v0.3 corrects that mistake by patching the APK's real
@@ -23,7 +23,7 @@ unchanged. v0.3 corrects that mistake by patching the APK's real
 
 - Fits landscape screens down to 640x320 logical pixels.
 - Defaults to compact deck information above two large vertically stacked waveforms.
-- Uses an explicit zero-spacing waveform stack with equal fixed-height A and B renderers.
+- Uses an explicit compact waveform stack with equal A and B lanes and 1-pixel padding.
 - Adds large permanent `A` and `B` badges plus a visible divider between lanes.
 - The normal performance view contains no library panel; a clipped viewport
   below the deck headers shows the fixed waveform stack.
@@ -59,19 +59,21 @@ unchanged. v0.3 corrects that mistake by patching the APK's real
   at 2x scaling and placed the bottom roughly 49 physical pixels offscreen.
 - The QML window now accepts Android's real landscape height before subtracting
   the deck header and calculating the A/B split.
-- The fixed waveform stack can translate within that real window without being rescaled.
+- The waveform viewport uses only the real remaining window height; it does not
+  translate into hidden space or rescale when the toolbar opens.
 
-## Fixed waveform stack
+## Precisely clipped waveform lanes
 
-- Replaces the resizable A/B viewport split. Both native waveform renderers now
-  remain exactly half of the original 258-logical-pixel compact waveform stack.
-- The stack is bottom-aligned by default, clipping unused space above A so the
-  entire B waveform and B label remain visible.
-- Dragging the blue middle handle translates the complete stack between its
-  top- and bottom-aligned limits. A, B, their labels, grid, and scrolling
-  waveform content all move together; renderer height and waveform zoom do not change.
-- v0.13 fixes v0.12's zero-travel bug: translation is always available across
-  up to 72 pixels or 18% of the waveform viewport, whichever is smaller.
+- The compact track-name and overview-waveform row owns a fixed 62-pixel header.
+  The black main waveform viewport starts at its bottom edge and is hard-clipped,
+  so it cannot bleed behind the labels or mini overview waveforms.
+- The 2-pixel blue divider is subtracted first. Every remaining visible pixel is
+  assigned to Deck A or Deck B, with A receiving `floor(remaining / 2)` and B
+  receiving the remainder. There is no oversized or translated hidden canvas.
+- Each compact lane has 1 pixel of top and bottom padding and its own clip boundary.
+- The colored waveform signal defaults to 1.7x visual gain to use more of each
+  lane. `WAVE -` and `WAVE +` adjust it between 1.0x and 2.5x without resizing
+  the lanes or changing waveform zoom, horizontal scrolling, or the playhead.
 
 ## Android music folders
 

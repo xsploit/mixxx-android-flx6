@@ -1,0 +1,253 @@
+diff --git a/packaging/android/AndroidManifest.xml b/packaging/android/AndroidManifest.xml
+--- a/packaging/android/AndroidManifest.xml
++++ b/packaging/android/AndroidManifest.xml
+@@ -2,8 +2,8 @@
+ <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+     package="org.mixxx.flx6standalone"
+     android:installLocation="auto"
+-    android:versionCode="13"
+-    android:versionName="0.13.0-draggable-waveform-stack">
++    android:versionCode="14"
++    android:versionName="0.14.0-clipped-waveform-lanes">
+     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"  />
+     <uses-permission android:name="android.permission.INTERNET"  />
+     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
+@@ -22,7 +22,7 @@
+         android:name="org.qtproject.qt.android.bindings.QtApplication"
+         android:hardwareAccelerated="true"
+         android:icon="@mipmap/ic_launcher"
+-        android:label="Mixxx FLX6 v0.13"
++        android:label="Mixxx FLX6 v0.14"
+         android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+         android:requestLegacyExternalStorage="true"
+         android:allowBackup="true"
+diff --git a/res/qml/WaveformDisplay.qml b/res/qml/WaveformDisplay.qml
+--- a/res/qml/WaveformDisplay.qml
++++ b/res/qml/WaveformDisplay.qml
+@@ -15,6 +15,7 @@
+ 
+     required property string group
+     property bool splitStemTracks: false
++    property real visualGain: 1.0
+     readonly property string zoomGroup: Mixxx.Config.waveformZoomSynchronization ? "[Channel1]" : group
+ 
+     MixxxControls.WaveformDisplay {
+@@ -69,7 +70,7 @@
+         }
+         Mixxx.WaveformRendererFiltered {
+             axesColor: '#a1a1a1a1'
+-            gainAll: 1.0
++            gainAll: root.visualGain
+             gainHigh: 1.0
+             gainLow: 1.0
+             gainMid: 1.0
+@@ -78,7 +79,7 @@
+             midColor: '#97632D'
+         }
+         Mixxx.WaveformRendererStem {
+-            gainAll: root.splitStemTracks ? 2.0 : 1.0
++            gainAll: root.visualGain * (root.splitStemTracks ? 2.0 : 1.0)
+             splitStemTracks: root.splitStemTracks
+         }
+         Mixxx.WaveformRendererBeat {
+diff --git a/res/qml/main.qml b/res/qml/main.qml
+--- a/res/qml/main.qml
++++ b/res/qml/main.qml
+@@ -23,7 +23,9 @@
+     property alias showEffects: showEffectsButton.checked
+     property alias showSamplers: showSamplersButton.checked
+     property bool toolbarExpanded: false
+-    property real waveformStackPosition: 1.0
++    property real waveformVisualGain: compactScreen ? 1.7 : 1.0
++    readonly property int waveformDividerThickness: 2
++    readonly property int waveformLanePadding: compactScreen ? 1 : 0
+ 
+     color: Theme.backgroundColor
+     height: 450
+@@ -152,6 +154,20 @@
+                     checkable: true
+                     text: "Sampler"
+                 }
++                Skin.Button {
++                    implicitWidth: 72
++                    text: "Wave -"
++
++                    onClicked: root.waveformVisualGain = Math.max(1.0,
++                            Math.round((root.waveformVisualGain - 0.1) * 10) / 10)
++                }
++                Skin.Button {
++                    implicitWidth: 72
++                    text: "Wave +"
++
++                    onClicked: root.waveformVisualGain = Math.min(2.5,
++                            Math.round((root.waveformVisualGain + 0.1) * 10) / 10)
++                }
+                 Item {
+                     Layout.fillWidth: true
+                 }
+@@ -291,6 +307,7 @@
+                     id: performanceDeckHeaders
+ 
+                     height: root.compactScreen ? 62 : 0
++                    clip: true
+                     visible: root.compactScreen
+                     width: parent.width
+                     z: 2
+@@ -335,8 +352,6 @@
+                 Item {
+                     id: waveformStack
+ 
+-                    readonly property real verticalTravel: Math.min(72, height * 0.18)
+-
+                     anchors.bottom: parent.bottom
+                     anchors.left: parent.left
+                     anchors.right: parent.right
+@@ -346,14 +361,14 @@
+                     Item {
+                         id: waveformContent
+ 
+-                        height: parent.height
+-                        width: parent.width
+-                        y: -waveformStack.verticalTravel * root.waveformStackPosition
++                        anchors.fill: parent
++                        clip: true
+ 
+                         Item {
+                             id: upperWaveformPane
+ 
+-                            height: parent.height / 2
++                            height: Math.max(0, Math.floor((parent.height - root.waveformDividerThickness) / 2))
++                            clip: true
+                             width: parent.width
+                             y: 0
+ 
+@@ -366,11 +381,13 @@
+                             anchors.left: parent.left
+                             anchors.right: parent.right
+                             anchors.top: parent.top
++                            anchors.topMargin: active ? root.waveformLanePadding : 0
+                             height: active ? parent.height / 2 : 0
+ 
+                             sourceComponent: Component {
+                                 Skin.WaveformDisplay {
+                                     group: deck3waveform.group
++                                    visualGain: root.waveformVisualGain
+ 
+                                     FadeBehavior on visible {
+                                         fadeTarget: deck3waveform
+@@ -385,15 +402,19 @@
+                             anchors.left: parent.left
+                             anchors.right: parent.right
+                             anchors.top: deck3waveform.bottom
++                            anchors.bottomMargin: root.waveformLanePadding
++                            anchors.topMargin: root.waveformLanePadding
+                             group: "[Channel1]"
++                            visualGain: root.waveformVisualGain
+                         }
+                         }
+                         Item {
+                             id: lowerWaveformPane
+ 
+-                            height: parent.height - upperWaveformPane.height
++                            height: Math.max(0, parent.height - y)
++                            clip: true
+                             width: parent.width
+-                            y: upperWaveformPane.height
++                            y: upperWaveformPane.height + root.waveformDividerThickness
+ 
+                         Skin.WaveformDisplay {
+                             id: deck2waveform
+@@ -402,7 +423,10 @@
+                             anchors.right: parent.right
+                             anchors.top: parent.top
+                             anchors.bottom: deck4waveform.top
++                            anchors.bottomMargin: root.waveformLanePadding
++                            anchors.topMargin: root.waveformLanePadding
+                             group: "[Channel2]"
++                            visualGain: root.waveformVisualGain
+                         }
+                         Loader {
+                             id: deck4waveform
+@@ -413,11 +437,13 @@
+                             anchors.bottom: parent.bottom
+                             anchors.left: parent.left
+                             anchors.right: parent.right
++                            anchors.bottomMargin: active ? root.waveformLanePadding : 0
+                             height: active ? parent.height / 2 : 0
+ 
+                             sourceComponent: Component {
+                                 Skin.WaveformDisplay {
+                                     group: deck4waveform.group
++                                    visualGain: root.waveformVisualGain
+ 
+                                     FadeBehavior on visible {
+                                         fadeTarget: deck4waveform
+@@ -432,48 +458,10 @@
+                     id: waveformDivider
+ 
+                     color: "#42A5F5"
+-                    height: 2
++                    height: root.waveformDividerThickness
+                     width: parent.width
+-                    y: waveformStack.y + waveformContent.y + upperWaveformPane.height - height / 2
++                    y: waveformStack.y + upperWaveformPane.height
+                     z: 8
+-
+-                    MouseArea {
+-                        anchors.horizontalCenter: parent.horizontalCenter
+-                        anchors.verticalCenter: parent.verticalCenter
+-                        height: 36
+-                        preventStealing: true
+-                        width: parent.width
+-
+-                        function updateStackPosition(pointer) {
+-                            const mapped = mapToItem(waveformStack, pointer.x, pointer.y);
+-                            const desiredY = mapped.y - waveformContent.height / 2;
+-                            root.waveformStackPosition = Math.max(0, Math.min(1,
+-                                    -desiredY / waveformStack.verticalTravel));
+-                        }
+-
+-                        onPositionChanged: pointer => {
+-                            if (pressed)
+-                                updateStackPosition(pointer);
+-                        }
+-                        onPressed: pointer => updateStackPosition(pointer)
+-                    }
+-                    Rectangle {
+-                        anchors.centerIn: parent
+-                        border.color: "#42A5F5"
+-                        border.width: 1
+-                        color: "#D0202630"
+-                        height: 14
+-                        radius: 7
+-                        width: 46
+-
+-                        Text {
+-                            anchors.centerIn: parent
+-                            color: Theme.white
+-                            font.bold: true
+-                            font.pixelSize: 11
+-                            text: "↕"
+-                        }
+-                    }
+                 }
+                 Rectangle {
+                     anchors.left: parent.left
+@@ -484,7 +472,7 @@
+                     height: 44
+                     radius: 4
+                     width: 38
+-                    y: waveformStack.y + waveformContent.y + upperWaveformPane.y + deck1waveform.y + deck1waveform.height / 2 - height / 2
++                    y: waveformStack.y + upperWaveformPane.y + deck1waveform.y + deck1waveform.height / 2 - height / 2
+                     z: 5
+ 
+                     Text {
+@@ -504,7 +492,7 @@
+                     height: 44
+                     radius: 4
+                     width: 38
+-                    y: waveformStack.y + waveformContent.y + lowerWaveformPane.y + deck2waveform.y + deck2waveform.height / 2 - height / 2
++                    y: waveformStack.y + lowerWaveformPane.y + deck2waveform.y + deck2waveform.height / 2 - height / 2
+                     z: 5
+ 
+                     Text {

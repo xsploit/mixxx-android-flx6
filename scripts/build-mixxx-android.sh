@@ -27,45 +27,48 @@ apply_patch_if_needed() {
 }
 
 apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-wsl.patch"
-if ! grep -qE 'android:versionName="0\.(3\.0-active-phone-ui|4\.0-performance-view|5\.0-waveform-fix|6\.0-android-storage|7\.0-live-layout|8\.0-native-waveform-split|9\.0-collapsible-toolbar|10\.0-safe-area-viewports|11\.0-visible-window-height|12\.0-fixed-waveform-stack|13\.0-draggable-waveform-stack)"' packaging/android/AndroidManifest.xml; then
+if ! grep -qE 'android:versionName="0\.(3\.0-active-phone-ui|4\.0-performance-view|5\.0-waveform-fix|6\.0-android-storage|7\.0-live-layout|8\.0-native-waveform-split|9\.0-collapsible-toolbar|10\.0-safe-area-viewports|11\.0-visible-window-height|12\.0-fixed-waveform-stack|13\.0-draggable-waveform-stack|14\.0-clipped-waveform-lanes)"' packaging/android/AndroidManifest.xml; then
     apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-phone-ui.patch"
     apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-v0.3-version.patch"
     apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-active-phone-ui.patch"
 fi
-if ! grep -qE 'android:versionName="0\.(4\.0-performance-view|5\.0-waveform-fix|6\.0-android-storage|7\.0-live-layout|8\.0-native-waveform-split|9\.0-collapsible-toolbar|10\.0-safe-area-viewports|11\.0-visible-window-height|12\.0-fixed-waveform-stack|13\.0-draggable-waveform-stack)"' packaging/android/AndroidManifest.xml; then
+if ! grep -qE 'android:versionName="0\.(4\.0-performance-view|5\.0-waveform-fix|6\.0-android-storage|7\.0-live-layout|8\.0-native-waveform-split|9\.0-collapsible-toolbar|10\.0-safe-area-viewports|11\.0-visible-window-height|12\.0-fixed-waveform-stack|13\.0-draggable-waveform-stack|14\.0-clipped-waveform-lanes)"' packaging/android/AndroidManifest.xml; then
     apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-v0.4-performance-view.patch"
 fi
-if ! grep -qE 'android:versionName="0\.(5\.0-waveform-fix|6\.0-android-storage|7\.0-live-layout|8\.0-native-waveform-split|9\.0-collapsible-toolbar|10\.0-safe-area-viewports|11\.0-visible-window-height|12\.0-fixed-waveform-stack|13\.0-draggable-waveform-stack)"' packaging/android/AndroidManifest.xml; then
+if ! grep -qE 'android:versionName="0\.(5\.0-waveform-fix|6\.0-android-storage|7\.0-live-layout|8\.0-native-waveform-split|9\.0-collapsible-toolbar|10\.0-safe-area-viewports|11\.0-visible-window-height|12\.0-fixed-waveform-stack|13\.0-draggable-waveform-stack|14\.0-clipped-waveform-lanes)"' packaging/android/AndroidManifest.xml; then
     apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-v0.5-version.patch"
     apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-v0.5-waveform-fix.patch"
 fi
-if ! grep -qE 'android:versionName="0\.(6\.0-android-storage|7\.0-live-layout|8\.0-native-waveform-split|9\.0-collapsible-toolbar|10\.0-safe-area-viewports|11\.0-visible-window-height|12\.0-fixed-waveform-stack|13\.0-draggable-waveform-stack)"' packaging/android/AndroidManifest.xml; then
+if ! grep -qE 'android:versionName="0\.(6\.0-android-storage|7\.0-live-layout|8\.0-native-waveform-split|9\.0-collapsible-toolbar|10\.0-safe-area-viewports|11\.0-visible-window-height|12\.0-fixed-waveform-stack|13\.0-draggable-waveform-stack|14\.0-clipped-waveform-lanes)"' packaging/android/AndroidManifest.xml; then
     apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-v0.6-version.patch"
     apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-v0.6-storage-access.patch"
 fi
-if ! grep -qE 'android:versionName="0\.(7\.0-live-layout|8\.0-native-waveform-split|9\.0-collapsible-toolbar|10\.0-safe-area-viewports|11\.0-visible-window-height|12\.0-fixed-waveform-stack|13\.0-draggable-waveform-stack)"' packaging/android/AndroidManifest.xml; then
+if ! grep -qE 'android:versionName="0\.(7\.0-live-layout|8\.0-native-waveform-split|9\.0-collapsible-toolbar|10\.0-safe-area-viewports|11\.0-visible-window-height|12\.0-fixed-waveform-stack|13\.0-draggable-waveform-stack|14\.0-clipped-waveform-lanes)"' packaging/android/AndroidManifest.xml; then
     apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-v0.7-version.patch"
     apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-v0.7-live-layout.patch"
 fi
-if ! grep -qE 'android:versionName="0\.(8\.0-native-waveform-split|9\.0-collapsible-toolbar|10\.0-safe-area-viewports|11\.0-visible-window-height|12\.0-fixed-waveform-stack|13\.0-draggable-waveform-stack)"' packaging/android/AndroidManifest.xml; then
+if ! grep -qE 'android:versionName="0\.(8\.0-native-waveform-split|9\.0-collapsible-toolbar|10\.0-safe-area-viewports|11\.0-visible-window-height|12\.0-fixed-waveform-stack|13\.0-draggable-waveform-stack|14\.0-clipped-waveform-lanes)"' packaging/android/AndroidManifest.xml; then
     apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-v0.8-version.patch"
     apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-v0.8-native-waveform-split.patch"
 fi
-if ! grep -qE 'android:versionName="0\.(9\.0-collapsible-toolbar|10\.0-safe-area-viewports|11\.0-visible-window-height|12\.0-fixed-waveform-stack|13\.0-draggable-waveform-stack)"' packaging/android/AndroidManifest.xml; then
+if ! grep -qE 'android:versionName="0\.(9\.0-collapsible-toolbar|10\.0-safe-area-viewports|11\.0-visible-window-height|12\.0-fixed-waveform-stack|13\.0-draggable-waveform-stack|14\.0-clipped-waveform-lanes)"' packaging/android/AndroidManifest.xml; then
     apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-v0.9-version-and-package.patch"
     apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-v0.9-collapsible-toolbar.patch"
 fi
-if ! grep -qE 'android:versionName="0\.(10\.0-safe-area-viewports|11\.0-visible-window-height|12\.0-fixed-waveform-stack|13\.0-draggable-waveform-stack)"' packaging/android/AndroidManifest.xml; then
+if ! grep -qE 'android:versionName="0\.(10\.0-safe-area-viewports|11\.0-visible-window-height|12\.0-fixed-waveform-stack|13\.0-draggable-waveform-stack|14\.0-clipped-waveform-lanes)"' packaging/android/AndroidManifest.xml; then
     apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-v0.10-safe-area-viewports.patch"
 fi
-if ! grep -qE 'android:versionName="0\.(11\.0-visible-window-height|12\.0-fixed-waveform-stack|13\.0-draggable-waveform-stack)"' packaging/android/AndroidManifest.xml; then
+if ! grep -qE 'android:versionName="0\.(11\.0-visible-window-height|12\.0-fixed-waveform-stack|13\.0-draggable-waveform-stack|14\.0-clipped-waveform-lanes)"' packaging/android/AndroidManifest.xml; then
     apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-v0.11-visible-window-height.patch"
 fi
-if ! grep -qE 'android:versionName="0\.(12\.0-fixed-waveform-stack|13\.0-draggable-waveform-stack)"' packaging/android/AndroidManifest.xml; then
+if ! grep -qE 'android:versionName="0\.(12\.0-fixed-waveform-stack|13\.0-draggable-waveform-stack|14\.0-clipped-waveform-lanes)"' packaging/android/AndroidManifest.xml; then
     apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-v0.12-fixed-waveform-stack.patch"
 fi
-if ! grep -q 'android:versionName="0.13.0-draggable-waveform-stack"' packaging/android/AndroidManifest.xml; then
+if ! grep -qE 'android:versionName="0\.(13\.0-draggable-waveform-stack|14\.0-clipped-waveform-lanes)"' packaging/android/AndroidManifest.xml; then
     apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-v0.13-draggable-waveform-stack.patch"
+fi
+if ! grep -q 'android:versionName="0.14.0-clipped-waveform-lanes"' packaging/android/AndroidManifest.xml; then
+    apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-v0.14-clipped-waveform-lanes.patch"
 fi
 
 install -m 0644 \

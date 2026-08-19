@@ -10,9 +10,9 @@ Mixxx. It is not an official Mixxx Android release.
 - Source commit: `86126792a3a11b493a74ea133dc1260890d9c200`
 - Minimum Android version: Android 9 / API 28
 - CPU architecture: ARM64
-- APK version: `0.13.0-draggable-waveform-stack` (version code 13)
-- APK label: `Mixxx FLX6 v0.13`
-- APK SHA-256: `7b52ebfb77264e04ee85d682abd463053f167e83daeb9a474d2c9ff7fb1f570c`
+- APK version: `0.14.0-clipped-waveform-lanes` (version code 14)
+- APK label: `Mixxx FLX6 v0.14`
+- APK SHA-256: `8d259fef26affc265ae7dc70d9ebd5d633cc645102e4ab2c9047195a8adef70f`
 
 The APK's v3 signature verifies. It contains the ARM64 Mixxx and Qt native
 libraries. No Android device was attached to this machine, so installation,
@@ -22,8 +22,10 @@ The normal compact view has deck headers and stacked waveforms but no library
 panel. The complete toolbar is hidden behind a tiny top-center arrow and opens
 as an overlay without resizing the waveform view. Android safe-area margins
 keep Deck B above any system navigation bar, and the obsolete 320-logical-pixel
-minimum window height has been removed. Use Android's App Info screen to
-confirm version `0.13.0-draggable-waveform-stack` and package
+minimum window height has been removed. The main waveform viewport begins below
+the track header and splits all remaining height equally around its blue divider,
+with no hidden translated canvas. Use Android's App Info screen to confirm
+version `0.14.0-clipped-waveform-lanes` and package
 `org.mixxx.flx6standalone`.
 
 ## Correct hookup
@@ -85,11 +87,11 @@ Android may warn that this is an unknown or locally signed app. That is expected
 6. Return to the waveform performance view. Press the FLX6 browse encoder and
    confirm that the full-screen library opens; rotate it to move through tracks,
    then press it again or tap **BACK TO MIX** to return to the waveforms.
-7. Confirm Deck B's label and bottom edge are fully onscreen. Drag the blue
-   grip and confirm the entire A+B waveform stack, labels, grid, and scrolling
-   content move vertically together while the two waveform heights stay equal.
-   Tap the tiny top-center arrow and confirm the toolbar overlays the view
-   without changing that split, then collapse it again.
+7. Confirm the black waveform viewport starts below the track-name/overview row,
+   with no dark area bleeding behind it. Confirm Deck A and B are equal visible
+   lanes, separated by the 2-pixel blue line, and Deck B's bottom edge is onscreen.
+   Open the toolbar and try `WAVE -` / `WAVE +`: only signal height should change;
+   lane geometry, horizontal scroll, zoom, and playheads must remain fixed.
 
 Start at 48 kHz with a moderate buffer. Turn off Bluetooth audio and remove
 Android battery optimization for Mixxx while testing.
