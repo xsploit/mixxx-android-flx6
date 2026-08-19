@@ -19,6 +19,9 @@
   deterministic equal height and adds permanent A/B deck markers.
 - `patches/mixxx-android-v0.6-storage-access.patch` replaces Android's unusable
   desktop folder dialog with file-access, Downloads/Music, and custom-path controls.
+- `patches/mixxx-android-v0.7-live-layout.patch` anchors the waveform region
+  below the toolbar, makes the toolbar horizontally scrollable, and adds a live
+  A/B waveform-height divider.
 - `controller-mapping/` contains the bundled experimental DDJ-FLX6 mapping and
   its upstream license.
 
@@ -41,6 +44,8 @@ device.
   auxiliary, sampler, edit, developer, library, and settings controls.
 - Pressing the FLX6 browse encoder toggles the full-screen library; turning it
   continues to move through the track list.
+- Swipe the top toolbar sideways to reach controls on narrow screens. Drag the
+  `↕ DRAG` divider to resize Deck A and Deck B; double-tap it to restore 50/50.
 
 ## Corresponding source and licensing
 

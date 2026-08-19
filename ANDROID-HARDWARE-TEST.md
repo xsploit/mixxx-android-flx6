@@ -10,8 +10,8 @@ Mixxx. It is not an official Mixxx Android release.
 - Source commit: `86126792a3a11b493a74ea133dc1260890d9c200`
 - Minimum Android version: Android 9 / API 28
 - CPU architecture: ARM64
-- APK version: `0.6.0-android-storage` (version code 6)
-- APK SHA-256: `263c8918df5bf8dadaa7d16d08715df97e38e1b273e0050cd02f08e5d48a676e`
+- APK version: `0.7.0-live-layout` (version code 7)
+- APK SHA-256: `205d73d021efde6907c9e6980ba5cbc0df2c0646c9031f1e290c1453dcd58d2a`
 
 The APK's v3 signature verifies. It contains the ARM64 Mixxx and Qt native
 libraries. No Android device was attached to this machine, so installation,
@@ -19,7 +19,7 @@ launch, touch layout, controller I/O, and live audio still need a physical test.
 The APK contains the active phone QML interface and experimental FLX6 mapping.
 The normal compact view has deck headers and stacked waveforms but no library
 panel. The complete toolbar remains visible. Use Android's App Info screen to
-confirm version `0.6.0-android-storage`.
+confirm version `0.7.0-live-layout`.
 
 ## Correct hookup
 
@@ -80,6 +80,9 @@ Android may warn that this is an unknown or locally signed app. That is expected
 6. Return to the waveform performance view. Press the FLX6 browse encoder and
    confirm that the full-screen library opens; rotate it to move through tracks,
    then press it again or tap **BACK TO MIX** to return to the waveforms.
+7. Swipe the top toolbar sideways and confirm all controls remain reachable.
+   Drag the `↕ DRAG` waveform divider up and down, confirm neither waveform is
+   cut off, then double-tap it and confirm the lanes return to a 50/50 split.
 
 Start at 48 kHz with a moderate buffer. Turn off Bluetooth audio and remove
 Android battery optimization for Mixxx while testing.

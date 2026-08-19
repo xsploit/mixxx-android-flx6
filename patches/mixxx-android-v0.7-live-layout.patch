@@ -1,0 +1,223 @@
+--- a/res/qml/main.qml
++++ b/res/qml/main.qml
+@@ -22,6 +22,7 @@
+     readonly property bool show4decks: show4DecksButton.checked && show4DecksButton.visible
+     property alias showEffects: showEffectsButton.checked
+     property alias showSamplers: showSamplersButton.checked
++    property real waveformSplitRatio: 0.5
+ 
+     color: Theme.backgroundColor
+     height: 450
+@@ -63,28 +64,36 @@
+             value = root.waveformOverviewTypeRgb;
+         }
+     }
+-    Column {
++    Item {
+         id: content
+ 
+         anchors.fill: parent
+ 
+-        move: Transition {
+-            NumberAnimation {
+-                duration: 150
+-                properties: "x,y"
+-            }
+-        }
+-
+         Rectangle {
+             id: toolbar
+ 
++            anchors.left: parent.left
++            anchors.right: parent.right
++            anchors.top: parent.top
+             color: Theme.toolbarBackgroundColor
+             height: root.compactScreen ? 46 : 36
+             radius: 1
+-            width: parent.width
+ 
+-            RowLayout {
++            Flickable {
++                id: toolbarFlick
++
+                 anchors.fill: parent
++                boundsBehavior: Flickable.StopAtBounds
++                clip: true
++                contentHeight: height
++                contentWidth: Math.max(width, toolbarButtons.implicitWidth)
++                flickableDirection: Flickable.HorizontalFlick
++
++                RowLayout {
++                    id: toolbarButtons
++
++                    height: toolbarFlick.height
++                    width: Math.max(toolbarFlick.width, implicitWidth)
+ 
+                 Skin.Button {
+                     id: show4DecksButton
+@@ -170,8 +179,8 @@
+                         width: 640
+                     }
+                 }
+-                Skin.Button {
+-                    id: showPreferencesButton
++                    Skin.Button {
++                        id: showPreferencesButton
+ 
+                     activeColor: Theme.white
+                     checked: settingsPopup.opened
+@@ -189,15 +198,18 @@
+                     onPressAndHold: {
+                         Mixxx.PreferencesDialog.show();
+                     }
++                    }
+                 }
+             }
+         }
+         SplitView {
+             id: splitView
+ 
+-            height: parent.height - y
++            anchors.bottom: parent.bottom
++            anchors.left: parent.left
++            anchors.right: parent.right
++            anchors.top: toolbar.bottom
+             orientation: Qt.Vertical
+-            width: parent.width
+ 
+             handle: Rectangle {
+                 id: handleDelegate
+@@ -290,15 +302,19 @@
+                         }
+                     }
+                 }
+-                Column {
++                Item {
+                     id: waveformStack
+ 
++                    readonly property real upperHeight: root.show4decks
++                            ? height / 2
++                            : height * root.waveformSplitRatio
++                    readonly property real lowerHeight: height - upperHeight
++
+                     anchors.bottom: parent.bottom
+                     anchors.left: parent.left
+                     anchors.right: parent.right
+                     anchors.top: performanceDeckHeaders.bottom
+                     clip: true
+-                    spacing: 0
+ 
+                     Loader {
+                         id: deck3waveform
+@@ -306,8 +322,9 @@
+                         readonly property string group: "[Channel3]"
+ 
+                         active: root.show4decks
+-                        height: active ? parent.height / 4 : 0
++                        height: active ? waveformStack.upperHeight / 2 : 0
+                         width: parent.width
++                        y: 0
+ 
+                         sourceComponent: Component {
+                             Skin.WaveformDisplay {
+@@ -323,15 +340,17 @@
+                         id: deck1waveform
+ 
+                         group: "[Channel1]"
+-                        height: parent.height / (root.show4decks ? 4 : 2)
++                        height: root.show4decks ? waveformStack.upperHeight / 2 : waveformStack.upperHeight
+                         width: parent.width
++                        y: deck3waveform.height
+                     }
+                     Skin.WaveformDisplay {
+                         id: deck2waveform
+ 
+                         group: "[Channel2]"
+-                        height: parent.height / (root.show4decks ? 4 : 2)
++                        height: root.show4decks ? waveformStack.lowerHeight / 2 : waveformStack.lowerHeight
+                         width: parent.width
++                        y: waveformStack.upperHeight
+                     }
+                     Loader {
+                         id: deck4waveform
+@@ -339,8 +358,9 @@
+                         readonly property string group: "[Channel4]"
+ 
+                         active: root.show4decks
+-                        height: active ? parent.height / 4 : 0
++                        height: active ? waveformStack.lowerHeight / 2 : 0
+                         width: parent.width
++                        y: deck2waveform.y + deck2waveform.height
+ 
+                         sourceComponent: Component {
+                             Skin.WaveformDisplay {
+@@ -362,7 +382,7 @@
+                     height: 44
+                     radius: 4
+                     width: 38
+-                    y: performanceDeckHeaders.height + waveforms.waveformContentHeight * (root.show4decks ? 0.375 : 0.25) - height / 2
++                    y: waveformStack.y + deck1waveform.y + deck1waveform.height / 2 - height / 2
+                     z: 5
+ 
+                     Text {
+@@ -382,7 +402,7 @@
+                     height: 44
+                     radius: 4
+                     width: 38
+-                    y: performanceDeckHeaders.height + waveforms.waveformContentHeight * (root.show4decks ? 0.625 : 0.75) - height / 2
++                    y: waveformStack.y + deck2waveform.y + deck2waveform.height / 2 - height / 2
+                     z: 5
+ 
+                     Text {
+@@ -394,11 +414,48 @@
+                     }
+                 }
+                 Rectangle {
++                    id: waveformDivider
++
+                     color: "#42A5F5"
+-                    height: 2
++                    height: 3
+                     width: parent.width
+-                    y: performanceDeckHeaders.height + waveforms.waveformContentHeight / 2 - height / 2
+-                    z: 4
++                    y: waveformStack.y + waveformStack.upperHeight - height / 2
++                    z: 8
++
++                    MouseArea {
++                        anchors.centerIn: parent
++                        height: 36
++                        preventStealing: true
++                        width: parent.width
++
++                        onDoubleClicked: root.waveformSplitRatio = 0.5
++                        onPositionChanged: mouse => {
++                            if (!pressed || waveformStack.height <= 0) {
++                                return;
++                            }
++                            const point = mapToItem(waveformStack, mouse.x, mouse.y);
++                            root.waveformSplitRatio = Math.max(0.2,
++                                    Math.min(0.8, point.y / waveformStack.height));
++                        }
++
++                        Rectangle {
++                            anchors.centerIn: parent
++                            border.color: "#42A5F5"
++                            border.width: 2
++                            color: "#D0202630"
++                            height: 28
++                            radius: 14
++                            width: 72
++
++                            Text {
++                                anchors.centerIn: parent
++                                color: Theme.white
++                                font.bold: true
++                                font.pixelSize: 16
++                                text: "↕ DRAG"
++                            }
++                        }
++                    }
+                 }
+                 Rectangle {
+                     width: 125

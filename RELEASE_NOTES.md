@@ -1,15 +1,15 @@
-# Experimental Mixxx Android ARM64 storage fix v0.6
+# Experimental Mixxx Android ARM64 live layout v0.7
 
 This is an unofficial development build for testing Mixxx with a DDJ-FLX6 on
 an Android phone or tablet. It is locally signed and may be unstable.
 
 ## Install
 
-Download `mixxx-android-flx6-v0.6.apk` on an ARM64 device running Android 9 or
+Download `mixxx-android-flx6-v0.7.apk` on an ARM64 device running Android 9 or
 newer, allow installation from the selected file source, and open the APK.
 
 SHA-256:
-`263c8918df5bf8dadaa7d16d08715df97e38e1b273e0050cd02f08e5d48a676e`
+`205d73d021efde6907c9e6980ba5cbc0df2c0646c9031f1e290c1453dcd58d2a`
 
 v0.2 changed an unused LateNight skin, so Android's `--new-ui` screen looked
 unchanged. v0.3 corrects that mistake by patching the APK's real
@@ -30,6 +30,15 @@ unchanged. v0.3 corrects that mistake by patching the APK's real
   scrolls through the library as before.
 - `SETTINGS` opens the native settings screen with a visible `CLOSE` button.
 - Android visual updates target 30 FPS to reduce heat and battery use.
+
+## Live screen adjustment
+
+- The waveform region is anchored between the bottom of the toolbar and the
+  bottom of the app, so toolbar height is deducted before sizing either deck.
+- Drag the visible `↕ DRAG` divider to give Deck A or Deck B between 20% and 80%
+  of the waveform space. Double-tap the divider to return to an even split.
+- The top toolbar scrolls horizontally instead of cutting off its last controls
+  on a narrow phone screen.
 
 ## Android music folders
 
