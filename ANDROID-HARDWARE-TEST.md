@@ -10,9 +10,9 @@ Mixxx. It is not an official Mixxx Android release.
 - Source commit: `86126792a3a11b493a74ea133dc1260890d9c200`
 - Minimum Android version: Android 9 / API 28
 - CPU architecture: ARM64
-- APK version: `0.9.0-collapsible-toolbar` (version code 9)
-- APK label: `Mixxx FLX6 v0.9 NEW`
-- APK SHA-256: `48fe1ee22adf1015938ec38557e513fd17a00243faa958ee8bf4e32d4d379522`
+- APK version: `0.10.0-safe-area-viewports` (version code 10)
+- APK label: `Mixxx FLX6 v0.10`
+- APK SHA-256: `bbb712a8ed3a9f541078b34d0cd503df48ae30c37b30aca73b0a6b68477bcfbd`
 
 The APK's v3 signature verifies. It contains the ARM64 Mixxx and Qt native
 libraries. No Android device was attached to this machine, so installation,
@@ -20,8 +20,9 @@ launch, touch layout, controller I/O, and live audio still need a physical test.
 The APK contains the active phone QML interface and experimental FLX6 mapping.
 The normal compact view has deck headers and stacked waveforms but no library
 panel. The complete toolbar is hidden behind a tiny top-center arrow and opens
-as an overlay without resizing the waveform view. Use Android's App Info screen
-to confirm version `0.9.0-collapsible-toolbar` and package
+as an overlay without resizing the waveform view. Android safe-area margins
+keep Deck B above any system navigation bar. Use Android's App Info screen to
+confirm version `0.10.0-safe-area-viewports` and package
 `org.mixxx.flx6standalone`.
 
 ## Correct hookup
@@ -83,10 +84,11 @@ Android may warn that this is an unknown or locally signed app. That is expected
 6. Return to the waveform performance view. Press the FLX6 browse encoder and
    confirm that the full-screen library opens; rotate it to move through tracks,
    then press it again or tap **BACK TO MIX** to return to the waveforms.
-7. Confirm the initial screen shows equal Deck A and Deck B waveforms with the
-   entire bottom lane visible. Tap the tiny top-center down arrow, confirm the
-   toolbar overlays the waveforms without moving or resizing them, swipe it
-   sideways to reach every control, then tap the up arrow to collapse it.
+7. Confirm the initial screen shows an equal visible 50/50 split with all of
+   Deck B above Android's navigation/gesture area. Drag the blue grip and
+   confirm it changes the A/B viewport allocation from 20/80 through 80/20.
+   Tap the tiny top-center arrow and confirm the toolbar overlays the view
+   without changing that split, then collapse it again.
 
 Start at 48 kHz with a moderate buffer. Turn off Bluetooth audio and remove
 Android battery optimization for Mixxx while testing.

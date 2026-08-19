@@ -29,6 +29,9 @@
 - `patches/mixxx-android-v0.9-collapsible-toolbar.patch` keeps the two
   waveform lanes fixed at equal height and moves the complete toolbar into a
   collapsible overlay that never changes the waveform layout.
+- `patches/mixxx-android-v0.10-safe-area-viewports.patch` keeps the waveform
+  view inside Android's reported safe area and restores a draggable blue
+  divider that allocates viewport height without changing waveform zoom.
 - `controller-mapping/` contains the bundled experimental DDJ-FLX6 mapping and
   its upstream license.
 
@@ -54,7 +57,8 @@ device.
   continues to move through the track list.
 - The toolbar floats over the waveform screen instead of pushing either deck
   downward. Swipe it sideways when expanded to reach controls on narrow screens.
-- Deck A and Deck B remain equal-height and the blue middle line stays centered.
+- Deck A and Deck B start at a true visible 50/50 split after Android's system
+  insets are removed. Drag the blue middle grip to adjust their viewport share.
 
 ## Corresponding source and licensing
 

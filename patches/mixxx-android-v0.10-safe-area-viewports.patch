@@ -1,0 +1,100 @@
+diff --git a/packaging/android/AndroidManifest.xml b/packaging/android/AndroidManifest.xml
+--- a/packaging/android/AndroidManifest.xml
++++ b/packaging/android/AndroidManifest.xml
+@@ -4,7 +4,7 @@
+     package="org.mixxx.flx6standalone"
+     android:installLocation="auto"
+-    android:versionCode="9"
+-    android:versionName="0.9.0-collapsible-toolbar">
++    android:versionCode="10"
++    android:versionName="0.10.0-safe-area-viewports">
+     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"  />
+     <uses-permission android:name="android.permission.INTERNET"  />
+     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
+@@ -22,7 +22,7 @@
+         android:name="org.qtproject.qt.android.bindings.QtApplication"
+         android:hardwareAccelerated="true"
+         android:icon="@mipmap/ic_launcher"
+-        android:label="Mixxx FLX6 v0.9 NEW"
++        android:label="Mixxx FLX6 v0.10"
+         android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+         android:requestLegacyExternalStorage="true"
+         android:allowBackup="true"
+diff --git a/res/qml/main.qml b/res/qml/main.qml
+--- a/res/qml/main.qml
++++ b/res/qml/main.qml
+@@ -23,6 +23,7 @@ ApplicationWindow {
+     property alias showEffects: showEffectsButton.checked
+     property alias showSamplers: showSamplersButton.checked
+     property bool toolbarExpanded: false
++    property real waveformSplitRatio: 0.5
+ 
+     color: Theme.backgroundColor
+     height: 450
+@@ -68,6 +69,10 @@ ApplicationWindow {
+         id: content
+ 
+         anchors.fill: parent
++        anchors.bottomMargin: parent.SafeArea.margins.bottom
++        anchors.leftMargin: parent.SafeArea.margins.left
++        anchors.rightMargin: parent.SafeArea.margins.right
++        anchors.topMargin: parent.SafeArea.margins.top
+ 
+         Rectangle {
+             id: toolbar
+@@ -341,7 +346,7 @@ ApplicationWindow {
+                     Item {
+                         id: upperWaveformPane
+ 
+-                        height: parent.height / 2
++                        height: Math.round(parent.height * root.waveformSplitRatio)
+                         width: parent.width
+                         y: 0
+ 
+@@ -421,8 +426,45 @@ ApplicationWindow {
+                     color: "#42A5F5"
+                     height: 2
+                     width: parent.width
+-                    y: waveformStack.y + waveformStack.height / 2 - height / 2
++                    y: waveformStack.y + upperWaveformPane.height - height / 2
+                     z: 8
++
++                    MouseArea {
++                        anchors.horizontalCenter: parent.horizontalCenter
++                        anchors.verticalCenter: parent.verticalCenter
++                        height: 36
++                        preventStealing: true
++                        width: parent.width
++
++                        function updateViewportSplit(pointer) {
++                            const mapped = mapToItem(waveformStack, pointer.x, pointer.y);
++                            root.waveformSplitRatio = Math.max(0.2, Math.min(0.8,
++                                    mapped.y / waveformStack.height));
++                        }
++
++                        onPositionChanged: pointer => {
++                            if (pressed)
++                                updateViewportSplit(pointer);
++                        }
++                        onPressed: pointer => updateViewportSplit(pointer)
++                    }
++                    Rectangle {
++                        anchors.centerIn: parent
++                        border.color: "#42A5F5"
++                        border.width: 1
++                        color: "#D0202630"
++                        height: 14
++                        radius: 7
++                        width: 46
++
++                        Text {
++                            anchors.centerIn: parent
++                            color: Theme.white
++                            font.bold: true
++                            font.pixelSize: 11
++                            text: "↕"
++                        }
++                    }
+                 }
+                 Rectangle {
+                     anchors.left: parent.left

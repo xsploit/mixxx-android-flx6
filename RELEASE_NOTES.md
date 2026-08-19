@@ -1,19 +1,19 @@
-# Experimental Mixxx Android ARM64 collapsible toolbar v0.9
+# Experimental Mixxx Android ARM64 safe-area viewports v0.10
 
 This is an unofficial development build for testing Mixxx with a DDJ-FLX6 on
 an Android phone or tablet. It is locally signed and may be unstable.
 
 ## Install
 
-Download `mixxx-android-flx6-v0.9-fresh.apk` on an ARM64 device running Android 9 or
+Download `mixxx-android-flx6-v0.10-safe-area.apk` on an ARM64 device running Android 9 or
 newer, allow installation from the selected file source, and open the APK.
 
-This build uses the new package `org.mixxx.flx6standalone` and appears as
-`Mixxx FLX6 v0.9 NEW`, so it installs beside the old `org.mixxx` previews. You
-do not need to uninstall the old app to test this one.
+This build uses package `org.mixxx.flx6standalone` and appears as
+`Mixxx FLX6 v0.10`. It upgrades v0.9 and still installs beside the older
+`org.mixxx` previews.
 
 SHA-256:
-`48fe1ee22adf1015938ec38557e513fd17a00243faa958ee8bf4e32d4d379522`
+`bbb712a8ed3a9f541078b34d0cd503df48ae30c37b30aca73b0a6b68477bcfbd`
 
 v0.2 changed an unused LateNight skin, so Android's `--new-ui` screen looked
 unchanged. v0.3 corrects that mistake by patching the APK's real
@@ -45,6 +45,15 @@ unchanged. v0.3 corrects that mistake by patching the APK's real
   the overlay; the blue middle divider remains fixed between them.
 - The expanded toolbar scrolls horizontally so every control, including
   `4 DECKS`, `LIBRARY`, and `SETTINGS`, remains reachable.
+
+## Safe-area waveform viewports
+
+- Android's top, bottom, left, and right safe-area insets are removed before
+  calculating the usable performance view, so a system navigation bar cannot
+  cover the bottom of Deck B.
+- Deck A and Deck B default to exactly 50% each inside the visible safe area.
+- The blue divider is draggable from 20/80 through 80/20 using a 36-pixel touch
+  target. It changes each deck's viewport allocation; waveform zoom is untouched.
 
 ## Android music folders
 
