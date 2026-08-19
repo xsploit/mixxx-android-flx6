@@ -1,0 +1,75 @@
+diff --git a/packaging/android/AndroidManifest.xml b/packaging/android/AndroidManifest.xml
+--- a/packaging/android/AndroidManifest.xml
++++ b/packaging/android/AndroidManifest.xml
+@@ -2,8 +2,8 @@
+ <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+     package="org.mixxx.flx6standalone"
+     android:installLocation="auto"
+-    android:versionCode="12"
+-    android:versionName="0.12.0-fixed-waveform-stack">
++    android:versionCode="13"
++    android:versionName="0.13.0-draggable-waveform-stack">
+     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"  />
+     <uses-permission android:name="android.permission.INTERNET"  />
+     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
+@@ -22,7 +22,7 @@
+         android:name="org.qtproject.qt.android.bindings.QtApplication"
+         android:hardwareAccelerated="true"
+         android:icon="@mipmap/ic_launcher"
+-        android:label="Mixxx FLX6 v0.12"
++        android:label="Mixxx FLX6 v0.13"
+         android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+         android:requestLegacyExternalStorage="true"
+         android:allowBackup="true"
+diff --git a/res/qml/main.qml b/res/qml/main.qml
+--- a/res/qml/main.qml
++++ b/res/qml/main.qml
+@@ -23,8 +23,7 @@
+     property alias showEffects: showEffectsButton.checked
+     property alias showSamplers: showSamplersButton.checked
+     property bool toolbarExpanded: false
+-    property real waveformStackAlignment: 1.0
+-    readonly property real waveformDesignHeight: compactScreen ? 258 : height
++    property real waveformStackPosition: 1.0
+ 
+     color: Theme.backgroundColor
+     height: 450
+@@ -336,6 +335,8 @@
+                 Item {
+                     id: waveformStack
+ 
++                    readonly property real verticalTravel: Math.min(72, height * 0.18)
++
+                     anchors.bottom: parent.bottom
+                     anchors.left: parent.left
+                     anchors.right: parent.right
+@@ -345,9 +346,9 @@
+                     Item {
+                         id: waveformContent
+ 
+-                        height: Math.max(parent.height, root.waveformDesignHeight)
++                        height: parent.height
+                         width: parent.width
+-                        y: (parent.height - height) * root.waveformStackAlignment
++                        y: -waveformStack.verticalTravel * root.waveformStackPosition
+ 
+                         Item {
+                             id: upperWaveformPane
+@@ -445,14 +446,9 @@
+ 
+                         function updateStackPosition(pointer) {
+                             const mapped = mapToItem(waveformStack, pointer.x, pointer.y);
+-                            const minimumY = waveformStack.height - waveformContent.height;
+-                            if (minimumY < 0) {
+-                                const desiredY = mapped.y - waveformContent.height / 2;
+-                                root.waveformStackAlignment = Math.max(0, Math.min(1,
+-                                        desiredY / minimumY));
+-                            } else {
+-                                root.waveformStackAlignment = 0;
+-                            }
++                            const desiredY = mapped.y - waveformContent.height / 2;
++                            root.waveformStackPosition = Math.max(0, Math.min(1,
++                                    -desiredY / waveformStack.verticalTravel));
+                         }
+ 
+                         onPositionChanged: pointer => {

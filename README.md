@@ -38,6 +38,9 @@
 - `patches/mixxx-android-v0.12-fixed-waveform-stack.patch` preserves the
   original equal A/B renderer heights and changes the blue handle to translate
   the complete waveform-and-label stack vertically inside a clipped viewport.
+- `patches/mixxx-android-v0.13-draggable-waveform-stack.patch` gives that
+  translation an unconditional 72-pixel/18% range instead of disabling it when
+  Qt reports a viewport taller than the earlier design constant.
 - `controller-mapping/` contains the bundled experimental DDJ-FLX6 mapping and
   its upstream license.
 

@@ -1,19 +1,19 @@
-# Experimental Mixxx Android ARM64 fixed waveform stack v0.12
+# Experimental Mixxx Android ARM64 draggable waveform stack v0.13
 
 This is an unofficial development build for testing Mixxx with a DDJ-FLX6 on
 an Android phone or tablet. It is locally signed and may be unstable.
 
 ## Install
 
-Download `mixxx-android-flx6-v0.12-fixed-stack.apk` on an ARM64 device running Android 9 or
+Download `mixxx-android-flx6-v0.13-draggable-stack.apk` on an ARM64 device running Android 9 or
 newer, allow installation from the selected file source, and open the APK.
 
 This build uses package `org.mixxx.flx6standalone` and appears as
-`Mixxx FLX6 v0.12`. It upgrades v0.9-v0.11 and still installs beside the older
+`Mixxx FLX6 v0.13`. It upgrades v0.9-v0.12 and still installs beside the older
 `org.mixxx` previews.
 
 SHA-256:
-`675226f7f6a6db4c655e01760f0d687c5ad2ca7172037a5e0123de2a2583fc75`
+`7b52ebfb77264e04ee85d682abd463053f167e83daeb9a474d2c9ff7fb1f570c`
 
 v0.2 changed an unused LateNight skin, so Android's `--new-ui` screen looked
 unchanged. v0.3 corrects that mistake by patching the APK's real
@@ -70,6 +70,8 @@ unchanged. v0.3 corrects that mistake by patching the APK's real
 - Dragging the blue middle handle translates the complete stack between its
   top- and bottom-aligned limits. A, B, their labels, grid, and scrolling
   waveform content all move together; renderer height and waveform zoom do not change.
+- v0.13 fixes v0.12's zero-travel bug: translation is always available across
+  up to 72 pixels or 18% of the waveform viewport, whichever is smaller.
 
 ## Android music folders
 
