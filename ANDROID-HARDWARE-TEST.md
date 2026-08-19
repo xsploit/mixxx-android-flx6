@@ -10,9 +10,9 @@ Mixxx. It is not an official Mixxx Android release.
 - Source commit: `86126792a3a11b493a74ea133dc1260890d9c200`
 - Minimum Android version: Android 9 / API 28
 - CPU architecture: ARM64
-- APK version: `0.16.0-five-pixel-header-guard` (version code 16)
-- APK label: `Mixxx FLX6 v0.16`
-- APK SHA-256: `fac9efe4bed3b9ec329cc71a48526147dfbcb56f0a8ace985f12ec605205ccc8`
+- APK version: `0.17.0-measured-header-layout` (version code 17)
+- APK label: `Mixxx FLX6 v0.17`
+- APK SHA-256: `3812ba2e17f580c488086339c8ea53e897ccbac90ca13d8e4dada55b822306f4`
 
 The APK's v3 signature verifies. It contains the ARM64 Mixxx and Qt native
 libraries. No Android device was attached to this machine, so installation,
@@ -25,7 +25,7 @@ keep Deck B above any system navigation bar, and the obsolete 320-logical-pixel
 minimum window height has been removed. The main waveform viewport begins below
 the track header and splits all remaining height equally around its blue divider.
 The adjustable stack remains clipped inside that lower layer. Use Android's App Info screen to confirm
-version `0.16.0-five-pixel-header-guard` and package
+version `0.17.0-measured-header-layout` and package
 `org.mixxx.flx6standalone`.
 
 ## Correct hookup
@@ -87,8 +87,8 @@ Android may warn that this is an unknown or locally signed app. That is expected
 6. Return to the waveform performance view. Press the FLX6 browse encoder and
    confirm that the full-screen library opens; rotate it to move through tracks,
    then press it again or tap **BACK TO MIX** to return to the waveforms.
-7. Confirm the black waveform viewport starts below the track-name/overview row,
-   with a small 5-pixel guard and no dark area bleeding behind it. Confirm Deck A and B are equal visible
+7. Confirm the black waveform viewport starts below the complete play/cue,
+   track-name, and overview row, with a small guard and no overlap. Confirm Deck A and B are equal visible
    lanes, separated by the 2-pixel blue line, and Deck B's bottom edge is onscreen.
    Drag the blue center grip and confirm the complete A+B stack moves while the
    track-name/overview row stays fixed above the clipped waveform boundary.

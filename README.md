@@ -52,6 +52,9 @@
 - `patches/mixxx-android-v0.16-five-pixel-header-guard.patch` adds a 5-pixel
   guard beneath that header. The waveform viewport and both side overlays now
   begin at pixel 67, without changing the working stack adjustment.
+- `patches/mixxx-android-v0.17-measured-header-layout.patch` removes the fixed
+  header height. Each minimized deck reports its actual layout implicit height,
+  including margins; the waveform viewport follows the measured header bottom.
 - `controller-mapping/` contains the bundled experimental DDJ-FLX6 mapping and
   its upstream license.
 
@@ -87,8 +90,9 @@ device.
 - Dragging the blue center grip moves the complete A+B waveform stack through
   its previous 72-pixel/18% adjustment range. The opaque header remains above it
   and the waveform viewport clips at the header boundary.
-- A 5-pixel opaque guard separates the 62-pixel cue/overview header from the
-  black waveform viewport, preventing edge bleed over those controls.
+- A 5-pixel opaque guard separates the measured cue/overview header from the
+  black waveform viewport, preventing edge bleed over those controls. The same
+  calculation responds to different phone, tablet, density, and font layouts.
 
 ## Corresponding source and licensing
 

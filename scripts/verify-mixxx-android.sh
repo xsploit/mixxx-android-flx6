@@ -12,15 +12,15 @@ test -n "$apksigner"
 
 echo "== Package metadata =="
 "$aapt" dump badging "$apk" | head -8
-"$aapt" dump badging "$apk" | grep "package: name='org.mixxx.flx6standalone' versionCode='16' versionName='0.16.0-five-pixel-header-guard'" >/dev/null
-"$aapt" dump badging "$apk" | grep "application-label:'Mixxx FLX6 v0.16'" >/dev/null
+"$aapt" dump badging "$apk" | grep "package: name='org.mixxx.flx6standalone' versionCode='17' versionName='0.17.0-measured-header-layout'" >/dev/null
+"$aapt" dump badging "$apk" | grep "application-label:'Mixxx FLX6 v0.17'" >/dev/null
 "$aapt" dump badging "$apk" | grep "launchable-activity: name='org.mixxx.MainActivity'" >/dev/null
 echo "== Signature =="
 "$apksigner" verify --verbose --print-certs "$apk"
 echo "== Selected ARM64 native libraries =="
 unzip -l "$apk" | grep -E 'lib/arm64-v8a/(libmixxx|libQt6Core|libc\+\+_shared)'
 echo "== Phone UI resources =="
-unzip -l "$apk" | grep -E 'assets/qml/(main.qml|WaveformDisplay.qml|Library.qml|Library/TrackList.qml|Settings.qml)'
+unzip -l "$apk" | grep -E 'assets/qml/(main.qml|Deck.qml|WaveformDisplay.qml|Library.qml|Library/TrackList.qml|Settings.qml)'
 unzip -p "$apk" assets/qml/main.qml | grep 'text: "4 Decks"' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'text: "Settings"' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'id: performanceDeckHeaders' >/dev/null
@@ -36,9 +36,18 @@ unzip -p "$apk" assets/qml/main.qml | grep 'parent.SafeArea.margins.bottom' >/de
 unzip -p "$apk" assets/qml/main.qml | grep 'id: waveformContent' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'property real waveformStackPosition: 1.0' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'property real waveformVisualGain: compactScreen ? 1.7 : 1.0' >/dev/null
-unzip -p "$apk" assets/qml/main.qml | grep 'readonly property int performanceHeaderHeight: compactScreen ? 62 : 0' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'readonly property int waveformTopGuard: compactScreen ? 5 : 0' >/dev/null
-unzip -p "$apk" assets/qml/main.qml | grep 'readonly property int waveformViewportTop: performanceHeaderHeight + waveformTopGuard' >/dev/null
+unzip -p "$apk" assets/qml/main.qml | grep 'readonly property real waveformViewportTop: performanceDeckHeaders.height + waveformTopGuard' >/dev/null
+unzip -p "$apk" assets/qml/main.qml | grep 'readonly property real measuredHeight: Math.max(performanceDeck1.implicitHeight,' >/dev/null
+unzip -p "$apk" assets/qml/main.qml | grep 'height: root.compactScreen ? Math.ceil(measuredHeight) : 0' >/dev/null
+if unzip -p "$apk" assets/qml/main.qml | grep -q 'performanceHeaderHeight'; then
+    echo "Fixed performance header height is still packaged" >&2
+    exit 1
+fi
+unzip -p "$apk" assets/qml/Deck.qml | grep 'readonly property int layoutMargin: 4' >/dev/null
+unzip -p "$apk" assets/qml/Deck.qml | grep 'readonly property real measuredContentHeight: minimized' >/dev/null
+unzip -p "$apk" assets/qml/Deck.qml | grep 'minimizedGrid.implicitHeight + layoutMargin \* 2' >/dev/null
+unzip -p "$apk" assets/qml/Deck.qml | grep 'implicitHeight: Math.ceil(measuredContentHeight)' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'readonly property int waveformDividerThickness: 2' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'readonly property int waveformLanePadding: compactScreen ? 1 : 0' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'text: "Wave -"' >/dev/null

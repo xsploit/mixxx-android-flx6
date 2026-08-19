@@ -1,0 +1,105 @@
+diff --git a/packaging/android/AndroidManifest.xml b/packaging/android/AndroidManifest.xml
+--- a/packaging/android/AndroidManifest.xml
++++ b/packaging/android/AndroidManifest.xml
+@@ -2,8 +2,8 @@
+ <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+     package="org.mixxx.flx6standalone"
+     android:installLocation="auto"
+-    android:versionCode="16"
+-    android:versionName="0.16.0-five-pixel-header-guard">
++    android:versionCode="17"
++    android:versionName="0.17.0-measured-header-layout">
+     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"  />
+     <uses-permission android:name="android.permission.INTERNET"  />
+     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
+@@ -22,7 +22,7 @@
+         android:name="org.qtproject.qt.android.bindings.QtApplication"
+         android:hardwareAccelerated="true"
+         android:icon="@mipmap/ic_launcher"
+-        android:label="Mixxx FLX6 v0.16"
++        android:label="Mixxx FLX6 v0.17"
+         android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+         android:requestLegacyExternalStorage="true"
+         android:allowBackup="true"
+diff --git a/res/qml/Deck.qml b/res/qml/Deck.qml
+--- a/res/qml/Deck.qml
++++ b/res/qml/Deck.qml
+@@ -23,11 +23,17 @@
+     }
+ 
+     readonly property var currentTrack: deckPlayer.currentTrack
++    readonly property int layoutMargin: 4
++    readonly property real measuredContentHeight: minimized
++            ? minimizedGrid.implicitHeight + layoutMargin * 2
++            : grid.implicitHeight + layoutMargin * 2
+     property var deckPlayer: Mixxx.PlayerManager.getPlayer(group)
+     property bool editMode: false
+     required property string group
+     property bool minimized: false
+ 
++    implicitHeight: Math.ceil(measuredContentHeight)
++
+     signal toggleFocus
+ 
+     function serializeModel(item) {
+@@ -438,7 +444,7 @@
+         id: grid
+ 
+         anchors.fill: parent
+-        anchors.margins: 4
++        anchors.margins: root.layoutMargin
+         visible: !root.minimized
+ 
+         FadeBehavior on visible {
+@@ -454,7 +460,7 @@
+         id: minimizedGrid
+ 
+         anchors.fill: parent
+-        anchors.margins: 4
++        anchors.margins: root.layoutMargin
+         visible: root.minimized
+ 
+         FadeBehavior on visible {
+diff --git a/res/qml/main.qml b/res/qml/main.qml
+--- a/res/qml/main.qml
++++ b/res/qml/main.qml
+@@ -25,9 +25,8 @@
+     property bool toolbarExpanded: false
+     property real waveformStackPosition: 1.0
+     property real waveformVisualGain: compactScreen ? 1.7 : 1.0
+-    readonly property int performanceHeaderHeight: compactScreen ? 62 : 0
+     readonly property int waveformTopGuard: compactScreen ? 5 : 0
+-    readonly property int waveformViewportTop: performanceHeaderHeight + waveformTopGuard
++    readonly property real waveformViewportTop: performanceDeckHeaders.height + waveformTopGuard
+     readonly property int waveformDividerThickness: 2
+     readonly property int waveformLanePadding: compactScreen ? 1 : 0
+ 
+@@ -320,7 +319,10 @@
+                 Row {
+                     id: performanceDeckHeaders
+ 
+-                    height: root.performanceHeaderHeight
++                    readonly property real measuredHeight: Math.max(performanceDeck1.implicitHeight,
++                            performanceDeck2.implicitHeight)
++
++                    height: root.compactScreen ? Math.ceil(measuredHeight) : 0
+                     clip: true
+                     visible: root.compactScreen
+                     width: parent.width
+@@ -328,12 +330,16 @@
+                     z: 21
+ 
+                     Deck {
++                        id: performanceDeck1
++
+                         group: "[Channel1]"
+                         height: parent.height
+                         minimized: true
+                         width: parent.width / (root.show4decks ? 4 : 2)
+                     }
+                     Deck {
++                        id: performanceDeck2
++
+                         group: "[Channel2]"
+                         height: parent.height
+                         minimized: true
