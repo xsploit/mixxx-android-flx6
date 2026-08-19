@@ -26,22 +26,22 @@ diff --git a/res/qml/WaveformDisplay.qml b/res/qml/WaveformDisplay.qml
 +++ b/res/qml/WaveformDisplay.qml
 @@ -15,13 +15,15 @@
  
-    required property string group
+     required property string group
      property bool splitStemTracks: false
 -    property real visualGain: 1.0
 +    property real verticalDrawScale: 1.0
-    readonly property string zoomGroup: Mixxx.Config.waveformZoomSynchronization ? "[Channel1]" : group
+     readonly property string zoomGroup: Mixxx.Config.waveformZoomSynchronization ? "[Channel1]" : group
  
-    MixxxControls.WaveformDisplay {
+     MixxxControls.WaveformDisplay {
 -        anchors.fill: parent
 +        anchors.centerIn: parent
          backgroundColor: "transparent"
          group: root.group
 +        height: parent.height * root.verticalDrawScale
 +        width: parent.width
-        zoom: zoomControl.value
+         zoom: zoomControl.value
  
-        Behavior on zoom {
+         Behavior on zoom {
 @@ -70,7 +72,7 @@
          }
          Mixxx.WaveformRendererFiltered {
@@ -111,7 +111,7 @@ diff --git a/res/qml/main.qml b/res/qml/main.qml
 +            radius: 2
 +            width: 28
              y: root.toolbarExpanded ? toolbar.height : 0
-            z: 31
+             z: 31
  
 @@ -243,11 +245,13 @@
                  anchors.centerIn: parent
@@ -136,7 +136,7 @@ diff --git a/res/qml/main.qml b/res/qml/main.qml
 -                                    visualGain: root.waveformVisualGain
 +                                    verticalDrawScale: root.waveformDrawScale
  
-                                    FadeBehavior on visible {
+                                     FadeBehavior on visible {
                                          fadeTarget: deck3waveform
 @@ -431,7 +435,7 @@
                              anchors.bottomMargin: root.waveformLanePadding
@@ -163,7 +163,7 @@ diff --git a/res/qml/main.qml b/res/qml/main.qml
 -                                    visualGain: root.waveformVisualGain
 +                                    verticalDrawScale: root.waveformDrawScale
  
-                                    FadeBehavior on visible {
+                                     FadeBehavior on visible {
                                          fadeTarget: deck4waveform
 @@ -479,6 +483,27 @@
                          }
@@ -207,7 +207,7 @@ diff --git a/res/qml/main.qml b/res/qml/main.qml
                          width: 46
 +                        opacity: root.editDeck ? 1.0 : 0.55
  
-                        Text {
+                         Text {
                              anchors.centerIn: parent
                              color: Theme.white
                              font.bold: true
