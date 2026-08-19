@@ -16,3 +16,10 @@ echo "== Signature =="
 "$apksigner" verify --verbose --print-certs "$apk"
 echo "== Selected ARM64 native libraries =="
 unzip -l "$apk" | grep -E 'lib/arm64-v8a/(libmixxx|libQt6Core|libc\+\+_shared)'
+echo "== Phone UI resources =="
+unzip -l "$apk" | grep -E 'assets/skins/LateNightQML/(main.qml|Toolbar/Toolbar.qml|skin.ini)'
+unzip -p "$apk" assets/skins/LateNightQML/main.qml | grep 'minimumWidth: 640' >/dev/null
+unzip -p "$apk" assets/skins/LateNightQML/Toolbar/Toolbar.qml | grep 'text: "SETTINGS"' >/dev/null
+unzip -p "$apk" assets/skins/LateNightQML/Toolbar/Toolbar.qml | grep 'text: "LOAD 1"' >/dev/null
+echo "== Experimental FLX6 mapping =="
+unzip -l "$apk" | grep -E 'assets/controllers/Pioneer-DDJ-FLX6(-script.js|.midi.xml)'

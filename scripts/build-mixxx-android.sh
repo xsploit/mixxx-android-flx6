@@ -16,10 +16,25 @@ fi
 
 cd "${MIXXX_SOURCE}"
 
-WSL_PATCH="${REPO_DIR}/patches/mixxx-android-wsl.patch"
-if git apply --check "${WSL_PATCH}" 2>/dev/null; then
-    git apply "${WSL_PATCH}"
-fi
+apply_patch_if_needed() {
+    local patch_path="$1"
+    if git apply --check "${patch_path}" 2>/dev/null; then
+        git apply "${patch_path}"
+    elif ! git apply --reverse --check "${patch_path}" 2>/dev/null; then
+        echo "Patch is neither applicable nor already applied: ${patch_path}" >&2
+        exit 1
+    fi
+}
+
+apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-wsl.patch"
+apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-phone-ui.patch"
+
+install -m 0644 \
+    "${REPO_DIR}/controller-mapping/Pioneer-DDJ-FLX6.midi.xml" \
+    "${MIXXX_SOURCE}/res/controllers/Pioneer-DDJ-FLX6.midi.xml"
+install -m 0644 \
+    "${REPO_DIR}/controller-mapping/Pioneer-DDJ-FLX6-script.js" \
+    "${MIXXX_SOURCE}/res/controllers/Pioneer-DDJ-FLX6-script.js"
 
 set +u
 source tools/android_buildenv.sh setup

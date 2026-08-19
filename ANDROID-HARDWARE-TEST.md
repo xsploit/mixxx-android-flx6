@@ -10,11 +10,13 @@ Mixxx. It is not an official Mixxx Android release.
 - Source commit: `86126792a3a11b493a74ea133dc1260890d9c200`
 - Minimum Android version: Android 9 / API 28
 - CPU architecture: ARM64
-- APK SHA-256: `a9438ddaa4cb3f23685fe2d89c7957a2f818a186ffc2c0244a65e7427e01ee0a`
+- APK version: `0.2.0-phone-preview` (version code 2)
+- APK SHA-256: `cbd003cac2484d393729a7a0764100205893822c6f4e37dc828a28964dbe5219`
 
 The APK's v3 signature verifies. It contains the ARM64 Mixxx and Qt native
 libraries. No Android device was attached to this machine, so installation,
 launch, touch layout, controller I/O, and live audio still need a physical test.
+The APK contains the phone QML skin and experimental FLX6 mapping.
 
 ## Correct hookup
 
@@ -53,8 +55,10 @@ Android may warn that this is an unknown or locally signed app. That is expected
 
 ## Test order
 
-1. Launch Mixxx without the controller. Grant requested music/file access,
-   import one track, load it, press Play, and confirm audio from the phone.
+1. Launch Mixxx without the controller. Tap **SETTINGS**, open **Library**, add
+   the phone music folder, and grant requested music/file access. Close settings,
+   tap **LIBRARY**, select one track, tap **LOAD 1**, press Play, and confirm
+   audio from the phone.
 2. Close Mixxx. Connect charger, hub, and FLX6 in the diagram above. Wait until
    the FLX6 finishes powering up, then launch Mixxx and accept any USB permission
    prompt.
@@ -65,29 +69,31 @@ Android may warn that this is an unknown or locally signed app. That is expected
 4. Connect speakers only to the FLX6 MASTER RCA sockets and headphones to its
    PHONES socket. Do not expect sound from the phone speaker after USB audio is
    selected.
-5. In **Preferences > Controllers**, confirm that the FLX6 is listed and that
-   moving a control produces input activity.
+5. Tap **SETTINGS**, open **Controllers**, confirm that the FLX6 is listed,
+   select the bundled Pioneer DDJ-FLX6 mapping if it is not auto-selected, and
+   confirm that moving a control produces input activity.
 
 Start at 48 kHz with a moderate buffer. Turn off Bluetooth audio and remove
 Android battery optimization for Mixxx while testing.
 
-## Expected controller limitation
+## Experimental controller mapping
 
 Current upstream Mixxx includes mappings for the DDJ-200, DDJ-400, DDJ-FLX4,
-and some older Pioneer controllers, but not the DDJ-FLX6. Detection and USB
-permission code are present in this build, but one-to-one FLX6 controls are not
-yet bundled.
+and some older Pioneer controllers, but not the DDJ-FLX6. This APK adds a
+community FLX6 mapping derived from the Pioneer mappings. It is structurally
+valid and bundled in the APK, but physical behavior is not proven yet.
 
-The next practical step is to capture the FLX6 MIDI messages and build a proper
-Mixxx XML/JavaScript mapping. The safest fast path is:
+Test browser, load, play/cue, channel faders, EQ, crossfader, jog wheels, pads,
+deck switching, LEDs, and VU meters in that order. Record anything incorrect;
+the repair path is:
 
 1. Connect the FLX6 to desktop Mixxx first.
 2. Use Mixxx's MIDI-learning tools for basic deck, mixer, browser, and transport
    controls.
 3. Capture the harder jog-wheel, LED, VU meter, and pad behavior with MIDI debug
    logging.
-4. Add the finished mapping to `res/controllers/` and rebuild this APK so it is
-   available inside the Android app.
+4. Correct `controller-mapping/Pioneer-DDJ-FLX6.midi.xml` or its JavaScript and
+   rebuild the APK.
 
 Trying to make rekordbox identify one controller as a different model does not
 solve Mixxx's mapping or Android audio routing. A native Mixxx FLX6 mapping is
@@ -106,8 +112,8 @@ the shorter, maintainable route.
   but separate cue may require an Android/driver fix or a second supported audio
   interface. A DDJ-200-style phone splitter is only a fallback and reduces
   master and cue to mono.
-- **Controls register but do the wrong thing or nothing:** this is the missing
-  FLX6 mapping, not an audio-cable problem.
+- **Controls register but do the wrong thing or nothing:** the bundled mapping
+  needs hardware-specific correction; this is separate from the audio path.
 
 For a useful log while reproducing a failure:
 
