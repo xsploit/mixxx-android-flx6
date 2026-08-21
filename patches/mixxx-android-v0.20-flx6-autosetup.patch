@@ -1,0 +1,279 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 114069e17..fbfd54eac 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -3796,6 +3796,18 @@ if(PORTMIDI)
+   )
+ endif()
+ 
++# Android's class-compliant MIDI service. PortMidi is intentionally disabled
++# on Android, so USB MIDI controllers need this native backend instead.
++if(ANDROID)
++  target_compile_definitions(mixxx-lib PUBLIC __ANDROIDMIDI__)
++  target_sources(
++    mixxx-lib
++    PRIVATE
++      src/controllers/midi/androidmidicontroller.cpp
++      src/controllers/midi/androidmidienumerator.cpp
++  )
++endif()
++
+ # Protobuf
+ add_subdirectory(src/proto)
+ target_link_libraries(mixxx-lib PUBLIC mixxx-proto)
+diff --git a/packaging/android/AndroidManifest.xml b/packaging/android/AndroidManifest.xml
+index af7af1233..453f255e9 100644
+--- a/packaging/android/AndroidManifest.xml
++++ b/packaging/android/AndroidManifest.xml
+@@ -1,7 +1,7 @@
+ <?xml version="1.0"?>
+ <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+     package="org.mixxx.flx6standalone"
+     android:installLocation="auto"
+-    android:versionCode="19"
+-    android:versionName="0.19.0-independent-waveform-centers">
++    android:versionCode="20"
++    android:versionName="0.20.0-flx6-auto-setup">
+     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"  />
+@@ -21,9 +21,9 @@
+     <application
+         android:name="org.qtproject.qt.android.bindings.QtApplication"
+         android:hardwareAccelerated="true"
+         android:icon="@mipmap/ic_launcher"
+-        android:label="Mixxx FLX6 v0.19"
++        android:label="Mixxx FLX6 v0.20"
+         android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+         android:requestLegacyExternalStorage="true"
+         android:allowBackup="true"
+         android:fullBackupOnly="false">
+diff --git a/res/qml/Settings.qml b/res/qml/Settings.qml
+index f4779995e..17bf19b2c 100644
+--- a/res/qml/Settings.qml
++++ b/res/qml/Settings.qml
+@@ -289,6 +289,8 @@ Popup {
+                         root.activeCategoryIndex = root.activeCategoryIndex;
+                     }
+ 
++                    Settings.Flx6Setup {
++                    }
+                     Settings.SoundHardware {
+                     }
+                     Settings.Library {
+diff --git a/src/controllers/controllermanager.cpp b/src/controllers/controllermanager.cpp
+index 88ba4dd43..a018c9952 100644
+--- a/src/controllers/controllermanager.cpp
++++ b/src/controllers/controllermanager.cpp
+@@ -17,6 +17,10 @@
+ #include "util/thread_affinity.h"
+ #include "util/time.h"
+ 
++#ifdef __ANDROIDMIDI__
++#include "controllers/midi/androidmidienumerator.h"
++#endif
++
+ #ifdef __PORTMIDI__
+ #include "controllers/midi/portmidienumerator.h"
+ #endif
+@@ -171,6 +175,9 @@ void ControllerManager::slotInitialize() {
+     // construct since they interact with host MIDI APIs.
+     {
+         auto locker = lockMutex(&m_mutex);
++#ifdef __ANDROIDMIDI__
++        m_enumerators.push_back(std::make_unique<AndroidMidiEnumerator>());
++#endif
+ #ifdef __PORTMIDI__
+         m_enumerators.push_back(std::make_unique<PortMidiEnumerator>(m_pConfig));
+ #endif
+@@ -285,6 +292,19 @@ void ControllerManager::slotSetUpDevices() {
+         // The filename for this device name.
+         QString deviceName = sanitizeDeviceName(name);
+ 
++#ifdef __ANDROIDMIDI__
++        // This build is a dedicated FLX6 standalone experiment. The hardware
++        // should work as soon as it is plugged in, without making the user
++        // select a mapping in the desktop-oriented preferences screen.
++        if (name.contains(QStringLiteral("FLX6"), Qt::CaseInsensitive)) {
++            m_pConfig->setValue(ConfigKey("[Controller]", deviceName), 1);
++            if (getConfiguredMappingFileForDevice(deviceName).isEmpty()) {
++                m_pConfig->setValue(ConfigKey(kSettingsGroup, deviceName),
++                        QStringLiteral("Pioneer-DDJ-FLX6.midi.xml"));
++            }
++        }
++#endif
++
+         // Check if device is enabled
+         if (!m_pConfig->getValue(ConfigKey("[Controller]", deviceName), 0)) {
+             continue;
+diff --git a/src/qml/qmlpreferencesproxy.h b/src/qml/qmlpreferencesproxy.h
+index d68a26904..a48c89a55 100644
+--- a/src/qml/qmlpreferencesproxy.h
++++ b/src/qml/qmlpreferencesproxy.h
+@@ -352,6 +352,7 @@ class QmlControllerManagerProxy : public QObject {
+     Q_INVOKABLE mixxx::qml::QmlControllerMappingProxyList mappings(
+             mixxx::qml::QmlControllerDeviceProxy::Type type) const {
+         return m_knownMappings.value(type);
+     }
++    Q_INVOKABLE QString flx6Status() const;
+ 
+     static QmlControllerManagerProxy* create(QQmlEngine* pQmlEngine, QJSEngine* pJsEngine);
+diff --git a/src/qml/qmlpreferencesproxy.cpp b/src/qml/qmlpreferencesproxy.cpp
+index 361e4dd15..440e8016a 100644
+--- a/src/qml/qmlpreferencesproxy.cpp
++++ b/src/qml/qmlpreferencesproxy.cpp
+@@ -769,6 +769,20 @@ QQmlListProperty<QmlControllerDeviceProxy> QmlControllerManagerProxy::unknownDev
+     return {this, &m_unknownDevicesFound};
+ }
+ 
++QString QmlControllerManagerProxy::flx6Status() const {
++    for (Controller* controller : m_pControllerManager->getControllers()) {
++        if (!controller->getName().contains(
++                    QStringLiteral("FLX6"), Qt::CaseInsensitive)) {
++            continue;
++        }
++        if (controller->isOpen()) {
++            return tr("Ready - MIDI active and FLX6 mapping loaded");
++        }
++        return tr("Detected - close and reopen Mixxx to finish setup");
++    }
++    return tr("Not detected - connect FLX6, then reopen Mixxx");
++}
++
+ // static
+ QmlControllerManagerProxy* QmlControllerManagerProxy::create(
+         QQmlEngine* pQmlEngine,
+diff --git a/src/qml/qmlsoundmanagerproxy.h b/src/qml/qmlsoundmanagerproxy.h
+index 66d9af815..791463b2f 100644
+--- a/src/qml/qmlsoundmanagerproxy.h
++++ b/src/qml/qmlsoundmanagerproxy.h
+@@ -158,4 +158,6 @@ class QmlSoundManagerProxy : public QObject {
+     Q_INVOKABLE void clearInputs();
+     Q_INVOKABLE bool hasMicInputs();
++    Q_INVOKABLE QString flx6AudioStatus() const;
++    Q_INVOKABLE QString autoConfigureFlx6();
+ 
+     std::shared_ptr<SoundManager> internal() const;
+diff --git a/src/qml/qmlsoundmanagerproxy.cpp b/src/qml/qmlsoundmanagerproxy.cpp
+index f9c68c569..c339898b6 100644
+--- a/src/qml/qmlsoundmanagerproxy.cpp
++++ b/src/qml/qmlsoundmanagerproxy.cpp
+@@ -238,6 +238,68 @@ bool QmlSoundManagerProxy::hasMicInputs() {
+     return m_config.hasMicInputs();
+ }
+ 
++QString QmlSoundManagerProxy::flx6AudioStatus() const {
++    const auto devices = m_pSoundManager->getDeviceList(QString(), true, false);
++    for (const auto& device : devices) {
++        if (!device->getDisplayName().contains(
++                    QStringLiteral("FLX6"), Qt::CaseInsensitive)) {
++            continue;
++        }
++        const int channels = device->getNumOutputChannels();
++        const int configured = m_config.getOutputs().count(device->getDeviceId());
++        const int expectedConnections = channels >= 4 ? 2 : 1;
++        if (configured >= expectedConnections) {
++            return channels >= 4
++                    ? tr("Ready - Master 1/2 and headphones 3/4")
++                    : tr("Ready - Master 1/2 (no separate headphone channels exposed)");
++        }
++        return tr("Detected - tap CHECK AND SET UP FLX6");
++    }
++    return tr("Not detected - Android has not exposed the FLX6 sound card");
++}
++
++QString QmlSoundManagerProxy::autoConfigureFlx6() {
++    if (m_commitInProgress.loadAcquire() == 1) {
++        return tr("Setting up audio...");
++    }
++
++    const auto devices = m_pSoundManager->getDeviceList(QString(), true, false);
++    SoundDevicePointer flx6;
++    for (const auto& device : devices) {
++        if (device->getDisplayName().contains(
++                    QStringLiteral("FLX6"), Qt::CaseInsensitive)) {
++            flx6 = device;
++            break;
++        }
++    }
++    if (!flx6) {
++        return tr("Not detected - Android has not exposed the FLX6 sound card");
++    }
++
++    const int channels = flx6->getNumOutputChannels();
++    if (channels < 2) {
++        return tr("Detected, but Android reports fewer than two audio channels");
++    }
++
++    m_config.clearOutputs();
++    m_config.addOutput(flx6->getDeviceId(),
++            AudioOutput(AudioPathType::Main,
++                    0,
++                    mixxx::audio::ChannelCount::stereo(),
++                    0));
++    if (channels >= 4) {
++        m_config.addOutput(flx6->getDeviceId(),
++                AudioOutput(AudioPathType::Headphones,
++                        2,
++                        mixxx::audio::ChannelCount::stereo(),
++                        0));
++    }
++    commit();
++    return channels >= 4
++            ? tr("Ready - Master 1/2 and headphones 3/4")
++            : tr("Ready - Master 1/2 (no separate headphone channels exposed)");
++}
++
+ std::shared_ptr<SoundManager> QmlSoundManagerProxy::internal() const {
+     return m_pSoundManager;
+ }
+diff --git a/src/soundio/portaudioenumerator.cpp b/src/soundio/portaudioenumerator.cpp
+index 830f35e8a..e60fb95c7 100644
+--- a/src/soundio/portaudioenumerator.cpp
++++ b/src/soundio/portaudioenumerator.cpp
+@@ -124,11 +124,15 @@ void PortAudioEnumerator::initialize() {
+                                        .toString();
+                 if (!maybeName.value().isEmpty()) {
+                     name.append(QStringLiteral(": %1").arg(maybeName.value()));
+                 }
+                 int32_t id = device->callMethod<jint>("getId");
+                 auto channelCounts = device->callMethod<QJniArray<jint>>("getChannelCounts");
+-                int channelCount = *std::max_element(
+-                        channelCounts.begin(), channelCounts.end());
++                // Android is allowed to return an empty capability array for
++                // class-compliant USB devices. That means "unspecified", not
++                // "no channels". Stereo is the safe Oboe fallback.
++                int channelCount = channelCounts.isEmpty()
++                        ? 2
++                        : *std::max_element(channelCounts.begin(), channelCounts.end());
+                 auto sampleRates = device->callMethod<QJniArray<jint>>("getSampleRates");
+                 qDebug() << "audioManager - Type:" << type
+                          << "- Name:" << name
+@@ -134,18 +138,16 @@ void PortAudioEnumerator::initialize() {
+                          << "- ChannelCount:" << channelCount
+                          << channelCounts.size();
+-                if (!sampleRates.isEmpty()) {
+-                    int sampleRate = *sampleRates.cbegin();
+-                    qDebug() << "audioManager - SampleRates:" << sampleRate;
+-                    auto result = PaOboe_RegisterDevice(name.toStdString().c_str(),
+-                            id,
+-                            direction,
+-                            channelCount,
+-                            sampleRate);
+-                    if (result != paNoError) {
+-                        qWarning()
+-                                << "Error registering device to PortAudio:"
+-                                << Pa_GetErrorText(result);
+-                    }
++                const int sampleRate = sampleRates.isEmpty() ? 48000 : *sampleRates.cbegin();
++                qDebug() << "audioManager - SampleRate:" << sampleRate;
++                auto result = PaOboe_RegisterDevice(name.toStdString().c_str(),
++                        id,
++                        direction,
++                        channelCount,
++                        sampleRate);
++                if (result != paNoError) {
++                    qWarning()
++                            << "Error registering device to PortAudio:"
++                            << Pa_GetErrorText(result);
+                 }
+             }
+         };

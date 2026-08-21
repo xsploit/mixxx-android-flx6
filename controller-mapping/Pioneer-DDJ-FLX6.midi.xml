@@ -3,8 +3,7 @@
     <info>
         <name>Pioneer DDJ-FLX6</name>
         <author>Robert904</author>
-        <description>Midi Mapping for the Pioneer DDJ-FLX4 (based on DDJ-400 mapping)</description>
-        <forums>https://mixxx.discourse.group/t/pioneer-ddj-flx4</forums>
+        <description>Experimental Android MIDI mapping for the Pioneer DDJ-FLX6</description>
     </info>
     <controller id="DDJ-FLX6">
         <scriptfiles>

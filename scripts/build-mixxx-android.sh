@@ -27,6 +27,7 @@ apply_patch_if_needed() {
 }
 
 apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-wsl.patch"
+if ! grep -q 'android:versionName="0.20.0-flx6-auto-setup"' packaging/android/AndroidManifest.xml; then
 if ! grep -qE 'android:versionName="0\.(16\.0-five-pixel-header-guard|17\.0-measured-header-layout|18\.0-edit-locked-draw-scale|19\.0-independent-waveform-centers)"' packaging/android/AndroidManifest.xml; then
 if ! grep -qE 'android:versionName="0\.(3\.0-active-phone-ui|4\.0-performance-view|5\.0-waveform-fix|6\.0-android-storage|7\.0-live-layout|8\.0-native-waveform-split|9\.0-collapsible-toolbar|10\.0-safe-area-viewports|11\.0-visible-window-height|12\.0-fixed-waveform-stack|13\.0-draggable-waveform-stack|14\.0-clipped-waveform-lanes|15\.0-layered-adjustable-waveforms)"' packaging/android/AndroidManifest.xml; then
     apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-phone-ui.patch"
@@ -84,9 +85,32 @@ fi
 if ! grep -qE 'android:versionName="0\.(18\.0-edit-locked-draw-scale|19\.0-independent-waveform-centers)"' packaging/android/AndroidManifest.xml; then
     apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-v0.18-edit-locked-draw-scale.patch"
 fi
-if ! grep -q 'android:versionName="0.19.0-independent-waveform-centers"' packaging/android/AndroidManifest.xml; then
+if ! grep -qE 'android:versionName="0\.(19\.0-independent-waveform-centers|20\.0-flx6-auto-setup)"' packaging/android/AndroidManifest.xml; then
     apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-v0.19-independent-waveform-centers.patch"
 fi
+fi
+if ! grep -q 'android:versionName="0.20.0-flx6-auto-setup"' packaging/android/AndroidManifest.xml; then
+    apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-v0.20-flx6-autosetup.patch"
+fi
+
+install -m 0644 \
+    "${REPO_DIR}/android-midi/MidiBridge.java" \
+    "${MIXXX_SOURCE}/packaging/android/src/org/mixxx/MidiBridge.java"
+install -m 0644 \
+    "${REPO_DIR}/android-midi/androidmidicontroller.h" \
+    "${MIXXX_SOURCE}/src/controllers/midi/androidmidicontroller.h"
+install -m 0644 \
+    "${REPO_DIR}/android-midi/androidmidicontroller.cpp" \
+    "${MIXXX_SOURCE}/src/controllers/midi/androidmidicontroller.cpp"
+install -m 0644 \
+    "${REPO_DIR}/android-midi/androidmidienumerator.h" \
+    "${MIXXX_SOURCE}/src/controllers/midi/androidmidienumerator.h"
+install -m 0644 \
+    "${REPO_DIR}/android-midi/androidmidienumerator.cpp" \
+    "${MIXXX_SOURCE}/src/controllers/midi/androidmidienumerator.cpp"
+install -m 0644 \
+    "${REPO_DIR}/android-midi/Flx6Setup.qml" \
+    "${MIXXX_SOURCE}/res/qml/Settings/Flx6Setup.qml"
 
 install -m 0644 \
     "${REPO_DIR}/controller-mapping/Pioneer-DDJ-FLX6.midi.xml" \

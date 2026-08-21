@@ -62,6 +62,9 @@
 - `patches/mixxx-android-v0.19-independent-waveform-centers.patch` makes the A
   and B badges track their actual renderer centers. In edit mode, each badge
   independently drags its renderer through the unused space inside its fixed lane.
+- `patches/mixxx-android-v0.20-flx6-autosetup.patch` adds the Android MIDI
+  backend, automatic FLX6 mapping/audio setup, and the simple hardware status page.
+- `android-midi/` contains the Java/Qt MIDI bridge and FLX6 setup UI.
 - `controller-mapping/` contains the bundled experimental DDJ-FLX6 mapping and
   its upstream license.
 

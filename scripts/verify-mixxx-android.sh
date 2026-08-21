@@ -12,15 +12,15 @@ test -n "$apksigner"
 
 echo "== Package metadata =="
 "$aapt" dump badging "$apk" | head -8
-"$aapt" dump badging "$apk" | grep "package: name='org.mixxx.flx6standalone' versionCode='19' versionName='0.19.0-independent-waveform-centers'" >/dev/null
-"$aapt" dump badging "$apk" | grep "application-label:'Mixxx FLX6 v0.19'" >/dev/null
+"$aapt" dump badging "$apk" | grep "package: name='org.mixxx.flx6standalone' versionCode='20' versionName='0.20.0-flx6-auto-setup'" >/dev/null
+"$aapt" dump badging "$apk" | grep "application-label:'Mixxx FLX6 v0.20'" >/dev/null
 "$aapt" dump badging "$apk" | grep "launchable-activity: name='org.mixxx.MainActivity'" >/dev/null
 echo "== Signature =="
 "$apksigner" verify --verbose --print-certs "$apk"
 echo "== Selected ARM64 native libraries =="
 unzip -l "$apk" | grep -E 'lib/arm64-v8a/(libmixxx|libQt6Core|libc\+\+_shared)'
 echo "== Phone UI resources =="
-unzip -l "$apk" | grep -E 'assets/qml/(main.qml|Deck.qml|WaveformDisplay.qml|Library.qml|Library/TrackList.qml|Settings.qml)'
+unzip -l "$apk" | grep -E 'assets/qml/(main.qml|Deck.qml|WaveformDisplay.qml|Library.qml|Library/TrackList.qml|Settings.qml|Settings/Flx6Setup.qml)'
 unzip -p "$apk" assets/qml/main.qml | grep 'text: "4 Decks"' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'text: "Settings"' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'id: performanceDeckHeaders' >/dev/null
@@ -100,6 +100,10 @@ unzip -p "$apk" assets/qml/main.qml | grep 'active: root.maximizeLibrary || (!ro
 unzip -p "$apk" assets/qml/Library/TrackList.qml | grep 'text: "Load 1"' >/dev/null
 unzip -p "$apk" assets/qml/Library/TrackList.qml | grep 'text: "Load 2"' >/dev/null
 unzip -p "$apk" assets/qml/Settings.qml | grep 'text: "Close"' >/dev/null
+unzip -p "$apk" assets/qml/Settings.qml | grep 'Settings.Flx6Setup' >/dev/null
+unzip -p "$apk" assets/qml/Settings/Flx6Setup.qml | grep 'CHECK AND SET UP FLX6' >/dev/null
+unzip -p "$apk" assets/qml/Settings/Flx6Setup.qml | grep 'Mixxx.ControllerManager.flx6Status()' >/dev/null
+unzip -p "$apk" assets/qml/Settings/Flx6Setup.qml | grep 'Mixxx.SoundManager.autoConfigureFlx6()' >/dev/null
 unzip -p "$apk" assets/qml/Settings/Library.qml | grep 'text: qsTr("Downloads")' >/dev/null
 unzip -p "$apk" assets/qml/Settings/Library.qml | grep 'text: qsTr("Add path")' >/dev/null
 unzip -p "$apk" assets/qml/Settings/Library.qml | grep 'Mixxx.Library.requestAndroidAllFilesAccess()' >/dev/null

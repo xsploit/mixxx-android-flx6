@@ -1,19 +1,31 @@
-# Experimental Mixxx Android ARM64 independent waveform centers v0.19
+# Experimental Mixxx Android ARM64 FLX6 auto-setup v0.20
 
 This is an unofficial development build for testing Mixxx with a DDJ-FLX6 on
 an Android phone or tablet. It is locally signed and may be unstable.
 
 ## Install
 
-Download `mixxx-android-flx6-v0.19-independent-waveform-centers.apk` on an ARM64 device running Android 9 or
+Download `mixxx-android-flx6-v0.20-auto-setup.apk` on an ARM64 device running Android 9 or
 newer, allow installation from the selected file source, and open the APK.
 
 This build uses package `org.mixxx.flx6standalone` and appears as
-`Mixxx FLX6 v0.19`. It upgrades v0.9-v0.18 and still installs beside the older
+`Mixxx FLX6 v0.20`. It upgrades v0.9-v0.19 and still installs beside the older
 `org.mixxx` previews.
 
 SHA-256:
-`9487bf0a396ca53e4c875db97db9e95ad80a5c0354d3d4f1ece9475802862207`
+`4f9c156835b3328943d19f6cdd88716b4e981b312f918ff1b45bb25b1e769cb9`
+
+## FLX6 auto-setup
+
+- Adds a real Android MIDI backend using `android.media.midi`; the earlier APK
+  bundled a mapping but had no Android MIDI backend to deliver controller data.
+- Detects a connected DDJ-FLX6, enables it, and loads the bundled mapping at startup.
+- Adds **SETTINGS > FLX6 Setup** with separate, plain Controls and Audio status.
+- **CHECK AND SET UP FLX6** automatically routes Master to 1/2 and, when Android
+  exposes four output channels, headphones to 3/4.
+- Treats empty Android USB-audio capability arrays as unspecified and uses safe
+  stereo/48 kHz fallbacks instead of silently omitting the sound card.
+- No controller utility-mode button combination is part of the normal setup.
 
 v0.2 changed an unused LateNight skin, so Android's `--new-ui` screen looked
 unchanged. v0.3 corrects that mistake by patching the APK's real

@@ -10,9 +10,9 @@ Mixxx. It is not an official Mixxx Android release.
 - Source commit: `86126792a3a11b493a74ea133dc1260890d9c200`
 - Minimum Android version: Android 9 / API 28
 - CPU architecture: ARM64
-- APK version: `0.19.0-independent-waveform-centers` (version code 19)
-- APK label: `Mixxx FLX6 v0.19`
-- APK SHA-256: `9487bf0a396ca53e4c875db97db9e95ad80a5c0354d3d4f1ece9475802862207`
+- APK version: `0.20.0-flx6-auto-setup` (version code 20)
+- APK label: `Mixxx FLX6 v0.20`
+- APK SHA-256: `4f9c156835b3328943d19f6cdd88716b4e981b312f918ff1b45bb25b1e769cb9`
 
 The APK's v3 signature verifies. It contains the ARM64 Mixxx and Qt native
 libraries. No Android device was attached to this machine, so installation,
@@ -25,7 +25,7 @@ keep Deck B above any system navigation bar, and the obsolete 320-logical-pixel
 minimum window height has been removed. The main waveform viewport begins below
 the track header and splits all remaining height equally around its blue divider.
 The adjustable stack remains clipped inside that lower layer. Use Android's App Info screen to confirm
-version `0.19.0-independent-waveform-centers` and package
+version `0.20.0-flx6-auto-setup` and package
 `org.mixxx.flx6standalone`.
 
 ## Correct hookup
@@ -65,43 +65,21 @@ Android may warn that this is an unknown or locally signed app. That is expected
 
 ## Test order
 
-1. Launch Mixxx without the controller. Tap **SETTINGS**, open **Library**, tap
-   **ALLOW FILES**, and enable Mixxx in Android's file-access screen. Return to
-   Mixxx, tap **DOWNLOADS** (or enter any full `/storage/...` path and tap
-   **ADD PATH**), then press **SAVE**. Close settings,
-   tap **LIBRARY**, select one track, tap **LOAD 1**, press Play, and confirm
-   audio from the phone.
-2. Close Mixxx. Connect charger, hub, and FLX6 in the diagram above. Wait until
-   the FLX6 finishes powering up, then launch Mixxx and accept any USB permission
-   prompt.
-3. In **Preferences > Sound Hardware**, look for `DDJ-FLX6`, `USB Audio`, or the
-   product name Android reports. If it exposes four outputs, assign:
-   - **Master** to channels 1-2
-   - **Headphones** to channels 3-4
-4. Connect speakers only to the FLX6 MASTER RCA sockets and headphones to its
-   PHONES socket. Do not expect sound from the phone speaker after USB audio is
-   selected.
-5. Tap **SETTINGS**, open **Controllers**, confirm that the FLX6 is listed,
-   select the bundled Pioneer DDJ-FLX6 mapping if it is not auto-selected, and
-   confirm that moving a control produces input activity.
-6. Return to the waveform performance view. Press the FLX6 browse encoder and
-   confirm that the full-screen library opens; rotate it to move through tracks,
-   then press it again or tap **BACK TO MIX** to return to the waveforms.
-7. Confirm the black waveform viewport starts below the complete play/cue,
-   track-name, and overview row, with a small guard and no overlap. Confirm Deck A and B are equal visible
-   lanes, separated by the 2-pixel blue line, and Deck B's bottom edge is onscreen.
-   Confirm the blue grip and pinch gestures do nothing while `EDIT` is off.
-   Enable `EDIT`, drag the blue center grip, and confirm the complete fixed-size
-   A+B stack moves while the track-name/overview row stays fixed. Then pinch
-   vertically over the stack or try `DRAW -` / `DRAW +`: only the centered
-   native drawing surfaces should become shorter or taller inside the unchanged
-   lane containers. Audio/visual gain, lane geometry, horizontal scroll, zoom,
-   and playheads must remain fixed.
-8. Leave `EDIT` enabled after shrinking the drawing surfaces. Drag the `A` badge
-   down toward the blue divider and confirm only A's renderer and badge move.
-   Drag the `B` badge up toward the divider and confirm only B's renderer and
-   badge move. Both must stop before their drawing surfaces leave their fixed
-   lanes. Disable `EDIT` and confirm both badges are locked again.
+1. Close Mixxx completely.
+2. Connect the FLX6 and wait for it to finish powering up.
+3. Open **Mixxx FLX6 v0.20**. No FLX6 utility-mode button combination is needed.
+4. Tap **SETTINGS**. The first page is **FLX6 Setup**. Tap
+   **CHECK AND SET UP FLX6** once.
+5. Read the two plain status lines:
+   - **Controls: Ready** means Android MIDI is open and the FLX6 mapping loaded.
+   - **Audio: Ready** means Master 1/2 is routed; if Android exposes four
+     channels, headphones 3/4 is routed too.
+6. Close Settings and try **PLAY**, a channel fader, and the browse encoder.
+   The browse encoder press should open the full-screen library.
+
+If Controls says **Not detected**, leave the cable connected, close Mixxx, and
+open it once more. If Audio alone says **Not detected**, the MIDI test can still
+continue; Android has not exposed the FLX6 audio endpoint on that phone.
 
 Start at 48 kHz with a moderate buffer. Turn off Bluetooth audio and remove
 Android battery optimization for Mixxx while testing.
