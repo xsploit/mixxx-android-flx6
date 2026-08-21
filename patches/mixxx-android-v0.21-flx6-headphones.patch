@@ -1,0 +1,127 @@
+diff --git a/packaging/android/AndroidManifest.xml b/packaging/android/AndroidManifest.xml
+index 453f255e9..0c4447eca 100644
+--- a/packaging/android/AndroidManifest.xml
++++ b/packaging/android/AndroidManifest.xml
+@@ -2,6 +2,6 @@
+ <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+     package="org.mixxx.flx6standalone"
+     android:installLocation="auto"
+-    android:versionCode="20"
+-    android:versionName="0.20.0-flx6-auto-setup">
++    android:versionCode="21"
++    android:versionName="0.21.0-flx6-headphones">
+     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"  />
+@@ -23,7 +23,7 @@
+         android:name="org.qtproject.qt.android.bindings.QtApplication"
+         android:hardwareAccelerated="true"
+         android:icon="@mipmap/ic_launcher"
+-        android:label="Mixxx FLX6 v0.20"
++        android:label="Mixxx FLX6 v0.21"
+         android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+         android:requestLegacyExternalStorage="true"
+         android:allowBackup="true"
+diff --git a/src/controllers/controllermanager.cpp b/src/controllers/controllermanager.cpp
+index a018c9952..249066686 100644
+--- a/src/controllers/controllermanager.cpp
++++ b/src/controllers/controllermanager.cpp
+@@ -184,10 +184,13 @@ void ControllerManager::slotInitialize() {
+ #ifdef __HSS1394__
+         m_enumerators.push_back(std::make_unique<Hss1394Enumerator>());
+ #endif
+-#ifdef __BULK__
++#if defined(__BULK__) && !defined(__ANDROIDMIDI__)
+         m_enumerators.push_back(std::make_unique<BulkEnumerator>());
+ #endif
+-#ifdef __HID__
++#if defined(__HID__) && !defined(__ANDROIDMIDI__)
+         m_enumerators.push_back(std::make_unique<HidEnumerator>());
+ #endif
++        // AndroidMidiEnumerator owns class-compliant USB controllers on Android.
++        // Running the legacy libusb bulk/HID scans as well can claim and reset the
++        // same composite device before Android exposes its audio interface.
+     } // Mutex locker released here
+diff --git a/src/qml/qmlsoundmanagerproxy.cpp b/src/qml/qmlsoundmanagerproxy.cpp
+index 440e8016a..415bda083 100644
+--- a/src/qml/qmlsoundmanagerproxy.cpp
++++ b/src/qml/qmlsoundmanagerproxy.cpp
+@@ -238,17 +238,43 @@ bool QmlSoundManagerProxy::hasMicInputs() {
+     return m_config.hasMicInputs();
+ }
+ 
++namespace {
++QList<SoundDevicePointer> androidOutputDevices(SoundManager* soundManager) {
++    QList<SoundDevicePointer> devices;
++    for (const QString& api : soundManager->getHostAPIList()) {
++        devices.append(soundManager->getDeviceList(api, true, false));
++    }
++    return devices;
++}
++
++SoundDevicePointer findFlx6Output(SoundManager* soundManager) {
++    const auto devices = androidOutputDevices(soundManager);
++    for (const auto& device : devices) {
++        if (device->getDisplayName().contains(
++                    QStringLiteral("FLX6"), Qt::CaseInsensitive)) {
++            return device;
++        }
++    }
++    // Some Android builds replace the USB product name with the phone model.
++    // The FLX6 is the only four-output device in this dedicated build, so use
++    // that capability as a safe fallback instead of falling back to stereo.
++    for (const auto& device : devices) {
++        if (device->getNumOutputChannels() >= 4) {
++            return device;
++        }
++    }
++    return {};
++}
++} // namespace
++
+ QString QmlSoundManagerProxy::flx6AudioStatus() const {
+-    const auto devices = m_pSoundManager->getDeviceList(QString(), true, false);
+-    for (const auto& device : devices) {
+-        if (!device->getDisplayName().contains(
+-                    QStringLiteral("FLX6"), Qt::CaseInsensitive)) {
+-            continue;
+-        }
++    const auto device = findFlx6Output(m_pSoundManager.get());
++    if (device) {
+         const int channels = device->getNumOutputChannels();
+         const int configured = m_config.getOutputs().count(device->getDeviceId());
+         const int expectedConnections = channels >= 4 ? 2 : 1;
+-        if (configured >= expectedConnections) {
++        if (m_config.getAPI() == device->getHostAPI() &&
++                configured >= expectedConnections) {
+             return channels >= 4
+                     ? tr("Ready - Master 1/2 and headphones 3/4")
+                     : tr("Ready - Master 1/2 (no separate headphone channels exposed)");
+@@ -265,24 +291,19 @@ QString QmlSoundManagerProxy::autoConfigureFlx6() {
+         return tr("Setting up audio...");
+     }
+ 
+-    const auto devices = m_pSoundManager->getDeviceList(QString(), true, false);
+-    SoundDevicePointer flx6;
+-    for (const auto& device : devices) {
+-        if (device->getDisplayName().contains(
+-                    QStringLiteral("FLX6"), Qt::CaseInsensitive)) {
+-            flx6 = device;
+-            break;
+-        }
+-    }
++    const auto flx6 = findFlx6Output(m_pSoundManager.get());
+     if (!flx6) {
+-        return tr("Not detected - Android has not exposed the FLX6 sound card");
++        return tr("Not detected - reconnect FLX6, allow USB access, then reopen Mixxx");
+     }
+ 
+     const int channels = flx6->getNumOutputChannels();
+     if (channels < 2) {
+         return tr("Detected, but Android reports fewer than two audio channels");
+     }
+ 
++    // The old Android default can be ALSA even though the controller belongs
++    // to PortAudio's ANDROID/Oboe API. Select the API that owns this device.
++    m_config.setAPI(flx6->getHostAPI());
+     m_config.clearOutputs();
+     m_config.addOutput(flx6->getDeviceId(),
+             AudioOutput(AudioPathType::Main,

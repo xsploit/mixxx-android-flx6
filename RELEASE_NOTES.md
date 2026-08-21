@@ -1,19 +1,32 @@
-# Experimental Mixxx Android ARM64 FLX6 auto-setup v0.20
+# Experimental Mixxx Android ARM64 FLX6 automatic headphones v0.22
 
 This is an unofficial development build for testing Mixxx with a DDJ-FLX6 on
 an Android phone or tablet. It is locally signed and may be unstable.
 
 ## Install
 
-Download `mixxx-android-flx6-v0.20-auto-setup.apk` on an ARM64 device running Android 9 or
+Download `mixxx-android-flx6-v0.22-auto-headphones.apk` on an ARM64 device running Android 9 or
 newer, allow installation from the selected file source, and open the APK.
 
 This build uses package `org.mixxx.flx6standalone` and appears as
-`Mixxx FLX6 v0.20`. It upgrades v0.9-v0.19 and still installs beside the older
+`Mixxx FLX6 v0.22`. It upgrades v0.9-v0.21 and still installs beside the older
 `org.mixxx` previews.
 
 SHA-256:
-`4f9c156835b3328943d19f6cdd88716b4e981b312f918ff1b45bb25b1e769cb9`
+`fc7078d439290a170c6392b15876b4369713793570c66841e99166eaacc812cc`
+
+## Verified FLX6 headphone cue
+
+- Fixes FLX6 discovery across Android's actual PortAudio/Oboe API instead of
+  querying an empty API name.
+- Selects the API that owns the FLX6 and routes Master to USB 1/2 plus the
+  controller's front PHONES/PFL output to USB 3/4.
+- Skips legacy bulk/HID USB scans on Android so they cannot reset the composite
+  FLX6 while Android MIDI and USB audio are opening it.
+- Runs FLX6 audio setup automatically shortly after launch; the settings page
+  remains available as a status display and manual retry.
+- Physically verified on a Samsung S24 with FLX6 controls and front headphone
+  CUE audio working through USB OTG.
 
 ## FLX6 auto-setup
 
@@ -21,7 +34,7 @@ SHA-256:
   bundled a mapping but had no Android MIDI backend to deliver controller data.
 - Detects a connected DDJ-FLX6, enables it, and loads the bundled mapping at startup.
 - Adds **SETTINGS > FLX6 Setup** with separate, plain Controls and Audio status.
-- **CHECK AND SET UP FLX6** automatically routes Master to 1/2 and, when Android
+- **SET UP MASTER + HEADPHONES** automatically routes Master to 1/2 and, when Android
   exposes four output channels, headphones to 3/4.
 - Treats empty Android USB-audio capability arrays as unspecified and uses safe
   stereo/48 kHz fallbacks instead of silently omitting the sound card.

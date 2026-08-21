@@ -44,7 +44,7 @@ Category {
             Layout.fillWidth: true
             color: Theme.midGray
             font.pixelSize: 14
-            text: "Plug in the controller before opening Mixxx. The app loads the mapping and routes Master + headphones automatically."
+            text: "Plug in the controller before opening Mixxx. The app routes Master to USB 1/2 and the front PHONES/CUE output to USB 3/4 automatically."
             wrapMode: Text.WordWrap
         }
         Rectangle {
@@ -77,7 +77,7 @@ Category {
             Layout.preferredHeight: 48
             Layout.fillWidth: true
             activeColor: Theme.accentColor
-            text: "CHECK AND SET UP FLX6"
+            text: "SET UP MASTER + HEADPHONES"
             onPressed: {
                 root.controllerStatus = Mixxx.ControllerManager.flx6Status();
                 root.audioStatus = Mixxx.SoundManager.autoConfigureFlx6();
@@ -87,7 +87,7 @@ Category {
             Layout.fillWidth: true
             color: Theme.midGray
             font.pixelSize: 12
-            text: "If Controls says not detected, leave the cable connected and reopen the app. No controller utility mode is required."
+            text: "Headphone test: load a track, press that channel's orange CUE button, turn HEADPHONES MIX toward CUE, then raise HEADPHONES LEVEL. If Audio says not detected, reconnect the FLX6 and reopen Mixxx."
             wrapMode: Text.WordWrap
         }
         Item { Layout.fillHeight: true }

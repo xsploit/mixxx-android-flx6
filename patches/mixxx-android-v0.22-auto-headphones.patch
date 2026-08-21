@@ -1,0 +1,46 @@
+diff --git a/packaging/android/AndroidManifest.xml b/packaging/android/AndroidManifest.xml
+index 0c4447eca..fa6e2b407 100644
+--- a/packaging/android/AndroidManifest.xml
++++ b/packaging/android/AndroidManifest.xml
+@@ -2,6 +2,6 @@
+ <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+     package="org.mixxx.flx6standalone"
+     android:installLocation="auto"
+-    android:versionCode="21"
+-    android:versionName="0.21.0-flx6-headphones">
++    android:versionCode="22"
++    android:versionName="0.22.0-auto-headphones">
+     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"  />
+@@ -23,7 +23,7 @@
+         android:name="org.qtproject.qt.android.bindings.QtApplication"
+         android:hardwareAccelerated="true"
+         android:icon="@mipmap/ic_launcher"
+-        android:label="Mixxx FLX6 v0.21"
++        android:label="Mixxx FLX6 v0.22"
+         android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+         android:requestLegacyExternalStorage="true"
+         android:allowBackup="true"
+diff --git a/res/qml/main.qml b/res/qml/main.qml
+index 9ea2f62bd..f89db8d63 100644
+--- a/res/qml/main.qml
++++ b/res/qml/main.qml
+@@ -37,6 +37,19 @@ ApplicationWindow {
+     visibility: Mixxx.Config.configStartInFullscreenKey ? Window.FullScreen : Window.Windowed
+     width: 800
+ 
++    // PortAudio has finished enumerating before QML is shown. Give the rest of
++    // startup a moment, then select the FLX6 Android endpoint and establish
++    // Master 1/2 plus PHONES/PFL 3/4 without making the user open Settings.
++    Timer {
++        interval: 1200
++        running: true
++        repeat: false
++        onTriggered: {
++            if (Mixxx.SoundManager.flx6AudioStatus().indexOf("Ready") !== 0)
++                Mixxx.SoundManager.autoConfigureFlx6();
++        }
++    }
++
+     Mixxx.ControlProxy {
+         group: "[App]"
+         key: "num_decks"

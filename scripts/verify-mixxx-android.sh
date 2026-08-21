@@ -12,8 +12,8 @@ test -n "$apksigner"
 
 echo "== Package metadata =="
 "$aapt" dump badging "$apk" | head -8
-"$aapt" dump badging "$apk" | grep "package: name='org.mixxx.flx6standalone' versionCode='20' versionName='0.20.0-flx6-auto-setup'" >/dev/null
-"$aapt" dump badging "$apk" | grep "application-label:'Mixxx FLX6 v0.20'" >/dev/null
+"$aapt" dump badging "$apk" | grep "package: name='org.mixxx.flx6standalone' versionCode='22' versionName='0.22.0-auto-headphones'" >/dev/null
+"$aapt" dump badging "$apk" | grep "application-label:'Mixxx FLX6 v0.22'" >/dev/null
 "$aapt" dump badging "$apk" | grep "launchable-activity: name='org.mixxx.MainActivity'" >/dev/null
 echo "== Signature =="
 "$apksigner" verify --verbose --print-certs "$apk"
@@ -35,6 +35,7 @@ unzip -p "$apk" assets/qml/main.qml | grep 'visible: root.toolbarExpanded' >/dev
 unzip -p "$apk" assets/qml/main.qml | grep 'parent.SafeArea.margins.bottom' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'id: waveformContent' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'property real waveformStackPosition: 1.0' >/dev/null
+unzip -p "$apk" assets/qml/main.qml | grep 'Mixxx.SoundManager.autoConfigureFlx6()' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'property real waveformDrawScale: 1.0' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'property real deckADrawPosition: 0.5' >/dev/null
 unzip -p "$apk" assets/qml/main.qml | grep 'property real deckBDrawPosition: 0.5' >/dev/null
@@ -101,7 +102,7 @@ unzip -p "$apk" assets/qml/Library/TrackList.qml | grep 'text: "Load 1"' >/dev/n
 unzip -p "$apk" assets/qml/Library/TrackList.qml | grep 'text: "Load 2"' >/dev/null
 unzip -p "$apk" assets/qml/Settings.qml | grep 'text: "Close"' >/dev/null
 unzip -p "$apk" assets/qml/Settings.qml | grep 'Settings.Flx6Setup' >/dev/null
-unzip -p "$apk" assets/qml/Settings/Flx6Setup.qml | grep 'CHECK AND SET UP FLX6' >/dev/null
+unzip -p "$apk" assets/qml/Settings/Flx6Setup.qml | grep 'SET UP MASTER + HEADPHONES' >/dev/null
 unzip -p "$apk" assets/qml/Settings/Flx6Setup.qml | grep 'Mixxx.ControllerManager.flx6Status()' >/dev/null
 unzip -p "$apk" assets/qml/Settings/Flx6Setup.qml | grep 'Mixxx.SoundManager.autoConfigureFlx6()' >/dev/null
 unzip -p "$apk" assets/qml/Settings/Library.qml | grep 'text: qsTr("Downloads")' >/dev/null

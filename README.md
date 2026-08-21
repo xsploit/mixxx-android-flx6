@@ -64,6 +64,11 @@
   independently drags its renderer through the unused space inside its fixed lane.
 - `patches/mixxx-android-v0.20-flx6-autosetup.patch` adds the Android MIDI
   backend, automatic FLX6 mapping/audio setup, and the simple hardware status page.
+- `patches/mixxx-android-v0.21-flx6-headphones.patch` searches every Android
+  audio API, selects the FLX6 endpoint, routes PHONES/PFL to USB 3/4, and avoids
+  legacy USB scans that can reset the controller during startup.
+- `patches/mixxx-android-v0.22-auto-headphones.patch` runs that routing
+  automatically after launch so the FLX6 settings screen is optional.
 - `android-midi/` contains the Java/Qt MIDI bridge and FLX6 setup UI.
 - `controller-mapping/` contains the bundled experimental DDJ-FLX6 mapping and
   its upstream license.
