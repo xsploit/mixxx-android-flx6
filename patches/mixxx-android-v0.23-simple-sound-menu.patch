@@ -1,0 +1,22 @@
+diff --git a/packaging/android/AndroidManifest.xml b/packaging/android/AndroidManifest.xml
+index fa6e2b407..b884cd7bb 100644
+--- a/packaging/android/AndroidManifest.xml
++++ b/packaging/android/AndroidManifest.xml
+@@ -2,6 +2,6 @@
+ <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+     package="org.mixxx.flx6standalone"
+     android:installLocation="auto"
+-    android:versionCode="22"
+-    android:versionName="0.22.0-auto-headphones">
++    android:versionCode="23"
++    android:versionName="0.23.0-simple-sound-menu">
+     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"  />
+@@ -23,7 +23,7 @@
+         android:name="org.qtproject.qt.android.bindings.QtApplication"
+         android:hardwareAccelerated="true"
+         android:icon="@mipmap/ic_launcher"
+-        android:label="Mixxx FLX6 v0.22"
++        android:label="Mixxx FLX6 v0.23"
+         android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+         android:requestLegacyExternalStorage="true"
+         android:allowBackup="true"

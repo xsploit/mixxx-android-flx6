@@ -12,8 +12,8 @@ test -n "$apksigner"
 
 echo "== Package metadata =="
 "$aapt" dump badging "$apk" | head -8
-"$aapt" dump badging "$apk" | grep "package: name='org.mixxx.flx6standalone' versionCode='22' versionName='0.22.0-auto-headphones'" >/dev/null
-"$aapt" dump badging "$apk" | grep "application-label:'Mixxx FLX6 v0.22'" >/dev/null
+"$aapt" dump badging "$apk" | grep "package: name='org.mixxx.flx6standalone' versionCode='23' versionName='0.23.0-simple-sound-menu'" >/dev/null
+"$aapt" dump badging "$apk" | grep "application-label:'Mixxx FLX6 v0.23'" >/dev/null
 "$aapt" dump badging "$apk" | grep "launchable-activity: name='org.mixxx.MainActivity'" >/dev/null
 echo "== Signature =="
 "$apksigner" verify --verbose --print-certs "$apk"
@@ -103,6 +103,10 @@ unzip -p "$apk" assets/qml/Library/TrackList.qml | grep 'text: "Load 2"' >/dev/n
 unzip -p "$apk" assets/qml/Settings.qml | grep 'text: "Close"' >/dev/null
 unzip -p "$apk" assets/qml/Settings.qml | grep 'Settings.Flx6Setup' >/dev/null
 unzip -p "$apk" assets/qml/Settings/Flx6Setup.qml | grep 'SET UP MASTER + HEADPHONES' >/dev/null
+unzip -p "$apk" assets/qml/Settings/SoundHardware.qml | grep 'AUTO SET UP FLX6' >/dev/null
+unzip -p "$apk" assets/qml/Settings/SoundHardware.qml | grep 'Headphones / PFL device' >/dev/null
+unzip -p "$apk" assets/qml/Settings/SoundHardware.qml | grep 'TEST CUE: DECK 1' >/dev/null
+unzip -p "$apk" assets/qml/Settings/SoundHardware.qml | grep 'root.applyManualRouting()' >/dev/null
 unzip -p "$apk" assets/qml/Settings/Flx6Setup.qml | grep 'Mixxx.ControllerManager.flx6Status()' >/dev/null
 unzip -p "$apk" assets/qml/Settings/Flx6Setup.qml | grep 'Mixxx.SoundManager.autoConfigureFlx6()' >/dev/null
 unzip -p "$apk" assets/qml/Settings/Library.qml | grep 'text: qsTr("Downloads")' >/dev/null

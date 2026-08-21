@@ -69,6 +69,9 @@
   legacy USB scans that can reset the controller during startup.
 - `patches/mixxx-android-v0.22-auto-headphones.patch` runs that routing
   automatically after launch so the FLX6 settings screen is optional.
+- `patches/mixxx-android-v0.23-simple-sound-menu.patch` versions the Android
+  build that replaces the desktop patch-cable router with phone-sized API,
+  device, channel-pair, sample-rate, buffer, Apply, Refresh, and Deck 1 PFL controls.
 - `android-midi/` contains the Java/Qt MIDI bridge and FLX6 setup UI.
 - `controller-mapping/` contains the bundled experimental DDJ-FLX6 mapping and
   its upstream license.

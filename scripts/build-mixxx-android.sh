@@ -27,7 +27,7 @@ apply_patch_if_needed() {
 }
 
 apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-wsl.patch"
-if ! grep -qE 'android:versionName="0\.(20\.0-flx6-auto-setup|21\.0-flx6-headphones|22\.0-auto-headphones)"' packaging/android/AndroidManifest.xml; then
+if ! grep -qE 'android:versionName="0\.(20\.0-flx6-auto-setup|21\.0-flx6-headphones|22\.0-auto-headphones|23\.0-simple-sound-menu)"' packaging/android/AndroidManifest.xml; then
 if ! grep -qE 'android:versionName="0\.(16\.0-five-pixel-header-guard|17\.0-measured-header-layout|18\.0-edit-locked-draw-scale|19\.0-independent-waveform-centers)"' packaging/android/AndroidManifest.xml; then
 if ! grep -qE 'android:versionName="0\.(3\.0-active-phone-ui|4\.0-performance-view|5\.0-waveform-fix|6\.0-android-storage|7\.0-live-layout|8\.0-native-waveform-split|9\.0-collapsible-toolbar|10\.0-safe-area-viewports|11\.0-visible-window-height|12\.0-fixed-waveform-stack|13\.0-draggable-waveform-stack|14\.0-clipped-waveform-lanes|15\.0-layered-adjustable-waveforms)"' packaging/android/AndroidManifest.xml; then
     apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-phone-ui.patch"
@@ -89,14 +89,17 @@ if ! grep -qE 'android:versionName="0\.(19\.0-independent-waveform-centers|20\.0
     apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-v0.19-independent-waveform-centers.patch"
 fi
 fi
-if ! grep -qE 'android:versionName="0\.(20\.0-flx6-auto-setup|21\.0-flx6-headphones|22\.0-auto-headphones)"' packaging/android/AndroidManifest.xml; then
+if ! grep -qE 'android:versionName="0\.(20\.0-flx6-auto-setup|21\.0-flx6-headphones|22\.0-auto-headphones|23\.0-simple-sound-menu)"' packaging/android/AndroidManifest.xml; then
     apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-v0.20-flx6-autosetup.patch"
 fi
-if ! grep -qE 'android:versionName="0\.(21\.0-flx6-headphones|22\.0-auto-headphones)"' packaging/android/AndroidManifest.xml; then
+if ! grep -qE 'android:versionName="0\.(21\.0-flx6-headphones|22\.0-auto-headphones|23\.0-simple-sound-menu)"' packaging/android/AndroidManifest.xml; then
     apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-v0.21-flx6-headphones.patch"
 fi
-if ! grep -q 'android:versionName="0.22.0-auto-headphones"' packaging/android/AndroidManifest.xml; then
+if ! grep -qE 'android:versionName="0\.(22\.0-auto-headphones|23\.0-simple-sound-menu)"' packaging/android/AndroidManifest.xml; then
     apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-v0.22-auto-headphones.patch"
+fi
+if ! grep -q 'android:versionName="0.23.0-simple-sound-menu"' packaging/android/AndroidManifest.xml; then
+    apply_patch_if_needed "${REPO_DIR}/patches/mixxx-android-v0.23-simple-sound-menu.patch"
 fi
 
 install -m 0644 \
@@ -117,6 +120,9 @@ install -m 0644 \
 install -m 0644 \
     "${REPO_DIR}/android-midi/Flx6Setup.qml" \
     "${MIXXX_SOURCE}/res/qml/Settings/Flx6Setup.qml"
+install -m 0644 \
+    "${REPO_DIR}/android-midi/SoundHardware.qml" \
+    "${MIXXX_SOURCE}/res/qml/Settings/SoundHardware.qml"
 
 install -m 0644 \
     "${REPO_DIR}/controller-mapping/Pioneer-DDJ-FLX6.midi.xml" \
