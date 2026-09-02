@@ -1,0 +1,38 @@
+{
+  "name": "PiFlex V17 rounded service bay with concealed ear channels",
+  "valid": true,
+  "solids": 1,
+  "dimensions_mm": [
+    211.275,
+    134.405,
+    324.273
+  ],
+  "volume_cm3": 395.008,
+  "complete_assembly_install_shift_x_mm": -18.629,
+  "rear_bay_back_face_mm": [
+    166.0,
+    100.0
+  ],
+  "rear_bay_screen_mouth_mm": [
+    184.0,
+    118.0
+  ],
+  "expanded_back_opening_mm": [
+    178.0,
+    112.0
+  ],
+  "concealed_channel_clear_mm": [
+    18.0,
+    6.8
+  ],
+  "channel_rear_limit_mm": -5.8,
+  "ear_rear_limit_mm": -9.0,
+  "external_raceway_bridges": false,
+  "service_windows": [
+    "USB/Ethernet side",
+    "power/HDMI side",
+    "microSD edge"
+  ],
+  "preserved_mount": "V14 centred clamps, screw holes and Master RCA clearance",
+  "production_gate": "verify Pi connector locations and selected panel USB lead dimensions with calipers"
+}
