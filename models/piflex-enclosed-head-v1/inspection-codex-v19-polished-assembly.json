@@ -1,0 +1,41 @@
+{
+  "design": "PiFlex Codex V19 polished USB-routing assembly",
+  "source": "piflex-complete-shifted-enclosure-only-v18.glb",
+  "source_sha256": "1e8f38c9b0fe71293d4c65373161993a344a87a454690efca5019ac39078182c",
+  "source_unchanged": true,
+  "outer_case_bounds_unchanged": true,
+  "shell_local_bounds": [
+    [
+      -126.577,
+      -85.771,
+      -6.84
+    ],
+    [
+      126.577,
+      85.771,
+      6.84
+    ]
+  ],
+  "service_opening_mm": [
+    147.001,
+    108.802
+  ],
+  "blue_screen_frame_cut_for_usb": false,
+  "usb_routing": "two concealed tunnels beneath the intact blue frame",
+  "structure_mesh_digest": "f2dc6ee241bcf11f339d2821674913f12dd22f62e8a446e76312a58b084bbe7a",
+  "structure_transform_reused_from_v18": true,
+  "preserved": [
+    "exact V18 exterior screen-case bounds",
+    "four screen screw towers with 1 mm web",
+    "FLX6 brackets and alignment",
+    "six-slot rear grill",
+    "two top-facing USB-A ear openings",
+    "continuous blue screen-case frame above USB tunnels"
+  ],
+  "filled": [
+    "old Pi connector openings",
+    "old micro-SD opening",
+    "stepped rear-case scars"
+  ],
+  "production_gate": "fit-check female USB-A body dimensions and cable bend radius"
+}

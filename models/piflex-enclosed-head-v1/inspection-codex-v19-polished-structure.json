@@ -1,0 +1,33 @@
+{
+  "design": "PiFlex Codex V19 polished existing V18 rear",
+  "valid": true,
+  "solids": 1,
+  "method": "union clean skin over V18, then recut only required openings",
+  "filled": [
+    "legacy Pi USB/Ethernet window",
+    "legacy Pi HDMI/power window",
+    "legacy micro-SD slot",
+    "legacy stepped rear-case scars"
+  ],
+  "retained_openings": [
+    "six-slot rear grill",
+    "two top-facing USB-A ear sockets",
+    "two concealed ear-to-Pi cable channels",
+    "central screw-safe service opening"
+  ],
+  "service_opening_mm": [
+    147.001,
+    108.802
+  ],
+  "service_opening_centre_mm": [
+    2.343,
+    -0.133
+  ],
+  "screw_tower_radius_mm": 5.5,
+  "structural_web_mm": 1.0,
+  "concealed_channel_clear_mm": [
+    18.0,
+    6.8
+  ],
+  "production_gate": "measure actual female USB-A panel lead bodies and bend radius"
+}
