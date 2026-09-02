@@ -1,0 +1,56 @@
+{
+  "design": "PiFlex Codex V21 bay-merged service opening",
+  "visual_baseline": "PiFlex Codex V19",
+  "valid": true,
+  "solids": 1,
+  "opening_profile_mm": [
+    [
+      -72.0,
+      56.0
+    ],
+    [
+      77.0,
+      56.0
+    ],
+    [
+      89.0,
+      40.0
+    ],
+    [
+      89.0,
+      -40.0
+    ],
+    [
+      77.0,
+      -56.0
+    ],
+    [
+      -72.0,
+      -56.0
+    ],
+    [
+      -89.0,
+      -40.0
+    ],
+    [
+      -89.0,
+      40.0
+    ]
+  ],
+  "opening_middle_width_mm": 178.0,
+  "opening_top_bottom_span_mm": 149.0,
+  "opening_max_height_mm": 112.0,
+  "minimum_screw_tower_clearance_mm": 7.162,
+  "rear_bay_inner_mouth_width_mm": 178.0,
+  "preserved": [
+    "V19 outer blue screen-case frame",
+    "V19 recessed inner bevel",
+    "four screen screw towers",
+    "six-slot rear grill",
+    "two top-facing USB-A ear sockets",
+    "two concealed USB tunnels under the blue frame",
+    "FLX6 bracket placement"
+  ],
+  "visible_change": "central opening widens into the orange bay's angled inner side walls; most of the former logo area is removed by the opening",
+  "production_gate": "fit-check the physical screen fasteners and female USB-A panel leads"
+}

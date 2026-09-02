@@ -1,0 +1,70 @@
+{
+  "design": "PiFlex Codex V21 bay-merged assembly",
+  "source": "piflex-codex-v19-polished-usb-routing.glb",
+  "source_sha256": "1bd388869ae7867eb2b2fb5348efae2c639393d59cb2b805f0ebb453604a38e9",
+  "source_unchanged": true,
+  "outer_case_bounds_unchanged": true,
+  "shell_local_bounds": [
+    [
+      -126.577,
+      -85.771,
+      -6.84
+    ],
+    [
+      126.577,
+      85.771,
+      6.84
+    ]
+  ],
+  "opening_profile_mm": [
+    [
+      -72.0,
+      56.0
+    ],
+    [
+      77.0,
+      56.0
+    ],
+    [
+      89.0,
+      40.0
+    ],
+    [
+      89.0,
+      -40.0
+    ],
+    [
+      77.0,
+      -56.0
+    ],
+    [
+      -72.0,
+      -56.0
+    ],
+    [
+      -89.0,
+      -40.0
+    ],
+    [
+      -89.0,
+      40.0
+    ]
+  ],
+  "opening_middle_width_mm": 178.0,
+  "opening_top_bottom_span_mm": 149.0,
+  "opening_max_height_mm": 112.0,
+  "minimum_screw_tower_clearance_mm": 7.162,
+  "blue_screen_frame_cut_for_usb": false,
+  "usb_routing": "two concealed tunnels beneath the intact blue frame",
+  "preserved": [
+    "V19 exterior screen-case bounds",
+    "V19 inner recessed bevel outside the expanded opening",
+    "four screen screw holes and guarded towers",
+    "orange bay and angled side-wall transition",
+    "six-slot rear grill",
+    "top-facing USB-A ear openings",
+    "FLX6 brackets and alignment"
+  ],
+  "visible_change": "opening reaches bay inner walls and removes most logo area",
+  "production_gate": "physical fastener and USB lead fit-check"
+}
