@@ -1,0 +1,284 @@
+# PiFlex CAD handoff for Claude
+
+Date: 2026-09-02  
+Workspace: `C:\Users\SUBSECT\Documents\Codex\2026-08-18\hey-i-need-you-to-research`  
+Git branch: `main`  
+Remote: `https://github.com/xsploit/mixxx-android-flx6.git`
+
+## Immediate task
+
+Start from the exact last-known-good V18 enclosure model and make **one small,
+symmetrical enlargement of the existing rectangular opening in the rear of the
+screen case**.
+
+The user does **not** want a new case, a replacement plate, a rebuilt frame, or
+a union that changes the visible enclosure. The complete V18 case must stay in
+place. Only the existing rear opening should become slightly larger.
+
+The enlarged opening should:
+
+- remain centered left/right;
+- stop before the printed `RPI TOUCH DISPLAY 2 DESKTOP CASE / 10 INCH VERSION`
+  logo;
+- encompass/remove the two short horizontal raised slit/vent features directly
+  above and below the old opening;
+- retain the four screen screw areas;
+- leave the front bezel, outside walls, ears, capped top USB openings, Pi pod,
+  FLX6 clamps, controller-port clearances, angle, position, and all other V18
+  geometry unchanged.
+
+The user's latest wording was: make the opening “just a little bit bigger.” Do
+not turn it into the very large rounded opening seen in the rejected cleaned
+model.
+
+### Authoritative visual target
+
+The user's annotated target image has been copied into the repository:
+
+`models\piflex-enclosed-head-v1\reference-opening-target.png`
+
+SHA-256:
+
+`C187ADCCB211E418B519C16B5671C85A8792BFBF897F7C60A565FB27F899ACFD`
+
+In that image, the black rectangle is the requested new opening boundary. Read
+it literally:
+
+- enlarge the existing blue opening outward to approximately the black box;
+- the upper and lower horizontal rails/slits inside that black box are removed
+  as part of the opening;
+- the top edge remains below the printed text/logo;
+- the opening remains symmetrical around the existing opening;
+- every orange case surface outside the black box remains present.
+
+The markup indicates a target roughly around `108-112 mm` wide and
+`100-106 mm` high, but derive/tune the final dimensions by overlaying the model
+render with the saved reference rather than treating those estimates as final.
+
+## Immutable last-known-good source
+
+This is the user-designated last-known-good model:
+
+`models\piflex-enclosed-head-v1\piflex-complete-shifted-enclosure-only-v18.glb`
+
+SHA-256:
+
+`1E8F38C9B0FE71293D4C65373161993A344A87A454690EFCA5019AC39078182C`
+
+Git commit that introduced the V18 source:
+
+`3a572fd Keep PiFlex service opening clear of screen screws`
+
+Do not overwrite, rename, transform, or regenerate that GLB. Import it, duplicate
+the screen-shell object, and save the result under a new revision filename.
+
+The source contains two objects:
+
+1. `Exact original 10-inch shell, opened only beneath Pi pod`
+2. `PiFlex V18 shifted-placement complete enclosure`
+
+Keep those as separate objects. Do not boolean-union the shell and mount merely
+to make a one-object GLB; that is what caused the enclosure to look removed or
+flattened in earlier attempts.
+
+## Verified shell coordinate system
+
+After importing the V18 GLB with Blender/bpy, the screen-shell object's local
+coordinates are:
+
+- X: screen width
+- Y: screen height
+- Z: case thickness
+- local bounds: `[-126.577, -85.771, -6.840]` to
+  `[126.577, 85.771, 6.840]` mm
+- dimensions: `253.154 x 171.542 x 13.680 mm`
+
+Its imported world matrix is:
+
+```text
+[-1.00000, -0.00000, -0.00000, -18.62900]
+[ 0.00000, -0.90631, -0.42262, 244.24420]
+[ 0.00000, -0.42262,  0.90631,  98.44753]
+[ 0.00000,  0.00000,  0.00000,   1.00000]
+```
+
+Important: the screen face is local **X/Y** and thickness is local **Z**. One
+failed attempt treated X/Z as the screen plane and therefore did not enlarge
+the visible opening.
+
+The old V18 opening was made in `render_enclosed_head.py` with:
+
+```python
+x_limit = 89.524 / 2.0 + 2.0
+y_limit = 60.345 / 2.0 + 2.0
+```
+
+That is approximately `93.524 x 64.345 mm`, centered on the screen shell.
+
+The screen screw centers used by V18 are approximately:
+
+```text
+(-77.657, -61.034)
+(-77.657,  60.768)
+( 82.344, -61.034)
+( 82.344,  60.768)
+```
+
+V18 used an 8 mm keep-out radius around each screw. Any new opening must remain
+outside those guards.
+
+## Current candidate, not yet accepted
+
+There is a current unaccepted candidate derived directly from the V18 GLB:
+
+- `models\piflex-enclosed-head-v1\piflex-v18-wide-service-opening.glb`
+- `models\piflex-enclosed-head-v1\piflex-v18-wide-service-opening.stl`
+- build script:
+  `models\piflex-enclosed-head-v1\build_v18_wide_opening.py`
+- render script:
+  `models\piflex-enclosed-head-v1\render_v18_wide_opening.py`
+- report:
+  `models\piflex-enclosed-head-v1\inspection-v18-wide-service-opening.json`
+
+The candidate currently uses a centered `104 x 92 mm` X/Y opening
+(`X = +/-52`, `Y = +/-46`). It is still smaller than the user's black-box
+markup, particularly vertically. The user has not accepted this candidate;
+treat it only as a starting point, enlarge it toward the saved visual target,
+and compare it with V18 before presenting anything.
+
+Latest rear render:
+
+`models\piflex-enclosed-head-v1\piflex-v18-wide-opening-rear.png`
+
+The candidate preserves these checked invariants:
+
+- original V18 source SHA-256 unchanged;
+- V18 mount/bracket mesh digest unchanged;
+- shell outer bounds unchanged;
+- only the screen-shell object was edited;
+- no shell/mount union was performed.
+
+## Recommended editing method
+
+Use the same bounded face-cut strategy used by V18:
+
+1. Import the last-known-good V18 GLB.
+2. Identify the shell and mount by their object names, not polygon count.
+3. Duplicate the shell object for the new revision.
+4. In the shell's local X/Y plane, bisect triangles at the four desired opening
+   boundaries.
+5. Delete only faces whose centers lie within those X/Y boundaries.
+6. Leave the mount object byte-for-byte/vertex-for-vertex unchanged.
+7. Export a new GLB with the edited shell and untouched V18 mount as two objects.
+8. Render rear, front, side, and rear three-quarter images before calling it
+   complete.
+
+The current `build_v18_wide_opening.py` demonstrates this method with Blender's
+`bmesh.ops.bisect_plane`. Adjust only `OPENING_WIDTH`, `OPENING_BOTTOM`, and
+`OPENING_TOP` if the user wants a smaller or larger cut.
+
+Do not use a solid Boolean directly on this display GLB unless the shell is
+first repaired and the before/after exterior is proven identical. The imported
+V18 display meshes are not watertight, and one Boolean attempt incorrectly
+expanded the shell thickness bounds from `+/-6.84` to `+/-10 mm`.
+
+## Tooling and exact commands
+
+Blender is available as the cached Python `bpy` package (version 5.0.1):
+
+```powershell
+uv run --python 3.11 --with bpy python "models\piflex-enclosed-head-v1\build_v18_wide_opening.py"
+uv run --python 3.11 --with bpy python "models\piflex-enclosed-head-v1\render_v18_wide_opening.py"
+```
+
+CadQuery can be run through uv when needed:
+
+```powershell
+uv run --with cadquery python path\to\script.py
+```
+
+FreeCAD is installed here:
+
+```text
+C:\Users\SUBSECT\AppData\Local\Programs\FreeCAD 1.1\bin\FreeCADCmd.exe
+```
+
+The immediate V18 opening edit does not require CadQuery or FreeCAD; Blender is
+the correct tool because the authoritative input is a GLB scene with two
+already-positioned meshes.
+
+To verify the protected source hash:
+
+```powershell
+Get-FileHash -Algorithm SHA256 -LiteralPath "models\piflex-enclosed-head-v1\piflex-complete-shifted-enclosure-only-v18.glb"
+```
+
+## Required visual proof
+
+Before handing a model back to the user, provide:
+
+1. Rear V18 before/after images from the exact same camera.
+2. A front three-quarter render proving the complete case is still present.
+3. A side render proving case depth and screen angle are unchanged.
+4. A close rear render showing the larger opening stops before the logo and
+   includes the two horizontal slits.
+5. A statement of the old and new opening dimensions.
+
+Do not rely only on a script report claiming the case is preserved. Earlier
+reports said that while the visible exported model was clearly wrong. The
+render is the acceptance test.
+
+## Printability warning
+
+Do not describe the current GLB-derived STL as production-ready solely because
+it exports. The exact V18 visualization shell was originally altered by
+splitting/deleting faces and is not watertight. Before actual printing, repair
+or recreate the accepted opening in the original solid screen-shell STL, then
+validate manifoldness, wall thickness, screw towers, connector access, and fit
+with physical caliper measurements.
+
+Original solid screen-shell source:
+
+`models\makerworld-3116241\stl\screen-case\10Inch_TouchDisplay2_DesktopCase_Shell.stl`
+
+## Rejected approaches and files
+
+Do not use these as the next source:
+
+- `piflex-v18-cleaned-one-piece.*`
+- `piflex-v18-cleaned-complete.*`
+- the reverted V20 work
+
+Those attempts regenerated/unioned geometry and produced the flat/missing-case
+appearance the user rejected.
+
+Relevant Git history:
+
+```text
+24177f3 Clean V18 case without cutting front rim        # rejected result
+b67021e Revert "Retain PiFlex screen screw plate in V20"
+93d9162 Retain PiFlex screen screw plate in V20         # reverted
+3a572fd Keep PiFlex service opening clear of screen screws  # V18 baseline
+```
+
+## Broader model constraints already established
+
+- Rear views must not be mirrored. On the FLX6, USB-B is on the right when
+  viewed from the back.
+- The right controller bracket has the controller USB-B clearance.
+- The opposite bracket has the RCA/master-output clearance.
+- The screen and enclosure are shifted approximately 18.629 mm from the earlier
+  bracket placement to center the screen on the controller's center encoder.
+- The screen angle is approximately 25 degrees, deliberately flatter than the
+  original tablet-mount reference.
+- The USB ears are part of the enclosure, capped, and their USB sockets face
+  upward.
+- Preserve the existing V18 port clearances, screw holes, clamp geometry, and
+  placement unless the user explicitly requests a separate change.
+
+## Repository safety
+
+The worktree contains many untracked CAD renders, models, build artifacts, and
+unrelated BiteDJ/PiFlex OS changes. Do not run broad `git clean`, reset, checkout,
+or mass deletion. Do not overwrite old V18 files. Stage and commit only the
+exact new handoff/model files intended for the next revision.

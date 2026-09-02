@@ -1,0 +1,58 @@
+{
+  "source": "piflex-complete-shifted-enclosure-only-v18.glb",
+  "source_sha256": "1e8f38c9b0fe71293d4c65373161993a344a87a454690efca5019ac39078182c",
+  "source_unchanged": true,
+  "mount_geometry_unchanged": true,
+  "outer_case_bounds_unchanged": true,
+  "shell_local_bounds": [
+    [
+      -126.577,
+      -85.771,
+      -6.84
+    ],
+    [
+      126.577,
+      85.771,
+      6.84
+    ]
+  ],
+  "shell_dimensions": [
+    253.154,
+    171.542,
+    13.68
+  ],
+  "shell_matrix_world": [
+    [
+      -1.0,
+      -0.0,
+      -0.0,
+      -18.629
+    ],
+    [
+      0.0,
+      -0.90631,
+      -0.42262,
+      244.2442
+    ],
+    [
+      0.0,
+      -0.42262,
+      0.90631,
+      98.44753
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "opening_local_mm": {
+    "width": 104.0,
+    "bottom": -46.0,
+    "top": 46.0,
+    "depth": 20.0,
+    "centered_x": true
+  },
+  "scope": "one bounded rectangular face cut on the original V18 screen-shell object"
+}
