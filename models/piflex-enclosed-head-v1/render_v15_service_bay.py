@@ -11,7 +11,11 @@ ROOT = Path(r"C:\Users\SUBSECT\Documents\Codex\2026-08-18\hey-i-need-you-to-rese
 OUT = ROOT / "models" / "piflex-enclosed-head-v1"
 REVISION = os.environ.get("PIFLEX_REVISION", "v15").lower()
 
-if REVISION == "v17":
+if REVISION == "v18":
+    LOCAL_STL = "piflex-v18-screw-safe-service-bay-local.stl"
+    OPEN_STL = "piflex-v18-service-open-inspection.stl"
+    SHAPE_LABEL = "screw-safe-service-bay"
+elif REVISION == "v17":
     LOCAL_STL = "piflex-v17-integrated-service-bay-local.stl"
     OPEN_STL = "piflex-v17-service-open-inspection.stl"
     SHAPE_LABEL = "integrated-service-bay"
@@ -99,7 +103,7 @@ def render_model(stl_name, png_name, mat):
 
 reset_scene()
 setup_scene()
-case_colour = (0.30, 0.37, 0.49) if REVISION == "v17" else (0.12, 0.15, 0.20)
+case_colour = (0.30, 0.37, 0.49) if REVISION in {"v17", "v18"} else (0.12, 0.15, 0.20)
 case_material = material("PiFlex graphite", case_colour, metallic=0.05, roughness=0.38)
 inspection_material = material("PiFlex inspection", (0.78, 0.22, 0.055), metallic=0.02, roughness=0.38)
 

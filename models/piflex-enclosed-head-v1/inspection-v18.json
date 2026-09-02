@@ -1,0 +1,72 @@
+{
+  "name": "PiFlex V18 screw-safe rounded service bay",
+  "valid": true,
+  "solids": 1,
+  "dimensions_mm": [
+    211.275,
+    134.405,
+    324.273
+  ],
+  "volume_cm3": 402.504,
+  "complete_assembly_install_shift_x_mm": -18.629,
+  "rear_bay_back_face_mm": [
+    166.0,
+    100.0
+  ],
+  "rear_bay_screen_mouth_mm": [
+    184.0,
+    118.0
+  ],
+  "screw_safe_back_opening_mm": [
+    144.001,
+    105.802
+  ],
+  "screw_safe_back_opening_centre_mm": [
+    2.343,
+    -0.133
+  ],
+  "screw_guard_radius_mm": 8.0,
+  "screw_guard_checks": [
+    {
+      "hole_mm": [
+        -77.657,
+        -61.034
+      ],
+      "opening_overlap_mm3": 0.0
+    },
+    {
+      "hole_mm": [
+        -77.657,
+        60.768
+      ],
+      "opening_overlap_mm3": 0.0
+    },
+    {
+      "hole_mm": [
+        82.344,
+        -61.034
+      ],
+      "opening_overlap_mm3": 0.0
+    },
+    {
+      "hole_mm": [
+        82.344,
+        60.768
+      ],
+      "opening_overlap_mm3": 0.0
+    }
+  ],
+  "concealed_channel_clear_mm": [
+    18.0,
+    6.8
+  ],
+  "channel_rear_limit_mm": -5.8,
+  "ear_rear_limit_mm": -9.0,
+  "external_raceway_bridges": false,
+  "service_windows": [
+    "USB/Ethernet side",
+    "power/HDMI side",
+    "microSD edge"
+  ],
+  "production_gate": "verify Pi connector locations and panel USB lead dimensions with calipers"
+}
