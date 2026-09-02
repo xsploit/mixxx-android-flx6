@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 from pathlib import Path
 
 import bpy
@@ -28,15 +29,25 @@ RAW_SHELL = (
     / "screen-case"
     / "10Inch_TouchDisplay2_DesktopCase_Shell.stl"
 )
-V21_ASSEMBLY = HERE / "piflex-codex-v21-bay-merged-usb-routing.glb"
+PRINT_VERSION = os.environ.get("PIFLEX_PRINT_VERSION", "v22")
+ASSEMBLY = HERE / os.environ.get(
+    "PIFLEX_ASSEMBLY", "piflex-codex-v21-bay-merged-usb-routing.glb"
+)
+REAR_OBJECT_PREFIX = os.environ.get("PIFLEX_REAR_PREFIX", "PiFlex Codex V21")
+APPROVED_GEOMETRY = os.environ.get(
+    "PIFLEX_APPROVED_GEOMETRY",
+    "V21 bay-merged opening on frozen V19 visual form",
+)
+TUNNEL_VOIDS_NAME = os.environ.get("PIFLEX_TUNNEL_VOIDS")
+TUNNEL_VOIDS = HERE / TUNNEL_VOIDS_NAME if TUNNEL_VOIDS_NAME else None
 
-OUT_SHELL = HERE / "piflex-codex-v22-printable-screen-shell.stl"
-OUT_REAR_MOUNT = HERE / "piflex-codex-v22-printable-rear-mount.stl"
-OUT_REGISTERED_SHELL = HERE / "piflex-codex-v22-registered-screen-shell.stl"
-OUT_REGISTERED = HERE / "piflex-codex-v22-printable-two-part-fit-check.stl"
-OUT_MONOLITHIC = HERE / "piflex-codex-v22-printable-monolithic.stl"
-OUT_MONOLITHIC_3MF = HERE / "piflex-codex-v22-printable-monolithic.3mf"
-REPORT = HERE / "inspection-codex-v22-print-parts.json"
+OUT_SHELL = HERE / f"piflex-codex-{PRINT_VERSION}-printable-screen-shell.stl"
+OUT_REAR_MOUNT = HERE / f"piflex-codex-{PRINT_VERSION}-printable-rear-mount.stl"
+OUT_REGISTERED_SHELL = HERE / f"piflex-codex-{PRINT_VERSION}-registered-screen-shell.stl"
+OUT_REGISTERED = HERE / f"piflex-codex-{PRINT_VERSION}-printable-two-part-fit-check.stl"
+OUT_MONOLITHIC = HERE / f"piflex-codex-{PRINT_VERSION}-printable-monolithic.stl"
+OUT_MONOLITHIC_3MF = HERE / f"piflex-codex-{PRINT_VERSION}-printable-monolithic.3mf"
+REPORT = HERE / f"inspection-codex-{PRINT_VERSION}-print-parts.json"
 
 OPENING_POINTS = (
     (-72.0, 56.0),
@@ -48,7 +59,18 @@ OPENING_POINTS = (
     (-89.0, -40.0),
     (-89.0, 40.0),
 )
-FUSION_SEAM_RELIEF_MM = 0.10
+FUSION_SEAM_RELIEF_MM = float(os.environ.get("PIFLEX_FUSION_SEAM_RELIEF", "0.10"))
+FUSION_JITTER_WORLD_MM = np.array(
+    [
+        float(value)
+        for value in os.environ.get(
+            "PIFLEX_FUSION_JITTER_WORLD", "0.0,0.0,0.0"
+        ).split(",")
+    ],
+    dtype=float,
+)
+if FUSION_JITTER_WORLD_MM.shape != (3,):
+    raise RuntimeError("PIFLEX_FUSION_JITTER_WORLD must contain three numbers")
 
 
 def sha256(path):
@@ -135,12 +157,14 @@ printable_shell.export(OUT_SHELL)
 # 2. Recover the exact V21 registration and replace only its visualization
 # shell with the repaired solid shell.
 bpy.ops.wm.read_factory_settings(use_empty=True)
-bpy.ops.import_scene.gltf(filepath=str(V21_ASSEMBLY))
+bpy.ops.import_scene.gltf(filepath=str(ASSEMBLY))
 visual_shell = next(
     obj for obj in bpy.context.scene.objects if obj.name.startswith("Exact V19 screen case")
 )
 rear_mount = next(
-    obj for obj in bpy.context.scene.objects if obj.name.startswith("PiFlex Codex V21")
+    obj
+    for obj in bpy.context.scene.objects
+    if obj.name.startswith(REAR_OBJECT_PREFIX)
 )
 shell_matrix = visual_shell.matrix_world.copy()
 bpy.data.objects.remove(visual_shell, do_unlink=True)
@@ -192,7 +216,9 @@ fusion_normal = np.array(
     [shell_matrix[0][2], shell_matrix[1][2], shell_matrix[2][2]], dtype=float
 )
 fusion_normal /= np.linalg.norm(fusion_normal)
-fusion_translation = -fusion_normal * FUSION_SEAM_RELIEF_MM
+fusion_translation = (
+    -fusion_normal * FUSION_SEAM_RELIEF_MM + FUSION_JITTER_WORLD_MM
+)
 fusion_rear_mesh = rear_mount_mesh.copy()
 fusion_rear_mesh.apply_translation(fusion_translation)
 intersection = trimesh.boolean.intersection(
@@ -202,6 +228,7 @@ intersection_volume = abs(float(intersection.volume)) if len(intersection.faces)
 monolithic_exported = False
 monolithic_report = None
 monolithic_3mf_report = None
+tunnel_validation = None
 if intersection_volume > 0.1:
     monolithic = trimesh.boolean.union(
         [registered_shell_mesh, fusion_rear_mesh], engine="manifold", check_volume=True
@@ -241,12 +268,66 @@ if not monolithic_exported and OUT_MONOLITHIC.exists():
 if not monolithic_exported and OUT_MONOLITHIC_3MF.exists():
     OUT_MONOLITHIC_3MF.unlink()
 
+# Optional functional-route validation. The registered void reference is moved
+# by the same fusion-only relief as the rear body, then intersected with the
+# actual disk-round-tripped monolithic mesh. Any meaningful overlap means the
+# route was silently plugged by the screen shell, yoke, or final union.
+if TUNNEL_VOIDS is not None and not monolithic_exported:
+    raise RuntimeError("Cannot validate USB tunnels without a monolithic export")
+if TUNNEL_VOIDS is not None:
+    tunnel_mesh = trimesh.load_mesh(TUNNEL_VOIDS, process=True)
+    route_reports = []
+    for index, route in enumerate(tunnel_mesh.split(only_watertight=False)):
+        if route.volume < 0:
+            route.invert()
+        shell_block = trimesh.boolean.intersection(
+            [route, registered_shell_mesh], engine="manifold", check_volume=True
+        )
+        rear_block = trimesh.boolean.intersection(
+            [route, rear_mount_mesh], engine="manifold", check_volume=True
+        )
+        fused_route = route.copy()
+        fused_route.apply_translation(fusion_translation)
+        final_block = trimesh.boolean.intersection(
+            [fused_route, monolithic_disk], engine="manifold", check_volume=True
+        )
+        route_reports.append(
+            {
+                "route": index,
+                "void_volume_mm3": round(abs(float(route.volume)), 6),
+                "blue_shell_blocked_mm3": round(
+                    abs(float(shell_block.volume)) if len(shell_block.faces) else 0.0,
+                    6,
+                ),
+                "rear_mount_blocked_mm3": round(
+                    abs(float(rear_block.volume)) if len(rear_block.faces) else 0.0,
+                    6,
+                ),
+                "monolithic_blocked_mm3": round(
+                    abs(float(final_block.volume)) if len(final_block.faces) else 0.0,
+                    6,
+                ),
+            }
+        )
+    maximum_block = max(
+        report["monolithic_blocked_mm3"] for report in route_reports
+    )
+    tunnel_validation = {
+        "reference_file": TUNNEL_VOIDS.name,
+        "routes": route_reports,
+        "maximum_allowed_numerical_overlap_mm3": 0.02,
+        "passed": maximum_block <= 0.02,
+    }
+    if not tunnel_validation["passed"]:
+        raise RuntimeError(f"Final union obstructed a USB tunnel: {tunnel_validation}")
+
 if sha256(RAW_SHELL) != raw_hash:
     raise RuntimeError("Authoritative raw screen shell changed during build")
 
 report = {
-    "design": "PiFlex Codex V22 topology-checked print parts",
-    "approved_geometry": "V21 bay-merged opening on frozen V19 visual form",
+    "design": f"PiFlex Codex {PRINT_VERSION.upper()} topology-checked print parts",
+    "approved_geometry": APPROVED_GEOMETRY,
+    "assembly_source": ASSEMBLY.name,
     "raw_shell": str(RAW_SHELL.relative_to(ROOT)),
     "raw_shell_sha256": raw_hash,
     "opening_profile_mm": [list(point) for point in OPENING_POINTS],
@@ -265,8 +346,13 @@ report = {
     "two_part_fit_check": OUT_REGISTERED.name,
     "fusion_seam_relief_mm": FUSION_SEAM_RELIEF_MM,
     "fusion_seam_relief_direction_world": [
-        round(float(value / FUSION_SEAM_RELIEF_MM), 7)
-        for value in fusion_translation
+        round(float(value), 7) for value in -fusion_normal
+    ],
+    "fusion_jitter_world_mm": [
+        round(float(value), 7) for value in FUSION_JITTER_WORLD_MM
+    ],
+    "fusion_total_translation_world_mm": [
+        round(float(value), 7) for value in fusion_translation
     ],
     "registered_part_overlap_mm3": round(intersection_volume, 3),
     "monolithic": {
@@ -276,6 +362,7 @@ report = {
         "mesh": monolithic_report,
         "3mf_mesh": monolithic_3mf_report,
     },
+    "usb_tunnel_validation": tunnel_validation,
     "nominal_designed_walls_mm": {
         "rear_bay": 3.0,
         "USB_ears": 3.2,

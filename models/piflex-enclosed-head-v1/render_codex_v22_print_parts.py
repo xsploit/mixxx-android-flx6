@@ -1,5 +1,6 @@
-"""Render the topology-checked V22 print assembly and monolithic result."""
+"""Render a topology-checked PiFlex print assembly and monolithic result."""
 
+import os
 from pathlib import Path
 
 import bpy
@@ -7,9 +8,10 @@ from mathutils import Vector
 
 
 HERE = Path(__file__).resolve().parent
-SHELL = HERE / "piflex-codex-v22-registered-screen-shell.stl"
-REAR = HERE / "piflex-codex-v22-printable-rear-mount.stl"
-MONOLITHIC = HERE / "piflex-codex-v22-printable-monolithic.stl"
+PRINT_VERSION = os.environ.get("PIFLEX_PRINT_VERSION", "v22")
+SHELL = HERE / f"piflex-codex-{PRINT_VERSION}-registered-screen-shell.stl"
+REAR = HERE / f"piflex-codex-{PRINT_VERSION}-printable-rear-mount.stl"
+MONOLITHIC = HERE / f"piflex-codex-{PRINT_VERSION}-printable-monolithic.stl"
 
 
 def point_camera(camera, target):
@@ -32,9 +34,9 @@ def import_stl(path, name, mat):
 
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
-shell = import_stl(SHELL, "V22 printable screen shell", material("Screen shell", (0.06, 0.23, 0.38)))
-rear = import_stl(REAR, "V22 printable rear mount", material("Rear mount", (0.88, 0.25, 0.055)))
-monolithic = import_stl(MONOLITHIC, "V22 fused enclosure", material("Fused enclosure", (0.08, 0.32, 0.42)))
+shell = import_stl(SHELL, f"{PRINT_VERSION.upper()} printable screen shell", material("Screen shell", (0.06, 0.23, 0.38)))
+rear = import_stl(REAR, f"{PRINT_VERSION.upper()} printable rear mount", material("Rear mount", (0.88, 0.25, 0.055)))
+monolithic = import_stl(MONOLITHIC, f"{PRINT_VERSION.upper()} fused enclosure", material("Fused enclosure", (0.08, 0.32, 0.42)))
 monolithic.hide_render = True
 
 assembly = [shell, rear]
@@ -74,7 +76,7 @@ for suffix, (location, target, scale) in views.items():
     camera.location = location
     camera.data.ortho_scale = scale
     point_camera(camera, target)
-    scene.render.filepath = str(HERE / f"piflex-codex-v22-printable-{suffix}.png")
+    scene.render.filepath = str(HERE / f"piflex-codex-{PRINT_VERSION}-printable-{suffix}.png")
     bpy.ops.render.render(write_still=True)
 
 # Render the union separately to prove the same accepted exterior survived the
@@ -86,7 +88,7 @@ location, target, scale = views["rear-three-quarter"]
 camera.location = location
 camera.data.ortho_scale = scale
 point_camera(camera, target)
-scene.render.filepath = str(HERE / "piflex-codex-v22-printable-monolithic-three-quarter.png")
+scene.render.filepath = str(HERE / f"piflex-codex-{PRINT_VERSION}-printable-monolithic-three-quarter.png")
 bpy.ops.render.render(write_still=True)
 
-print("Rendered PiFlex Codex V22 print parts")
+print(f"Rendered PiFlex Codex {PRINT_VERSION.upper()} print parts")
