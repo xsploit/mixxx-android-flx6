@@ -1,0 +1,71 @@
+{
+  "source": "piflex-complete-shifted-enclosure-only-v18.glb",
+  "source_sha256": "1e8f38c9b0fe71293d4c65373161993a344a87a454690efca5019ac39078182c",
+  "source_unchanged": true,
+  "mount_geometry_unchanged": true,
+  "outer_case_bounds_unchanged": true,
+  "shell_local_bounds": [
+    [
+      -126.577,
+      -85.771,
+      -6.84
+    ],
+    [
+      126.577,
+      85.771,
+      6.84
+    ]
+  ],
+  "shell_dimensions": [
+    253.154,
+    171.542,
+    13.68
+  ],
+  "shell_matrix_world": [
+    [
+      -1.0,
+      -0.0,
+      -0.0,
+      -18.629
+    ],
+    [
+      0.0,
+      -0.90631,
+      -0.42262,
+      244.2442
+    ],
+    [
+      0.0,
+      -0.42262,
+      0.90631,
+      98.44753
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "opening_local_mm": {
+    "left": -71.157,
+    "right": 75.844,
+    "width": 147.001,
+    "bottom": -54.534,
+    "top": 54.268,
+    "height": 108.802,
+    "depth": 20.0,
+    "centre": [
+      2.343,
+      -0.133
+    ]
+  },
+  "screw_guard_radius_mm": 6.5,
+  "remaining_structural_web_outside_screw_tower_mm": 1.0,
+  "existing_v18_mount_features_preserved": [
+    "two hollow 38 x 70 mm USB ears",
+    "two top-facing 16.4 x 9.2 mm USB openings",
+    "two concealed 18 mm high x 6.8 mm deep ear-to-cavity channels"
+  ],
+  "scope": "one screw-safe rectangular face cut on the original V18 screen-shell object; V18 mount unchanged"
+}

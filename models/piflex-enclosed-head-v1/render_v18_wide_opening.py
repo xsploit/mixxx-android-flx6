@@ -7,7 +7,7 @@ from mathutils import Vector
 
 
 HERE = Path(__file__).resolve().parent
-SOURCE = HERE / "piflex-v18-wide-service-opening.glb"
+SOURCE = HERE / "piflex-codex-v18-usb-routing.glb"
 
 
 def point_camera(camera, target):
@@ -57,7 +57,7 @@ views = {
 for suffix, (location, target) in views.items():
     camera.location = location
     point_camera(camera, target)
-    scene.render.filepath = str(HERE / f"piflex-v18-wide-opening-{suffix}.png")
+    scene.render.filepath = str(HERE / f"piflex-codex-v18-usb-routing-{suffix}.png")
     bpy.ops.render.render(write_still=True)
 
-print("Rendered V18 wide-opening revision")
+print("Rendered Codex V18 USB-routing revision")

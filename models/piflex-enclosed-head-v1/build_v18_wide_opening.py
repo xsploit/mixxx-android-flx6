@@ -1,8 +1,8 @@
 """Enlarge only the rear service opening in the last-known-good V18 GLB.
 
-The V18 source is imported unchanged.  A centred rectangular cutter removes
-the old opening plus both horizontal vent slots, stopping below the logo.
-The mount/brackets and every other part of the screen case are untouched.
+The V18 source is imported unchanged. A screw-safe rectangular face cut grows
+the service opening to within 1 mm of the four existing screw towers. The
+mount, ears, concealed USB channels and every outer case surface stay intact.
 """
 
 from pathlib import Path
@@ -15,17 +15,20 @@ import bmesh
 
 HERE = Path(__file__).resolve().parent
 SOURCE = HERE / "piflex-complete-shifted-enclosure-only-v18.glb"
-OUT_GLB = HERE / "piflex-v18-wide-service-opening.glb"
-OUT_STL = HERE / "piflex-v18-wide-service-opening.stl"
-REPORT = HERE / "inspection-v18-wide-service-opening.json"
+OUT_GLB = HERE / "piflex-codex-v18-usb-routing.glb"
+OUT_STL = HERE / "piflex-codex-v18-usb-routing-fit-check.stl"
+REPORT = HERE / "inspection-codex-v18-usb-routing.json"
 
 # Screen-shell local coordinates.  The exact shell is 253.154 x 171.542 mm.
-# This is centred left/right, stays below the printed logo, encompasses the
-# original rectangular opening and both horizontal vent lines, and remains
-# well inside the four screen screws at x ~= +/-80 and z ~= +/-61 mm.
-OPENING_WIDTH = 104.0
-OPENING_BOTTOM = -46.0
-OPENING_TOP = 46.0
+# Enlarge to the four original screen-screw centres, retaining the complete
+# 5.5 mm screw towers plus 1.0 mm of structural web around each one.  This is
+# deliberately the last sensible increment: widening farther would cut into
+# the screw supports that attach the case to the display.
+SCREW_GUARD_RADIUS = 6.5
+OPENING_LEFT = -77.657 + SCREW_GUARD_RADIUS
+OPENING_RIGHT = 82.344 - SCREW_GUARD_RADIUS
+OPENING_BOTTOM = -61.034 + SCREW_GUARD_RADIUS
+OPENING_TOP = 60.768 - SCREW_GUARD_RADIUS
 OPENING_DEPTH = 20.0
 
 
@@ -62,12 +65,11 @@ mount_digest_before = mesh_digest(mount)
 # Use the same bounded face-cut method that produced the known-good V18 shell.
 # Splitting on all four boundaries first prevents partial triangles outside the
 # requested opening from being deleted.  No replacement body is generated.
-x_limit = OPENING_WIDTH / 2.0
 bm = bmesh.new()
 bm.from_mesh(shell.data)
 for plane_co, plane_no in (
-    ((x_limit, 0.0, 0.0), (1.0, 0.0, 0.0)),
-    ((-x_limit, 0.0, 0.0), (1.0, 0.0, 0.0)),
+    ((OPENING_RIGHT, 0.0, 0.0), (1.0, 0.0, 0.0)),
+    ((OPENING_LEFT, 0.0, 0.0), (1.0, 0.0, 0.0)),
     ((0.0, OPENING_TOP, 0.0), (0.0, 1.0, 0.0)),
     ((0.0, OPENING_BOTTOM, 0.0), (0.0, 1.0, 0.0)),
 ):
@@ -81,7 +83,7 @@ for plane_co, plane_no in (
 central_faces = []
 for face in bm.faces:
     centre = face.calc_center_median()
-    if -x_limit < centre.x < x_limit and OPENING_BOTTOM < centre.y < OPENING_TOP:
+    if OPENING_LEFT < centre.x < OPENING_RIGHT and OPENING_BOTTOM < centre.y < OPENING_TOP:
         central_faces.append(face)
 bmesh.ops.delete(bm, geom=central_faces, context="FACES")
 bm.to_mesh(shell.data)
@@ -118,13 +120,26 @@ report = {
     "shell_dimensions": [round(value, 4) for value in shell.dimensions],
     "shell_matrix_world": [[round(value, 5) for value in row] for row in shell.matrix_world],
     "opening_local_mm": {
-        "width": OPENING_WIDTH,
+        "left": OPENING_LEFT,
+        "right": OPENING_RIGHT,
+        "width": round(OPENING_RIGHT - OPENING_LEFT, 3),
         "bottom": OPENING_BOTTOM,
         "top": OPENING_TOP,
+        "height": round(OPENING_TOP - OPENING_BOTTOM, 3),
         "depth": OPENING_DEPTH,
-        "centered_x": True,
+        "centre": [
+            round((OPENING_LEFT + OPENING_RIGHT) / 2.0, 3),
+            round((OPENING_BOTTOM + OPENING_TOP) / 2.0, 3),
+        ],
     },
-    "scope": "one bounded rectangular face cut on the original V18 screen-shell object",
+    "screw_guard_radius_mm": SCREW_GUARD_RADIUS,
+    "remaining_structural_web_outside_screw_tower_mm": 1.0,
+    "existing_v18_mount_features_preserved": [
+        "two hollow 38 x 70 mm USB ears",
+        "two top-facing 16.4 x 9.2 mm USB openings",
+        "two concealed 18 mm high x 6.8 mm deep ear-to-cavity channels",
+    ],
+    "scope": "one screw-safe rectangular face cut on the original V18 screen-shell object; V18 mount unchanged",
 }
 REPORT.write_text(json.dumps(report, indent=2), encoding="utf-8")
 print(json.dumps(report, indent=2))
