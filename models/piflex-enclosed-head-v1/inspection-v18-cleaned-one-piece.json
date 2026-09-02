@@ -1,0 +1,55 @@
+{
+  "vertices": 11259,
+  "edges": 33891,
+  "faces": 22594,
+  "connected_components": 3,
+  "component_bounds": [
+    {
+      "vertices": 10769,
+      "min": [
+        -161.273,
+        -5.0,
+        -162.077
+      ],
+      "max": [
+        50.0,
+        129.403,
+        162.077
+      ]
+    },
+    {
+      "vertices": 245,
+      "min": [
+        -109.257,
+        73.553,
+        138.077
+      ],
+      "max": [
+        -46.485,
+        115.186,
+        158.877
+      ]
+    },
+    {
+      "vertices": 245,
+      "min": [
+        -109.257,
+        73.553,
+        -158.877
+      ],
+      "max": [
+        -46.485,
+        115.186,
+        -138.077
+      ]
+    }
+  ],
+  "boundary_edges": 0,
+  "non_manifold_edges": 0,
+  "design": "PiFlex cleaned V18 one-piece protective case",
+  "source_case": "exact original printed 10-inch shell",
+  "front_case_preserved": true,
+  "rear_plate_only_cut": true,
+  "screen_screw_areas_preserved": true,
+  "legacy_empty_slots_filled": true
+}

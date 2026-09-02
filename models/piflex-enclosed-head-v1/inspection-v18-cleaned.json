@@ -1,0 +1,24 @@
+{
+  "name": "PiFlex V18 conservative cleanup",
+  "source": "V18",
+  "valid": true,
+  "solids": 1,
+  "dimensions_mm": [
+    211.275,
+    134.405,
+    324.273
+  ],
+  "volume_cm3": 408.126,
+  "service_opening_mm": [
+    144.001,
+    105.802
+  ],
+  "screen_screw_areas_preserved": true,
+  "original_front_rim_cut": false,
+  "legacy_vent_and_slot_gaps_filled": true,
+  "intentional_openings": [
+    "two top-facing ear USB sockets",
+    "rounded USB/Ethernet connector window",
+    "rounded power/HDMI connector window"
+  ]
+}
