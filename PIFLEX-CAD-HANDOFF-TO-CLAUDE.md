@@ -11,6 +11,33 @@ Start from the exact last-known-good V18 enclosure model and make **one small,
 symmetrical enlargement of the existing rectangular opening in the rear of the
 screen case**.
 
+### Latest requirements supersede the earlier logo limit
+
+The opening is not only for Pi access. It must create a usable cable-routing
+volume between the Raspberry Pi cavity and both USB ears. The user's latest
+instruction explicitly allows the opening to extend farther into the second
+screen-case layer and past/through the printed logo if necessary. The logo is
+therefore no longer protected geometry. The four screen fasteners and their
+structural material are the hard limits.
+
+The finished internal path is:
+
+```text
+left top-facing female USB socket
+        -> hollow left ear
+        -> enclosed left cable channel
+        -> enlarged central Pi cavity
+        <- enclosed right cable channel
+        <- hollow right ear
+        <- right top-facing female USB socket
+```
+
+Both ears must receive real internal cutouts for the panel-mount/female USB
+connectors. From the middle/inside end of each ear, cut one concealed channel
+through the adjacent screen-case layer into the central Pi opening. The channels
+must be voids inside the enclosure, not solid protruding tunnels and not exposed
+external raceways.
+
 The user does **not** want a new case, a replacement plate, a rebuilt frame, or
 a union that changes the visible enclosure. The complete V18 case must stay in
 place. Only the existing rear opening should become slightly larger.
@@ -18,8 +45,8 @@ place. Only the existing rear opening should become slightly larger.
 The enlarged opening should:
 
 - remain centered left/right;
-- stop before the printed `RPI TOUCH DISPLAY 2 DESKTOP CASE / 10 INCH VERSION`
-  logo;
+- extend far enough into the second/rear screen-case layer to meet both ear
+  channels; it may remove printed-logo material;
 - encompass/remove the two short horizontal raised slit/vent features directly
   above and below the old opening;
 - retain the four screen screw areas;
@@ -27,9 +54,10 @@ The enlarged opening should:
   FLX6 clamps, controller-port clearances, angle, position, and all other V18
   geometry unchanged.
 
-The user's latest wording was: make the opening “just a little bit bigger.” Do
-not turn it into the very large rounded opening seen in the rejected cleaned
-model.
+Earlier, the user described a small enlargement. The latest explanation adds
+the functional reason for more clearance: female USB leads must pass from both
+ears to the Pi cavity. Prefer the smallest opening that provides that complete
+route, but do not preserve the logo at the expense of usable cable paths.
 
 ### Authoritative visual target
 
@@ -41,19 +69,26 @@ SHA-256:
 
 `C187ADCCB211E418B519C16B5671C85A8792BFBF897F7C60A565FB27F899ACFD`
 
-In that image, the black rectangle is the requested new opening boundary. Read
-it literally:
+In that image, the black rectangle was the earlier requested opening boundary:
 
 - enlarge the existing blue opening outward to approximately the black box;
 - the upper and lower horizontal rails/slits inside that black box are removed
   as part of the opening;
-- the top edge remains below the printed text/logo;
 - the opening remains symmetrical around the existing opening;
 - every orange case surface outside the black box remains present.
 
-The markup indicates a target roughly around `108-112 mm` wide and
-`100-106 mm` high, but derive/tune the final dimensions by overlaying the model
-render with the saved reference rather than treating those estimates as final.
+The user's later USB-routing instruction supersedes the black box as a hard
+maximum. The opening may grow past it and through the logo region, but only as
+far as required to connect both concealed ear channels while retaining all four
+screw guards and the surrounding case.
+
+The markup indicates an earlier target roughly around `108-112 mm` wide and
+`100-106 mm` high. The existing V18 parametric code also defines a larger proven
+screw-safe throat of `144.001 x 105.802 mm`, centered at approximately
+`(2.343, -0.133) mm`. That larger throat stops immediately before the four 8 mm
+screw guards and is the strongest existing starting point for the revised
+USB-routing requirement. Compare both options against the real channel path;
+do not simply delete the entire back layer.
 
 ## Immutable last-known-good source
 
@@ -141,10 +176,11 @@ There is a current unaccepted candidate derived directly from the V18 GLB:
   `models\piflex-enclosed-head-v1\inspection-v18-wide-service-opening.json`
 
 The candidate currently uses a centered `104 x 92 mm` X/Y opening
-(`X = +/-52`, `Y = +/-46`). It is still smaller than the user's black-box
-markup, particularly vertically. The user has not accepted this candidate;
-treat it only as a starting point, enlarge it toward the saved visual target,
-and compare it with V18 before presenting anything.
+(`X = +/-52`, `Y = +/-46`). It is too small for the newly clarified two-ear
+cable-routing goal and contains no newly verified connector/channel work. The
+user has not accepted it. Treat it only as a reference for how to preserve the
+V18 shell object while cutting; redesign the cavity/channel geometry around the
+latest requirement.
 
 Latest rear render:
 
@@ -166,12 +202,27 @@ Use the same bounded face-cut strategy used by V18:
 2. Identify the shell and mount by their object names, not polygon count.
 3. Duplicate the shell object for the new revision.
 4. In the shell's local X/Y plane, bisect triangles at the four desired opening
-   boundaries.
+   boundaries. Start from V18's `144.001 x 105.802 mm` screw-safe throat and
+   reduce it only if the two ear channels still connect cleanly.
 5. Delete only faces whose centers lie within those X/Y boundaries.
 6. Leave the mount object byte-for-byte/vertex-for-vertex unchanged.
 7. Export a new GLB with the edited shell and untouched V18 mount as two objects.
 8. Render rear, front, side, and rear three-quarter images before calling it
    complete.
+
+For the ears and channels:
+
+1. Preserve the rounded exterior and permanent caps of both ears.
+2. Use the existing top-facing USB socket openings as the connector locations.
+3. Hollow sufficient internal space for the female USB bodies and cable bend
+   radius; do not size this from the USB metal tongue alone.
+4. Cut a channel from the inner middle of each ear into the central cavity.
+5. Keep each channel within the ear/case envelope with continuous floor, roof,
+   and outside walls.
+6. Make the left and right routes symmetrical unless measured Pi connector or
+   strain-relief requirements justify a difference.
+7. Test with solid proxy models for the female USB connectors and plugs, then
+   hide/remove the proxies before exporting the printable body.
 
 The current `build_v18_wide_opening.py` demonstrates this method with Blender's
 `bmesh.ops.bisect_plane`. Adjust only `OPENING_WIDTH`, `OPENING_BOTTOM`, and
@@ -273,6 +324,15 @@ b67021e Revert "Retain PiFlex screen screw plate in V20"
   original tablet-mount reference.
 - The USB ears are part of the enclosure, capped, and their USB sockets face
   upward.
+- Existing ear envelope: `38 x 70 mm`, 3.2 mm nominal wall, 9 mm rear depth.
+- Existing top USB opening: `16.4 x 9.2 mm`, centered in the upper edge. Verify
+  the actual female USB panel-mount hardware before final print.
+- V18 already contains an initial concealed-channel concept with 18 mm clear
+  height and 6.8 mm depth. Inspect and extend/repair it rather than adding the
+  earlier protruding tunnel geometry.
+- Both ear channels must terminate openly in the enlarged Pi cavity so a female
+  USB extension can be inserted from the ear and routed to the Pi without
+  removing exterior case material.
 - Preserve the existing V18 port clearances, screw holes, clamp geometry, and
   placement unless the user explicitly requests a separate change.
 
