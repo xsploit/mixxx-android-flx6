@@ -1,0 +1,14 @@
+{
+  "vertices": 11262,
+  "edges": 33900,
+  "faces": 22600,
+  "boundary_edges": 0,
+  "non_manifold_edges": 0,
+  "design": "PiFlex one-piece clean protective case V20",
+  "construction": "first screw-bearing layer retained; center opening modestly enlarged; V20 structure fused",
+  "screen_screw_bosses_preserved": true,
+  "enlarged_opening_mm": [
+    118.0,
+    88.0
+  ]
+}
