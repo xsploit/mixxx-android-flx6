@@ -32,6 +32,21 @@ TUNNEL_CENTRE_Y = float(os.environ.get("PIFLEX_TUNNEL_CENTRE_Y", "0.0"))
 EAR_CENTRED_DOGLEG = os.environ.get("PIFLEX_EAR_CENTRED_DOGLEG") == "1"
 OPEN_INNER_CHANNEL = os.environ.get("PIFLEX_OPEN_INNER_CHANNEL") == "1"
 HOLLOW_EAR_INTERIOR = os.environ.get("PIFLEX_HOLLOW_EAR_INTERIOR") == "1"
+EXTEND_ORIGINAL_SCREW_TOWERS = (
+    os.environ.get("PIFLEX_EXTEND_ORIGINAL_SCREW_TOWERS") == "1"
+)
+SCREW_TOWER_EXTENSION_Z0 = float(
+    os.environ.get("PIFLEX_SCREW_TOWER_EXTENSION_Z0", "-11.2")
+)
+SCREW_TOWER_EXTENSION_TOP_Z = float(
+    os.environ.get("PIFLEX_SCREW_TOWER_EXTENSION_TOP_Z", "-8.9")
+)
+SCREW_TOWER_EXTENSION_RADIUS = float(
+    os.environ.get(
+        "PIFLEX_SCREW_TOWER_EXTENSION_RADIUS",
+        str(v19.head.BACK_SCREW_TUNNEL_RADIUS + 0.6),
+    )
+)
 TUNNEL_DROP_BELOW_OLD_ROUTE = 4.5
 TUNNEL_REAR_Z = float(
     os.environ.get(
@@ -308,6 +323,44 @@ def tunnel_housings():
     return housings
 
 
+def original_screw_tower_extensions():
+    """Extend the four original annular towers into the orange Pi wall.
+
+    V34's tower ends and tapered bay mouth meet almost tangentially, creating
+    four corner pinholes. These collars use the untouched source hole axes and
+    bores, and only add material behind the existing towers.
+    """
+    if not EXTEND_ORIGINAL_SCREW_TOWERS:
+        return []
+    depth = SCREW_TOWER_EXTENSION_TOP_Z - SCREW_TOWER_EXTENSION_Z0
+    if depth <= 0.0:
+        raise ValueError("Screw-tower extension top must be above its base")
+    if SCREW_TOWER_EXTENSION_RADIUS >= min(
+        item["opening_clearance_mm"] for item in opening_screw_clearances()
+    ):
+        raise ValueError("Screw-tower extension would intrude into the opening")
+
+    extensions = []
+    for x in v19.HOLE_X:
+        for y in v19.HOLE_Y:
+            outer = (
+                cq.Workplane("XY")
+                .center(x, y)
+                .circle(SCREW_TOWER_EXTENSION_RADIUS)
+                .extrude(depth)
+                .translate((0.0, 0.0, SCREW_TOWER_EXTENSION_Z0))
+            )
+            bore = (
+                cq.Workplane("XY")
+                .center(x, y)
+                .circle(v19.head.BACK_SCREW_CLEARANCE / 2.0)
+                .extrude(depth + 2.0)
+                .translate((0.0, 0.0, SCREW_TOWER_EXTENSION_Z0 - 1.0))
+            )
+            extensions.append(outer.cut(bore))
+    return extensions
+
+
 def build_centered_tunnel_rear_local():
     # V18 contains the obsolete short cuts. Restore their exact cutter volumes
     # before making the approved V21 opening and the corrected longer tunnels.
@@ -316,6 +369,8 @@ def build_centered_tunnel_rear_local():
         polished = polished.union(obsolete_channel)
     for housing in tunnel_housings():
         polished = polished.union(housing)
+    for extension in original_screw_tower_extensions():
+        polished = polished.union(extension)
 
     polished = polished.cut(v21.bay_merged_service_throat())
     for tunnel in routing_cutters():
@@ -365,6 +420,24 @@ def opening_screw_clearances():
 
 
 rear_local = build_centered_tunnel_rear_local()
+screw_bore_obstructions = []
+if EXTEND_ORIGINAL_SCREW_TOWERS:
+    depth = SCREW_TOWER_EXTENSION_TOP_Z - SCREW_TOWER_EXTENSION_Z0 + 2.0
+    for x in v19.HOLE_X:
+        for y in v19.HOLE_Y:
+            bore = (
+                cq.Workplane("XY")
+                .center(x, y)
+                .circle(v19.head.BACK_SCREW_CLEARANCE / 2.0)
+                .extrude(depth)
+                .translate((0.0, 0.0, SCREW_TOWER_EXTENSION_Z0 - 1.0))
+            )
+            screw_bore_obstructions.append(rear_local.intersect(bore).val().Volume())
+if any(volume > 0.02 for volume in screw_bore_obstructions):
+    raise RuntimeError(
+        "A reinforced original screw bore is obstructed: "
+        f"{screw_bore_obstructions}"
+    )
 ear_cavity_blocked_volumes = [
     rear_local.intersect(cavity).val().Volume()
     for cavity in restored_hollow_ear_cutters()
@@ -495,6 +568,25 @@ def export():
         ),
         "ear_centred_dogleg": EAR_CENTRED_DOGLEG,
         "ear_interior_fully_rehollowed": HOLLOW_EAR_INTERIOR,
+        "original_screw_tower_extensions": (
+            {
+                "source_hole_centres_mm": [
+                    [x, y] for x in v19.HOLE_X for y in v19.HOLE_Y
+                ],
+                "source_bore_diameter_mm": v19.head.BACK_SCREW_CLEARANCE,
+                "collar_radius_mm": SCREW_TOWER_EXTENSION_RADIUS,
+                "z_range_mm": [
+                    SCREW_TOWER_EXTENSION_Z0,
+                    SCREW_TOWER_EXTENSION_TOP_Z,
+                ],
+                "bore_obstruction_volumes_mm3": [
+                    round(volume, 6) for volume in screw_bore_obstructions
+                ],
+                "added_ring_or_case_step": False,
+            }
+            if EXTEND_ORIGINAL_SCREW_TOWERS
+            else None
+        ),
         "remaining_nominal_ear_wall_mm": round(v19.head.WING_WALL, 3),
         "ear_cavity_blocked_volume_mm3": [
             round(volume, 6) for volume in ear_cavity_blocked_volumes

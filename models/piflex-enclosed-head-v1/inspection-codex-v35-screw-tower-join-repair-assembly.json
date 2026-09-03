@@ -1,0 +1,40 @@
+{
+  "design": "PiFlex Codex V35 enclosed USB tunnels assembly",
+  "source": "piflex-codex-v21-bay-merged-usb-routing.glb",
+  "source_sha256": "6cbad5f6b93dd993dbce789b6b6e3ea4ecb849d54afbe627f8f0ed288f824c47",
+  "source_unchanged": true,
+  "screen_shell_world_bounds_unchanged": true,
+  "screen_shell_world_bounds_mm": [
+    [
+      -145.206,
+      163.6185,
+      56.0
+    ],
+    [
+      107.948,
+      324.8699,
+      140.8951
+    ]
+  ],
+  "opening_changed_from_v21": false,
+  "blue_screen_frame_cut_for_usb": true,
+  "rear_mount_replaced": true,
+  "usb_tunnel_centres_local_mm": [
+    [
+      -143.077,
+      0.0
+    ],
+    [
+      143.077,
+      0.0
+    ]
+  ],
+  "usb_tunnel_clear_section_mm": [
+    18.4,
+    10.0
+  ],
+  "ear_cavity_centre_z_mm": null,
+  "ear_centred_dogleg": false,
+  "routing_form": "open inner channels with enclosed tunnel sections inside the USB ears",
+  "production_gate": "physical USB-A extension fit-check"
+}
