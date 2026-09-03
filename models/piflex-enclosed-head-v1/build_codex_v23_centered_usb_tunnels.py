@@ -84,6 +84,18 @@ EAR_USB_CUT_FLOOR_Z = float(
         str(EAR_USB_OPENING_ORIGINAL_FLOOR_Z),
     )
 )
+EAR_USB_OPENING_OUTER_Y = (
+    v19.head.WING_CENTRE_Y + v19.head.WING_HEIGHT / 2.0 + 6.0
+)
+EAR_USB_OPENING_ORIGINAL_INNER_Y = (
+    v19.head.WING_CENTRE_Y + v19.head.WING_HEIGHT / 2.0 - 6.0
+)
+EAR_USB_CUT_INNER_Y = float(
+    os.environ.get(
+        "PIFLEX_EAR_USB_CUT_INNER_Y",
+        str(EAR_USB_OPENING_ORIGINAL_INNER_Y),
+    )
+)
 
 
 def corrected_usb_tunnels():
@@ -196,22 +208,27 @@ def routing_cutters():
 
 
 def deepened_ear_usb_cutters():
-    """Extend each existing top-edge USB opening down to the requested floor."""
-    if EAR_USB_CUT_FLOOR_Z >= EAR_USB_OPENING_ORIGINAL_FLOOR_Z:
+    """Extend each top-edge USB opening down and inward into the hollow ear."""
+    if (
+        EAR_USB_CUT_FLOOR_Z >= EAR_USB_OPENING_ORIGINAL_FLOOR_Z
+        and EAR_USB_CUT_INNER_Y >= EAR_USB_OPENING_ORIGINAL_INNER_Y
+    ):
         return []
     cut_height = EAR_USB_OPENING_TOP_Z - EAR_USB_CUT_FLOOR_Z
+    cut_depth = EAR_USB_OPENING_OUTER_Y - EAR_USB_CUT_INNER_Y
+    cut_centre_y = (EAR_USB_OPENING_OUTER_Y + EAR_USB_CUT_INNER_Y) / 2.0
     return [
         cq.Workplane("XY")
         .box(
             v19.head.USB_OPENING_X,
-            12.0,
+            cut_depth,
             cut_height,
             centered=(True, True, False),
         )
         .translate(
             (
                 x,
-                v19.head.WING_CENTRE_Y + v19.head.WING_HEIGHT / 2.0,
+                cut_centre_y,
                 EAR_USB_CUT_FLOOR_Z,
             )
         )
@@ -430,6 +447,18 @@ def export():
         ],
         "ear_usb_opening_deepened_mm": round(
             EAR_USB_OPENING_ORIGINAL_FLOOR_Z - EAR_USB_CUT_FLOOR_Z,
+            3,
+        ),
+        "ear_usb_pocket_y_range_mm": [
+            round(EAR_USB_CUT_INNER_Y, 3),
+            round(EAR_USB_OPENING_OUTER_Y, 3),
+        ],
+        "ear_usb_pocket_inward_depth_mm": round(
+            EAR_USB_OPENING_OUTER_Y - EAR_USB_CUT_INNER_Y,
+            3,
+        ),
+        "ear_usb_pocket_extra_inward_mm": round(
+            EAR_USB_OPENING_ORIGINAL_INNER_Y - EAR_USB_CUT_INNER_Y,
             3,
         ),
         "ear_centred_dogleg": EAR_CENTRED_DOGLEG,
