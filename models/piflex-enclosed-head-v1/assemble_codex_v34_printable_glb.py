@@ -9,11 +9,17 @@ HERE = Path(__file__).resolve().parent
 SHELL = HERE / "piflex-codex-v34-registered-screen-shell.stl"
 REAR = HERE / "piflex-codex-v34-printable-rear-mount.stl"
 OUTPUT = HERE / "piflex-codex-v34-printable-inspection.glb"
+COLOURED_OUTPUT = HERE / "piflex-codex-v34-coloured-inspection.glb"
 
 
 def material(name, colour):
     value = bpy.data.materials.new(name)
     value.diffuse_color = (*colour, 1.0)
+    value.use_nodes = True
+    principled = value.node_tree.nodes.get("Principled BSDF")
+    principled.inputs["Base Color"].default_value = (*colour, 1.0)
+    principled.inputs["Roughness"].default_value = 0.42
+    principled.inputs["Metallic"].default_value = 0.0
     return value
 
 
@@ -28,5 +34,10 @@ for path, name, surface in (
     obj = bpy.context.object
     obj.name = name
     obj.data.materials.append(surface)
-bpy.ops.export_scene.gltf(filepath=str(OUTPUT), export_format="GLB")
-print(f"Exported {OUTPUT.name}")
+for output in (OUTPUT, COLOURED_OUTPUT):
+    bpy.ops.export_scene.gltf(
+        filepath=str(output),
+        export_format="GLB",
+        export_materials="EXPORT",
+    )
+    print(f"Exported {output.name}")
