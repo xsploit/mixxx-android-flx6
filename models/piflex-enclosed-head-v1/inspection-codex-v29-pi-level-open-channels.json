@@ -1,0 +1,148 @@
+{
+  "design": "PiFlex Codex V29 enclosed USB tunnels",
+  "visual_baseline": "PiFlex Codex V21 opening on frozen V19 exterior",
+  "valid": true,
+  "solids": 1,
+  "opening_profile_mm": [
+    [
+      -72.0,
+      56.0
+    ],
+    [
+      77.0,
+      56.0
+    ],
+    [
+      89.0,
+      40.0
+    ],
+    [
+      89.0,
+      -40.0
+    ],
+    [
+      77.0,
+      -56.0
+    ],
+    [
+      -72.0,
+      -56.0
+    ],
+    [
+      -89.0,
+      -40.0
+    ],
+    [
+      -89.0,
+      40.0
+    ]
+  ],
+  "opening_is_mirror_symmetric_about_case_x0": false,
+  "opening_vertex_average_x_mm": 1.25,
+  "screen_hole_pattern_centre_x_mm": 2.3435,
+  "opening_screw_clearances": [
+    {
+      "hole_mm": [
+        -77.657,
+        -61.034
+      ],
+      "opening_clearance_mm": 7.543
+    },
+    {
+      "hole_mm": [
+        -77.657,
+        60.768
+      ],
+      "opening_clearance_mm": 7.349
+    },
+    {
+      "hole_mm": [
+        82.344,
+        -61.034
+      ],
+      "opening_clearance_mm": 7.342
+    },
+    {
+      "hole_mm": [
+        82.344,
+        60.768
+      ],
+      "opening_clearance_mm": 7.162
+    }
+  ],
+  "ear_centres_mm": [
+    [
+      -143.077,
+      0.0
+    ],
+    [
+      143.077,
+      0.0
+    ]
+  ],
+  "tunnel_x_ranges_mm": [
+    [
+      -143.077,
+      -86.0
+    ],
+    [
+      86.0,
+      143.077
+    ]
+  ],
+  "tunnel_clear_section_mm": [
+    18.4,
+    10.0
+  ],
+  "tunnel_centre_y_mm": 0.0,
+  "tunnel_y_range_mm": [
+    -9.2,
+    9.2
+  ],
+  "tunnel_z_range_mm": [
+    -2.66,
+    7.34
+  ],
+  "ear_cavity_z_range_mm": [
+    -5.8,
+    10.48
+  ],
+  "ear_cavity_centre_z_mm": 2.34,
+  "ear_tunnel_z_range_mm": [
+    -2.66,
+    7.34
+  ],
+  "ear_centred_dogleg": false,
+  "open_inner_channel": true,
+  "open_channel_outer_abs_x_mm": 127.577,
+  "open_channel_floor_top_z_mm": -32.0,
+  "tunnel_drop_below_old_route_mm": 4.5,
+  "raceway_outer_section_mm": [
+    24.799999999999997,
+    13.6
+  ],
+  "raceway_y_range_mm": [
+    -12.4,
+    12.4
+  ],
+  "ear_y_range_mm": [
+    -35.0,
+    35.0
+  ],
+  "raceway_wall_mm": 3.2,
+  "raceway_roof_overlap_mm": 0.4,
+  "raceway_rear_limit_mm": -5.86,
+  "tunnel_entry": "3 mm overlap into each V21 opening side wall at x +/-89 mm",
+  "tunnel_termination": "true hollow-ear X centre at x +/-143.077 mm",
+  "blue_screen_frame_cut_for_usb": true,
+  "routing_form": "flush open inner channel with enclosed USB-ear tunnel",
+  "preserved": [
+    "V21 service opening",
+    "V19 exterior screen frame and recessed bevel",
+    "four screen screw towers",
+    "six-slot rear grill",
+    "top-facing USB-A ear sockets",
+    "FLX6 brackets and alignment"
+  ],
+  "production_gate": "fit-check the selected female USB-A extension body and cable bend radius"
+}

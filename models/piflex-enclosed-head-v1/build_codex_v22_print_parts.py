@@ -202,6 +202,10 @@ if CUT_SCREEN_SHELL_FOR_TUNNELS:
     shell_bounds_before_tunnel_cut = registered_shell_mesh.bounds.copy()
     shell_volume_before_tunnel_cut = float(registered_shell_mesh.volume)
     registered_tunnel_mesh = trimesh.load_mesh(TUNNEL_VOIDS, process=True)
+    if registered_tunnel_mesh.is_watertight and registered_tunnel_mesh.volume < 0:
+        # Some reflected assembly registrations preserve a closed cutter but
+        # reverse its winding. Normalize it before the Manifold Boolean.
+        registered_tunnel_mesh.invert()
     registered_shell_mesh = trimesh.boolean.difference(
         [registered_shell_mesh, registered_tunnel_mesh],
         engine="manifold",

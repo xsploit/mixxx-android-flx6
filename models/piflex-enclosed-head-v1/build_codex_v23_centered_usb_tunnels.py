@@ -30,6 +30,7 @@ TUNNEL_CLEAR_WIDTH = 18.4
 TUNNEL_CLEAR_HEIGHT = 10.0
 TUNNEL_CENTRE_Y = float(os.environ.get("PIFLEX_TUNNEL_CENTRE_Y", "0.0"))
 EAR_CENTRED_DOGLEG = os.environ.get("PIFLEX_EAR_CENTRED_DOGLEG") == "1"
+OPEN_INNER_CHANNEL = os.environ.get("PIFLEX_OPEN_INNER_CHANNEL") == "1"
 TUNNEL_DROP_BELOW_OLD_ROUTE = 4.5
 TUNNEL_REAR_Z = float(
     os.environ.get(
@@ -58,6 +59,13 @@ SHELL_OUTER_X = v19.head.SCREEN_WIDTH / 2.0
 EAR_RISER_INNER_ABS = SHELL_OUTER_X + 0.6
 EAR_HIGH_RUN_INNER_ABS = EAR_RISER_INNER_ABS + 3.0
 INNER_HIGH_RUN_OUTER_ABS = OPENING_MIDDLE_HALF_WIDTH - 0.5
+# Run the opening completely through the exact shell edge; stopping on the
+# coincident boundary leaves an open STL seam after float32 export.
+OPEN_CHANNEL_OUTER_ABS = SHELL_OUTER_X + 1.0
+OPEN_CHANNEL_SEAM_CLEARANCE = 0.20
+OPEN_CHANNEL_FLOOR_TOP_Z = float(
+    os.environ.get("PIFLEX_OPEN_CHANNEL_FLOOR_TOP_Z", str(TUNNEL_REAR_Z))
+)
 
 
 def corrected_usb_tunnels():
@@ -133,8 +141,74 @@ def corrected_usb_tunnels():
     return passages
 
 
+def roof_opening_cutters():
+    """Open only the inner run; the portion inside each USB ear stays roofed."""
+    if not OPEN_INNER_CHANNEL:
+        return []
+    cutter_rear_z = OPEN_CHANNEL_FLOOR_TOP_Z + 0.02
+    cutter_height = v19.head.SCREEN_DEPTH + 4.0 - cutter_rear_z
+    cutter_length = OPEN_CHANNEL_OUTER_ABS - TUNNEL_INNER_ABS
+    cutters = []
+    for sign in (-1.0, 1.0):
+        centre_x = sign * (TUNNEL_INNER_ABS + OPEN_CHANNEL_OUTER_ABS) / 2.0
+        cutters.append(
+            cq.Workplane("XY")
+            .box(
+                cutter_length,
+                TUNNEL_CLEAR_WIDTH + 2.0 * OPEN_CHANNEL_SEAM_CLEARANCE,
+                cutter_height,
+                centered=(True, True, False),
+            )
+            .translate((centre_x, TUNNEL_CENTRE_Y, cutter_rear_z))
+        )
+    return cutters
+
+
+def routing_cutters():
+    tunnels = corrected_usb_tunnels()
+    roofs = roof_opening_cutters()
+    if not roofs:
+        return tunnels
+    return [
+        tunnel.union(roof).combine(clean=True)
+        for tunnel, roof in zip(tunnels, roofs)
+    ]
+
+
 def tunnel_housings():
     """Rounded outer raceways that retain a floor and walls below the bevel."""
+    if OPEN_INNER_CHANNEL:
+        # The inner span is a flat floor only. Its top is exactly the old
+        # tunnel floor plane, so there is no raised U-shaped lip. A full
+        # housing resumes just before the screen-shell edge and remains closed
+        # through the USB ear.
+        floor_inner_abs = TUNNEL_INNER_ABS - RACEWAY_WALL
+        floor_outer_abs = OPEN_CHANNEL_OUTER_ABS + 1.0
+        enclosed_inner_abs = OPEN_CHANNEL_OUTER_ABS - 1.0
+        enclosed_outer_abs = TUNNEL_OUTER_ABS + RACEWAY_WALL
+        housings = []
+        for sign in (-1.0, 1.0):
+            floor_centre = sign * (floor_inner_abs + floor_outer_abs) / 2.0
+            floor = v19.head.rounded_box(
+                floor_outer_abs - floor_inner_abs,
+                RACEWAY_WIDTH,
+                RACEWAY_WALL,
+                OPEN_CHANNEL_FLOOR_TOP_Z - RACEWAY_WALL,
+                3.0,
+            ).translate((floor_centre, TUNNEL_CENTRE_Y, 0.0))
+            enclosed_centre = sign * (
+                enclosed_inner_abs + enclosed_outer_abs
+            ) / 2.0
+            enclosed = v19.head.rounded_box(
+                enclosed_outer_abs - enclosed_inner_abs,
+                RACEWAY_WIDTH,
+                RACEWAY_HEIGHT,
+                RACEWAY_REAR_Z,
+                4.0,
+            ).translate((enclosed_centre, TUNNEL_CENTRE_Y, 0.0))
+            housings.append(floor.union(enclosed).combine(clean=True))
+        return housings
+
     housing_inner_abs = TUNNEL_INNER_ABS - RACEWAY_WALL
     housing_outer_abs = TUNNEL_OUTER_ABS + RACEWAY_WALL
     housing_length = housing_outer_abs - housing_inner_abs
@@ -162,7 +236,7 @@ def build_centered_tunnel_rear_local():
         polished = polished.union(housing)
 
     polished = polished.cut(v21.bay_merged_service_throat())
-    for tunnel in corrected_usb_tunnels():
+    for tunnel in routing_cutters():
         polished = polished.cut(tunnel)
     for grill in v19.rear_grill_cutters():
         polished = polished.cut(grill)
@@ -209,7 +283,7 @@ rear = v19.head.to_bracket_coordinates(rear_local)
 complete = rear.union(v19.yoke.shifted_case_mount_result_v14)
 # The FLX6 yoke overlaps the rear body at the mounting roots. Re-cut the same
 # voids after that union so the yoke cannot silently plug either cable route.
-for tunnel in corrected_usb_tunnels():
+for tunnel in routing_cutters():
     complete = complete.cut(v19.head.to_bracket_coordinates(tunnel))
 complete = complete.combine(clean=True)
 shape = complete.val()
@@ -246,7 +320,7 @@ def export():
         angularTolerance=0.10,
     )
     tunnel_compound = cq.Compound.makeCompound(
-        [tunnel.val() for tunnel in corrected_usb_tunnels()]
+        [tunnel.val() for tunnel in routing_cutters()]
     )
     cq.exporters.export(
         tunnel_compound,
@@ -305,6 +379,13 @@ def export():
             round(EAR_TUNNEL_REAR_Z + TUNNEL_CLEAR_HEIGHT, 3),
         ],
         "ear_centred_dogleg": EAR_CENTRED_DOGLEG,
+        "open_inner_channel": OPEN_INNER_CHANNEL,
+        "open_channel_outer_abs_x_mm": (
+            round(OPEN_CHANNEL_OUTER_ABS, 3) if OPEN_INNER_CHANNEL else None
+        ),
+        "open_channel_floor_top_z_mm": (
+            round(OPEN_CHANNEL_FLOOR_TOP_Z, 3) if OPEN_INNER_CHANNEL else None
+        ),
         "tunnel_drop_below_old_route_mm": TUNNEL_DROP_BELOW_OLD_ROUTE,
         "raceway_outer_section_mm": [RACEWAY_WIDTH, RACEWAY_HEIGHT],
         "raceway_y_range_mm": [
@@ -325,8 +406,12 @@ def export():
             if EAR_CENTRED_DOGLEG
             else "true hollow-ear X centre at x +/-143.077 mm"
         ),
-        "blue_screen_frame_cut_for_usb": False,
-        "routing_form": "roofed internal tunnel, never an open canal",
+        "blue_screen_frame_cut_for_usb": OPEN_INNER_CHANNEL,
+        "routing_form": (
+            "flush open inner channel with enclosed USB-ear tunnel"
+            if OPEN_INNER_CHANNEL
+            else "roofed internal tunnel, never an open canal"
+        ),
         "preserved": [
             "V21 service opening",
             "V19 exterior screen frame and recessed bevel",

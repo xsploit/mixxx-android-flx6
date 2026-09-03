@@ -16,6 +16,7 @@ DESIGN_VERSION = os.environ.get("PIFLEX_TUNNEL_VERSION", "v23")
 DESIGN_SLUG = os.environ.get("PIFLEX_TUNNEL_SLUG", "centered-usb-tunnels")
 TUNNEL_CENTRE_Y = float(os.environ.get("PIFLEX_TUNNEL_CENTRE_Y", "0.0"))
 EAR_CENTRED_DOGLEG = os.environ.get("PIFLEX_EAR_CENTRED_DOGLEG") == "1"
+OPEN_INNER_CHANNEL = os.environ.get("PIFLEX_OPEN_INNER_CHANNEL") == "1"
 SOURCE = HERE / "piflex-codex-v21-bay-merged-usb-routing.glb"
 STEM = f"piflex-codex-{DESIGN_VERSION}-{DESIGN_SLUG}"
 STRUCTURE = HERE / f"{STEM}-structure.stl"
@@ -94,7 +95,7 @@ report = {
     "screen_shell_world_bounds_unchanged": True,
     "screen_shell_world_bounds_mm": shell_bounds_before,
     "opening_changed_from_v21": False,
-    "blue_screen_frame_cut_for_usb": False,
+    "blue_screen_frame_cut_for_usb": OPEN_INNER_CHANNEL,
     "rear_mount_replaced": True,
     "usb_tunnel_centres_local_mm": [
         [-143.077, TUNNEL_CENTRE_Y],
@@ -103,7 +104,11 @@ report = {
     "usb_tunnel_clear_section_mm": [18.4, 10.0],
     "ear_cavity_centre_z_mm": 2.34 if EAR_CENTRED_DOGLEG else None,
     "ear_centred_dogleg": EAR_CENTRED_DOGLEG,
-    "routing_form": "internal roofed tunnels beneath intact screen frame",
+    "routing_form": (
+        "open inner channels with enclosed tunnel sections inside the USB ears"
+        if OPEN_INNER_CHANNEL
+        else "internal roofed tunnels beneath intact screen frame"
+    ),
     "production_gate": "physical USB-A extension fit-check",
 }
 REPORT.write_text(json.dumps(report, indent=2), encoding="utf-8")
