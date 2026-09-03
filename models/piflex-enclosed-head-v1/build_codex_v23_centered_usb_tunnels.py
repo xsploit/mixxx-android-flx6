@@ -72,6 +72,18 @@ OPEN_CHANNEL_ROOF_CUT_OUTER_ABS = (
 OPEN_CHANNEL_FLOOR_TOP_Z = float(
     os.environ.get("PIFLEX_OPEN_CHANNEL_FLOOR_TOP_Z", str(TUNNEL_REAR_Z))
 )
+EAR_USB_OPENING_TOP_Z = (
+    v19.head.USB_OPENING_CENTRE_Z + v19.head.USB_OPENING_Z / 2.0
+)
+EAR_USB_OPENING_ORIGINAL_FLOOR_Z = (
+    v19.head.USB_OPENING_CENTRE_Z - v19.head.USB_OPENING_Z / 2.0
+)
+EAR_USB_CUT_FLOOR_Z = float(
+    os.environ.get(
+        "PIFLEX_EAR_USB_CUT_FLOOR_Z",
+        str(EAR_USB_OPENING_ORIGINAL_FLOOR_Z),
+    )
+)
 
 
 def corrected_usb_tunnels():
@@ -183,6 +195,30 @@ def routing_cutters():
     ]
 
 
+def deepened_ear_usb_cutters():
+    """Extend each existing top-edge USB opening down to the requested floor."""
+    if EAR_USB_CUT_FLOOR_Z >= EAR_USB_OPENING_ORIGINAL_FLOOR_Z:
+        return []
+    cut_height = EAR_USB_OPENING_TOP_Z - EAR_USB_CUT_FLOOR_Z
+    return [
+        cq.Workplane("XY")
+        .box(
+            v19.head.USB_OPENING_X,
+            12.0,
+            cut_height,
+            centered=(True, True, False),
+        )
+        .translate(
+            (
+                x,
+                v19.head.WING_CENTRE_Y + v19.head.WING_HEIGHT / 2.0,
+                EAR_USB_CUT_FLOOR_Z,
+            )
+        )
+        for x in EAR_CENTRES
+    ]
+
+
 def tunnel_housings():
     """Rounded outer raceways that retain a floor and walls below the bevel."""
     if OPEN_INNER_CHANNEL:
@@ -246,6 +282,8 @@ def build_centered_tunnel_rear_local():
     polished = polished.cut(v21.bay_merged_service_throat())
     for tunnel in routing_cutters():
         polished = polished.cut(tunnel)
+    for ear_usb in deepened_ear_usb_cutters():
+        polished = polished.cut(ear_usb)
     for grill in v19.rear_grill_cutters():
         polished = polished.cut(grill)
     return polished.combine(clean=True)
@@ -386,6 +424,14 @@ def export():
             round(EAR_TUNNEL_REAR_Z, 3),
             round(EAR_TUNNEL_REAR_Z + TUNNEL_CLEAR_HEIGHT, 3),
         ],
+        "ear_usb_opening_z_range_mm": [
+            round(EAR_USB_CUT_FLOOR_Z, 3),
+            round(EAR_USB_OPENING_TOP_Z, 3),
+        ],
+        "ear_usb_opening_deepened_mm": round(
+            EAR_USB_OPENING_ORIGINAL_FLOOR_Z - EAR_USB_CUT_FLOOR_Z,
+            3,
+        ),
         "ear_centred_dogleg": EAR_CENTRED_DOGLEG,
         "open_inner_channel": OPEN_INNER_CHANNEL,
         "open_channel_outer_abs_x_mm": (
