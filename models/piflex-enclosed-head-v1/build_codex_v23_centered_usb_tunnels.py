@@ -63,6 +63,12 @@ INNER_HIGH_RUN_OUTER_ABS = OPENING_MIDDLE_HALF_WIDTH - 0.5
 # coincident boundary leaves an open STL seam after float32 export.
 OPEN_CHANNEL_OUTER_ABS = SHELL_OUTER_X + 1.0
 OPEN_CHANNEL_SEAM_CLEARANCE = 0.20
+OPEN_CHANNEL_BLUE_ROOF_LENGTH = float(
+    os.environ.get("PIFLEX_OPEN_CHANNEL_BLUE_ROOF_LENGTH", "0.0")
+)
+OPEN_CHANNEL_ROOF_CUT_OUTER_ABS = (
+    SHELL_OUTER_X - OPEN_CHANNEL_BLUE_ROOF_LENGTH
+)
 OPEN_CHANNEL_FLOOR_TOP_Z = float(
     os.environ.get("PIFLEX_OPEN_CHANNEL_FLOOR_TOP_Z", str(TUNNEL_REAR_Z))
 )
@@ -147,10 +153,12 @@ def roof_opening_cutters():
         return []
     cutter_rear_z = OPEN_CHANNEL_FLOOR_TOP_Z + 0.02
     cutter_height = v19.head.SCREEN_DEPTH + 4.0 - cutter_rear_z
-    cutter_length = OPEN_CHANNEL_OUTER_ABS - TUNNEL_INNER_ABS
+    cutter_length = OPEN_CHANNEL_ROOF_CUT_OUTER_ABS - TUNNEL_INNER_ABS
     cutters = []
     for sign in (-1.0, 1.0):
-        centre_x = sign * (TUNNEL_INNER_ABS + OPEN_CHANNEL_OUTER_ABS) / 2.0
+        centre_x = sign * (
+            TUNNEL_INNER_ABS + OPEN_CHANNEL_ROOF_CUT_OUTER_ABS
+        ) / 2.0
         cutters.append(
             cq.Workplane("XY")
             .box(
@@ -381,7 +389,14 @@ def export():
         "ear_centred_dogleg": EAR_CENTRED_DOGLEG,
         "open_inner_channel": OPEN_INNER_CHANNEL,
         "open_channel_outer_abs_x_mm": (
-            round(OPEN_CHANNEL_OUTER_ABS, 3) if OPEN_INNER_CHANNEL else None
+            round(OPEN_CHANNEL_ROOF_CUT_OUTER_ABS, 3)
+            if OPEN_INNER_CHANNEL
+            else None
+        ),
+        "blue_roof_bridge_length_mm": (
+            round(OPEN_CHANNEL_BLUE_ROOF_LENGTH, 3)
+            if OPEN_INNER_CHANNEL
+            else None
         ),
         "open_channel_floor_top_z_mm": (
             round(OPEN_CHANNEL_FLOOR_TOP_Z, 3) if OPEN_INNER_CHANNEL else None

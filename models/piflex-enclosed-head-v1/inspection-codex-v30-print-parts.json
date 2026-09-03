@@ -1,0 +1,206 @@
+{
+  "design": "PiFlex Codex V30 topology-checked print parts",
+  "approved_geometry": "V21 opening with V30 closed channel floors, 5 mm blue roof bridges, and enclosed USB ears",
+  "assembly_source": "piflex-codex-v30-pi-level-channel-blue-roof.glb",
+  "raw_shell": "models\\makerworld-3116241\\stl\\screen-case\\10Inch_TouchDisplay2_DesktopCase_Shell.stl",
+  "raw_shell_sha256": "f37d0c8b5ae34024d16e9b5ddc30109c10acc3d957f4519edb5cb8fe6b6b63ab",
+  "opening_profile_mm": [
+    [
+      -72.0,
+      56.0
+    ],
+    [
+      77.0,
+      56.0
+    ],
+    [
+      89.0,
+      40.0
+    ],
+    [
+      89.0,
+      -40.0
+    ],
+    [
+      77.0,
+      -56.0
+    ],
+    [
+      -72.0,
+      -56.0
+    ],
+    [
+      -89.0,
+      -40.0
+    ],
+    [
+      -89.0,
+      40.0
+    ]
+  ],
+  "screen_shell_local": {
+    "file": "piflex-codex-v30-printable-screen-shell.stl",
+    "watertight": true,
+    "winding_consistent": true,
+    "volume": true,
+    "faces": 20932,
+    "vertices": 10458,
+    "volume_mm3": 151213.828,
+    "bounds_mm": [
+      [
+        -126.577,
+        -85.771,
+        -6.84
+      ],
+      [
+        126.577,
+        85.771,
+        6.84
+      ]
+    ]
+  },
+  "screen_shell_registered": {
+    "file": "piflex-codex-v30-registered-screen-shell.stl",
+    "watertight": true,
+    "winding_consistent": true,
+    "volume": true,
+    "faces": 21760,
+    "vertices": 10872,
+    "volume_mm3": 145254.328,
+    "bounds_mm": [
+      [
+        -145.206,
+        163.6185,
+        56.2709
+      ],
+      [
+        107.948,
+        324.5998,
+        140.8951
+      ]
+    ],
+    "cut_for_usb_tunnels": true,
+    "tunnel_cut_volume_mm3": 5959.555171
+  },
+  "rear_mount": {
+    "file": "piflex-codex-v30-printable-rear-mount.stl",
+    "watertight": true,
+    "winding_consistent": true,
+    "volume": true,
+    "faces": 17316,
+    "vertices": 8612,
+    "volume_mm3": 405701.63,
+    "bounds_mm": [
+      [
+        -180.706,
+        117.4,
+        -5.0
+      ],
+      [
+        143.448,
+        328.6734,
+        129.4031
+      ]
+    ]
+  },
+  "two_part_fit_check": "piflex-codex-v30-printable-two-part-fit-check.stl",
+  "fusion_seam_relief_mm": 0.3,
+  "fusion_seam_relief_direction_world": [
+    0.0,
+    0.4226182,
+    -0.9063078
+  ],
+  "fusion_jitter_world_mm": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "fusion_total_translation_world_mm": [
+    0.0,
+    0.1267855,
+    -0.2718923
+  ],
+  "registered_part_overlap_mm3": 5371.7,
+  "monolithic": {
+    "file": "piflex-codex-v30-printable-monolithic.stl",
+    "3mf_file": "piflex-codex-v30-printable-monolithic.3mf",
+    "exported": true,
+    "mesh": {
+      "watertight": true,
+      "winding_consistent": true,
+      "volume": true,
+      "faces": 40540,
+      "vertices": 20214,
+      "volume_mm3": 545584.312,
+      "bounds_mm": [
+        [
+          -180.706,
+          117.5268,
+          -5.2719
+        ],
+        [
+          143.448,
+          328.8002,
+          140.8951
+        ]
+      ],
+      "degenerate_faces": 0,
+      "duplicate_faces": 0,
+      "round_trip_validated": true
+    },
+    "3mf_mesh": {
+      "watertight": true,
+      "winding_consistent": true,
+      "volume": true,
+      "faces": 40540,
+      "vertices": 20214,
+      "volume_mm3": 545584.312,
+      "bounds_mm": [
+        [
+          -180.706,
+          117.5268,
+          -5.2719
+        ],
+        [
+          143.448,
+          328.8002,
+          140.8951
+        ]
+      ],
+      "round_trip_validated": true
+    },
+    "sub_micron_seam_cleanup": null
+  },
+  "usb_tunnel_validation": {
+    "reference_file": "piflex-codex-v30-usb-tunnel-voids-registered.stl",
+    "routes": [
+      {
+        "route": 0,
+        "void_volume_mm3": 17560.072959,
+        "blue_shell_blocked_mm3": 1e-05,
+        "rear_mount_blocked_mm3": 0.004009,
+        "monolithic_blocked_mm3": 0.004862
+      },
+      {
+        "route": 1,
+        "void_volume_mm3": 17560.07004,
+        "blue_shell_blocked_mm3": 6.4e-05,
+        "rear_mount_blocked_mm3": 0.000853,
+        "monolithic_blocked_mm3": 0.001401
+      }
+    ],
+    "maximum_allowed_numerical_overlap_mm3": 0.02,
+    "passed": true
+  },
+  "nominal_designed_walls_mm": {
+    "rear_bay": 3.0,
+    "USB_ears": 3.2,
+    "screw_tower_web": 1.0
+  },
+  "physical_fit_gates": [
+    "screen screw diameter and engagement",
+    "female USB-A panel body dimensions",
+    "USB cable bend radius",
+    "printer-specific clearance and shrink compensation"
+  ]
+}
