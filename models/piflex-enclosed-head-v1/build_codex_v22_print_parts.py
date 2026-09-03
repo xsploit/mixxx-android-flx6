@@ -42,6 +42,9 @@ TUNNEL_VOIDS_NAME = os.environ.get("PIFLEX_TUNNEL_VOIDS")
 TUNNEL_VOIDS = HERE / TUNNEL_VOIDS_NAME if TUNNEL_VOIDS_NAME else None
 KEEP_FAILED_MONOLITHIC = os.environ.get("PIFLEX_KEEP_FAILED_MONOLITHIC") == "1"
 PRECISION_SEAM_CLEANUP = os.environ.get("PIFLEX_PRECISION_SEAM_CLEANUP", "1") == "1"
+CUT_SCREEN_SHELL_FOR_TUNNELS = (
+    os.environ.get("PIFLEX_CUT_SCREEN_SHELL_FOR_TUNNELS") == "1"
+)
 
 OUT_SHELL = HERE / f"piflex-codex-{PRINT_VERSION}-printable-screen-shell.stl"
 OUT_REAR_MOUNT = HERE / f"piflex-codex-{PRINT_VERSION}-printable-rear-mount.stl"
@@ -192,6 +195,26 @@ export_stl(OUT_REAR_MOUNT, rear_mount)
 # 3. Validate the exported registered parts independently of Blender.
 registered_shell_mesh = trimesh.load_mesh(OUT_REGISTERED_SHELL, process=True)
 rear_mount_mesh = trimesh.load_mesh(OUT_REAR_MOUNT, process=True)
+screen_shell_tunnel_cut_volume = 0.0
+if CUT_SCREEN_SHELL_FOR_TUNNELS:
+    if TUNNEL_VOIDS is None:
+        raise RuntimeError("A registered tunnel-void file is required to cut the shell")
+    shell_bounds_before_tunnel_cut = registered_shell_mesh.bounds.copy()
+    shell_volume_before_tunnel_cut = float(registered_shell_mesh.volume)
+    registered_tunnel_mesh = trimesh.load_mesh(TUNNEL_VOIDS, process=True)
+    registered_shell_mesh = trimesh.boolean.difference(
+        [registered_shell_mesh, registered_tunnel_mesh],
+        engine="manifold",
+        check_volume=True,
+    )
+    if not registered_shell_mesh.is_volume:
+        raise RuntimeError("USB tunnel cut opened the registered screen shell")
+    if not (abs(registered_shell_mesh.bounds - shell_bounds_before_tunnel_cut) < 0.001).all():
+        raise RuntimeError("USB tunnel cut changed the screen shell exterior bounds")
+    screen_shell_tunnel_cut_volume = (
+        shell_volume_before_tunnel_cut - float(registered_shell_mesh.volume)
+    )
+    registered_shell_mesh.export(OUT_REGISTERED_SHELL)
 if rear_mount_mesh.is_watertight and rear_mount_mesh.volume < 0:
     # The exact assembly registration contains a reflection, so reverse the
     # transformed STL's face winding while preserving every coordinate.
@@ -370,6 +393,8 @@ report = {
     "screen_shell_registered": {
         "file": OUT_REGISTERED_SHELL.name,
         **mesh_report(registered_shell_mesh),
+        "cut_for_usb_tunnels": CUT_SCREEN_SHELL_FOR_TUNNELS,
+        "tunnel_cut_volume_mm3": round(screen_shell_tunnel_cut_volume, 6),
     },
     "rear_mount": {
         "file": OUT_REAR_MOUNT.name,

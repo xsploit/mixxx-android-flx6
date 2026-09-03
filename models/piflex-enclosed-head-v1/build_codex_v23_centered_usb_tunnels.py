@@ -31,10 +31,13 @@ TUNNEL_CLEAR_HEIGHT = 10.0
 TUNNEL_CENTRE_Y = float(os.environ.get("PIFLEX_TUNNEL_CENTRE_Y", "0.0"))
 EAR_CENTRED_DOGLEG = os.environ.get("PIFLEX_EAR_CENTRED_DOGLEG") == "1"
 TUNNEL_DROP_BELOW_OLD_ROUTE = 4.5
-TUNNEL_REAR_Z = (
-    -v19.head.WING_REAR_DEPTH
-    + v19.head.WING_WALL
-    - TUNNEL_DROP_BELOW_OLD_ROUTE
+TUNNEL_REAR_Z = float(
+    os.environ.get(
+        "PIFLEX_TUNNEL_REAR_Z",
+        -v19.head.WING_REAR_DEPTH
+        + v19.head.WING_WALL
+        - TUNNEL_DROP_BELOW_OLD_ROUTE,
+    )
 )
 RACEWAY_WALL = v19.head.WING_WALL
 RACEWAY_ROOF_OVERLAP = 0.4
@@ -317,7 +320,8 @@ def export():
         "raceway_rear_limit_mm": round(RACEWAY_REAR_Z, 3),
         "tunnel_entry": "3 mm overlap into each V21 opening side wall at x +/-89 mm",
         "tunnel_termination": (
-            "true hollow-ear centres at x +/-143.077 mm, y 0 mm, z 2.34 mm"
+            "hollow-ear sockets at x +/-143.077 mm, "
+            f"y {TUNNEL_CENTRE_Y:g} mm, z 2.34 mm"
             if EAR_CENTRED_DOGLEG
             else "true hollow-ear X centre at x +/-143.077 mm"
         ),
