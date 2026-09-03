@@ -31,6 +31,7 @@ TUNNEL_CLEAR_HEIGHT = 10.0
 TUNNEL_CENTRE_Y = float(os.environ.get("PIFLEX_TUNNEL_CENTRE_Y", "0.0"))
 EAR_CENTRED_DOGLEG = os.environ.get("PIFLEX_EAR_CENTRED_DOGLEG") == "1"
 OPEN_INNER_CHANNEL = os.environ.get("PIFLEX_OPEN_INNER_CHANNEL") == "1"
+HOLLOW_EAR_INTERIOR = os.environ.get("PIFLEX_HOLLOW_EAR_INTERIOR") == "1"
 TUNNEL_DROP_BELOW_OLD_ROUTE = 4.5
 TUNNEL_REAR_Z = float(
     os.environ.get(
@@ -236,6 +237,26 @@ def deepened_ear_usb_cutters():
     ]
 
 
+def restored_hollow_ear_cutters():
+    """Restore the ears' full rounded inner cavities after routing unions."""
+    if not HOLLOW_EAR_INTERIOR:
+        return []
+    return [
+        v19.head.rounded_box(
+            v19.head.WING_WIDTH - v19.head.WING_WALL * 2.0,
+            v19.head.WING_HEIGHT - v19.head.WING_WALL * 2.0,
+            (
+                v19.head.SCREEN_DEPTH
+                + v19.head.WING_REAR_DEPTH
+                - v19.head.WING_WALL * 2.0
+            ),
+            -v19.head.WING_REAR_DEPTH + v19.head.WING_WALL,
+            v19.head.WING_CORNER_RADIUS - v19.head.WING_WALL,
+        ).translate((x, v19.head.WING_CENTRE_Y, 0.0))
+        for x in EAR_CENTRES
+    ]
+
+
 def tunnel_housings():
     """Rounded outer raceways that retain a floor and walls below the bevel."""
     if OPEN_INNER_CHANNEL:
@@ -301,6 +322,8 @@ def build_centered_tunnel_rear_local():
         polished = polished.cut(tunnel)
     for ear_usb in deepened_ear_usb_cutters():
         polished = polished.cut(ear_usb)
+    for ear_cavity in restored_hollow_ear_cutters():
+        polished = polished.cut(ear_cavity)
     for grill in v19.rear_grill_cutters():
         polished = polished.cut(grill)
     return polished.combine(clean=True)
@@ -342,6 +365,15 @@ def opening_screw_clearances():
 
 
 rear_local = build_centered_tunnel_rear_local()
+ear_cavity_blocked_volumes = [
+    rear_local.intersect(cavity).val().Volume()
+    for cavity in restored_hollow_ear_cutters()
+]
+if any(volume > 0.02 for volume in ear_cavity_blocked_volumes):
+    raise RuntimeError(
+        "Restored USB ear cavity still contains solid obstructions: "
+        f"{ear_cavity_blocked_volumes}"
+    )
 rear = v19.head.to_bracket_coordinates(rear_local)
 complete = rear.union(v19.yoke.shifted_case_mount_result_v14)
 # The FLX6 yoke overlaps the rear body at the mounting roots. Re-cut the same
@@ -462,6 +494,11 @@ def export():
             3,
         ),
         "ear_centred_dogleg": EAR_CENTRED_DOGLEG,
+        "ear_interior_fully_rehollowed": HOLLOW_EAR_INTERIOR,
+        "remaining_nominal_ear_wall_mm": round(v19.head.WING_WALL, 3),
+        "ear_cavity_blocked_volume_mm3": [
+            round(volume, 6) for volume in ear_cavity_blocked_volumes
+        ],
         "open_inner_channel": OPEN_INNER_CHANNEL,
         "open_channel_outer_abs_x_mm": (
             round(OPEN_CHANNEL_ROOF_CUT_OUTER_ABS, 3)
