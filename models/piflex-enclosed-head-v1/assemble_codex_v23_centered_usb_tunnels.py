@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 from pathlib import Path
 
 import bpy
@@ -11,13 +12,18 @@ from mathutils import Vector
 
 
 HERE = Path(__file__).resolve().parent
+DESIGN_VERSION = os.environ.get("PIFLEX_TUNNEL_VERSION", "v23")
+DESIGN_SLUG = os.environ.get("PIFLEX_TUNNEL_SLUG", "centered-usb-tunnels")
+TUNNEL_CENTRE_Y = float(os.environ.get("PIFLEX_TUNNEL_CENTRE_Y", "0.0"))
+EAR_CENTRED_DOGLEG = os.environ.get("PIFLEX_EAR_CENTRED_DOGLEG") == "1"
 SOURCE = HERE / "piflex-codex-v21-bay-merged-usb-routing.glb"
-STRUCTURE = HERE / "piflex-codex-v23-centered-usb-tunnels-structure.stl"
-TUNNEL_VOIDS = HERE / "piflex-codex-v23-usb-tunnel-voids-structure-coordinates.stl"
-OUT_GLB = HERE / "piflex-codex-v23-centered-usb-tunnels.glb"
-OUT_STL = HERE / "piflex-codex-v23-centered-usb-tunnels-fit-check.stl"
-OUT_REGISTERED_TUNNEL_VOIDS = HERE / "piflex-codex-v23-usb-tunnel-voids-registered.stl"
-REPORT = HERE / "inspection-codex-v23-centered-usb-tunnels-assembly.json"
+STEM = f"piflex-codex-{DESIGN_VERSION}-{DESIGN_SLUG}"
+STRUCTURE = HERE / f"{STEM}-structure.stl"
+TUNNEL_VOIDS = HERE / f"piflex-codex-{DESIGN_VERSION}-usb-tunnel-voids-structure-coordinates.stl"
+OUT_GLB = HERE / f"{STEM}.glb"
+OUT_STL = HERE / f"{STEM}-fit-check.stl"
+OUT_REGISTERED_TUNNEL_VOIDS = HERE / f"piflex-codex-{DESIGN_VERSION}-usb-tunnel-voids-registered.stl"
+REPORT = HERE / f"inspection-codex-{DESIGN_VERSION}-{DESIGN_SLUG}-assembly.json"
 
 
 def sha256(path):
@@ -52,12 +58,12 @@ bpy.data.objects.remove(old_structure, do_unlink=True)
 
 bpy.ops.wm.stl_import(filepath=str(STRUCTURE))
 structure = bpy.context.object
-structure.name = "PiFlex Codex V23 centred enclosed USB tunnels rear and mount"
+structure.name = f"PiFlex Codex {DESIGN_VERSION.upper()} enclosed USB tunnels rear and mount"
 structure.matrix_world = structure_matrix
 
 bpy.ops.wm.stl_import(filepath=str(TUNNEL_VOIDS))
 tunnel_voids = bpy.context.object
-tunnel_voids.name = "PiFlex Codex V23 registered USB tunnel voids"
+tunnel_voids.name = f"PiFlex Codex {DESIGN_VERSION.upper()} registered USB tunnel voids"
 tunnel_voids.matrix_world = structure_matrix
 bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
 bpy.ops.object.select_all(action="DESELECT")
@@ -81,7 +87,7 @@ bpy.ops.export_scene.gltf(filepath=str(OUT_GLB), export_format="GLB", use_select
 bpy.ops.wm.stl_export(filepath=str(OUT_STL), export_selected_objects=True)
 
 report = {
-    "design": "PiFlex Codex V23 centred enclosed USB tunnels assembly",
+    "design": f"PiFlex Codex {DESIGN_VERSION.upper()} enclosed USB tunnels assembly",
     "source": SOURCE.name,
     "source_sha256": source_hash_before,
     "source_unchanged": True,
@@ -90,8 +96,13 @@ report = {
     "opening_changed_from_v21": False,
     "blue_screen_frame_cut_for_usb": False,
     "rear_mount_replaced": True,
-    "usb_tunnel_centres_local_mm": [[-143.077, 0.0], [143.077, 0.0]],
+    "usb_tunnel_centres_local_mm": [
+        [-143.077, TUNNEL_CENTRE_Y],
+        [143.077, TUNNEL_CENTRE_Y],
+    ],
     "usb_tunnel_clear_section_mm": [18.4, 10.0],
+    "ear_cavity_centre_z_mm": 2.34 if EAR_CENTRED_DOGLEG else None,
+    "ear_centred_dogleg": EAR_CENTRED_DOGLEG,
     "routing_form": "internal roofed tunnels beneath intact screen frame",
     "production_gate": "physical USB-A extension fit-check",
 }

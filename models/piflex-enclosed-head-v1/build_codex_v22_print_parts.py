@@ -40,6 +40,8 @@ APPROVED_GEOMETRY = os.environ.get(
 )
 TUNNEL_VOIDS_NAME = os.environ.get("PIFLEX_TUNNEL_VOIDS")
 TUNNEL_VOIDS = HERE / TUNNEL_VOIDS_NAME if TUNNEL_VOIDS_NAME else None
+KEEP_FAILED_MONOLITHIC = os.environ.get("PIFLEX_KEEP_FAILED_MONOLITHIC") == "1"
+PRECISION_SEAM_CLEANUP = os.environ.get("PIFLEX_PRECISION_SEAM_CLEANUP", "1") == "1"
 
 OUT_SHELL = HERE / f"piflex-codex-{PRINT_VERSION}-printable-screen-shell.stl"
 OUT_REAR_MOUNT = HERE / f"piflex-codex-{PRINT_VERSION}-printable-rear-mount.stl"
@@ -229,6 +231,7 @@ monolithic_exported = False
 monolithic_report = None
 monolithic_3mf_report = None
 tunnel_validation = None
+precision_cleanup_report = None
 if intersection_volume > 0.1:
     monolithic = trimesh.boolean.union(
         [registered_shell_mesh, fusion_rear_mesh], engine="manifold", check_volume=True
@@ -241,6 +244,35 @@ if intersection_volume > 0.1:
     duplicate_faces = int(
         len(monolithic_disk.faces) - monolithic_disk.unique_faces().sum()
     )
+    if PRECISION_SEAM_CLEANUP and (degenerate_faces > 0 or duplicate_faces > 0):
+        # STL stores 32-bit coordinates. At a complex Boolean seam that can
+        # leave sub-micron sliver triangles after disk quantisation. Weld at
+        # 0.001 mm precision, discard only collapsed/duplicate facets, and
+        # require the cleaned disk mesh to remain the same closed volume.
+        volume_before_cleanup = float(monolithic_disk.volume)
+        faces_before_cleanup = int(len(monolithic_disk.faces))
+        monolithic_disk.merge_vertices(digits_vertex=3)
+        monolithic_disk.update_faces(monolithic_disk.nondegenerate_faces())
+        monolithic_disk.update_faces(monolithic_disk.unique_faces())
+        monolithic_disk.remove_unreferenced_vertices()
+        if not monolithic_disk.is_volume:
+            raise RuntimeError("Sub-micron STL seam cleanup opened the fused mesh")
+        monolithic_disk.export(OUT_MONOLITHIC)
+        monolithic_disk = trimesh.load_mesh(OUT_MONOLITHIC, process=True)
+        precision_cleanup_report = {
+            "vertex_precision_mm": 0.001,
+            "faces_before": faces_before_cleanup,
+            "faces_after": int(len(monolithic_disk.faces)),
+            "absolute_volume_change_mm3": round(
+                abs(float(monolithic_disk.volume) - volume_before_cleanup), 9
+            ),
+        }
+        degenerate_faces = int(
+            len(monolithic_disk.faces) - monolithic_disk.nondegenerate_faces().sum()
+        )
+        duplicate_faces = int(
+            len(monolithic_disk.faces) - monolithic_disk.unique_faces().sum()
+        )
     monolithic_report = {
         **mesh_report(monolithic_disk),
         "degenerate_faces": degenerate_faces,
@@ -263,7 +295,7 @@ if intersection_volume > 0.1:
         }
         if not monolithic_3mf.is_volume:
             raise RuntimeError("3MF round trip did not remain a closed volume")
-if not monolithic_exported and OUT_MONOLITHIC.exists():
+if not monolithic_exported and OUT_MONOLITHIC.exists() and not KEEP_FAILED_MONOLITHIC:
     OUT_MONOLITHIC.unlink()
 if not monolithic_exported and OUT_MONOLITHIC_3MF.exists():
     OUT_MONOLITHIC_3MF.unlink()
@@ -361,6 +393,7 @@ report = {
         "exported": monolithic_exported,
         "mesh": monolithic_report,
         "3mf_mesh": monolithic_3mf_report,
+        "sub_micron_seam_cleanup": precision_cleanup_report,
     },
     "usb_tunnel_validation": tunnel_validation,
     "nominal_designed_walls_mm": {

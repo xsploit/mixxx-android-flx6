@@ -1,4 +1,4 @@
-"""Build V23 with USB tunnels aligned to the true centres of both ears.
+"""Build enclosed USB tunnels aligned across both ears.
 
 V23 preserves the approved V21 service opening and the frozen V19 exterior.
 It first fills the obsolete short V18/V19 cable cuts, then cuts two new roofed
@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import math
+import os
 from pathlib import Path
 
 import cadquery as cq
@@ -20,10 +21,15 @@ import build_codex_v21_bay_merged_structure as v21
 
 HERE = Path(__file__).resolve().parent
 
+DESIGN_VERSION = os.environ.get("PIFLEX_TUNNEL_VERSION", "v23")
+DESIGN_SLUG = os.environ.get("PIFLEX_TUNNEL_SLUG", "centered-usb-tunnels")
+
 OPENING_MIDDLE_HALF_WIDTH = 89.0
 TUNNEL_ENTRY_OVERLAP = 3.0
 TUNNEL_CLEAR_WIDTH = 18.4
 TUNNEL_CLEAR_HEIGHT = 10.0
+TUNNEL_CENTRE_Y = float(os.environ.get("PIFLEX_TUNNEL_CENTRE_Y", "0.0"))
+EAR_CENTRED_DOGLEG = os.environ.get("PIFLEX_EAR_CENTRED_DOGLEG") == "1"
 TUNNEL_DROP_BELOW_OLD_ROUTE = 4.5
 TUNNEL_REAR_Z = (
     -v19.head.WING_REAR_DEPTH
@@ -41,6 +47,14 @@ EAR_CENTRE_ABS = abs(EAR_CENTRES[1])
 TUNNEL_INNER_ABS = OPENING_MIDDLE_HALF_WIDTH - TUNNEL_ENTRY_OVERLAP
 TUNNEL_OUTER_ABS = EAR_CENTRE_ABS
 TUNNEL_LENGTH = TUNNEL_OUTER_ABS - TUNNEL_INNER_ABS
+EAR_CAVITY_REAR_Z = -v19.head.WING_REAR_DEPTH + v19.head.WING_WALL
+EAR_CAVITY_FRONT_Z = v19.head.SCREEN_DEPTH - v19.head.WING_WALL
+EAR_CAVITY_CENTRE_Z = (EAR_CAVITY_REAR_Z + EAR_CAVITY_FRONT_Z) / 2.0
+EAR_TUNNEL_REAR_Z = EAR_CAVITY_CENTRE_Z - TUNNEL_CLEAR_HEIGHT / 2.0
+SHELL_OUTER_X = v19.head.SCREEN_WIDTH / 2.0
+EAR_RISER_INNER_ABS = SHELL_OUTER_X + 0.6
+EAR_HIGH_RUN_INNER_ABS = EAR_RISER_INNER_ABS + 3.0
+INNER_HIGH_RUN_OUTER_ABS = OPENING_MIDDLE_HALF_WIDTH - 0.5
 
 
 def corrected_usb_tunnels():
@@ -59,12 +73,60 @@ def corrected_usb_tunnels():
             .translate(
                 (
                     centre_x,
-                    v19.head.WING_CENTRE_Y,
+                    TUNNEL_CENTRE_Y,
                     TUNNEL_REAR_Z,
                 )
             )
         )
-        passages.append(passage)
+        if EAR_CENTRED_DOGLEG:
+            # Keep the middle span beneath the untouched blue shell. At the
+            # already-open bay edge and inside the hollow ear, extend upward
+            # to the ear cavity's true top-to-bottom centre.
+            inner_high_length = INNER_HIGH_RUN_OUTER_ABS - TUNNEL_INNER_ABS
+            inner_high_centre = sign * (
+                TUNNEL_INNER_ABS + INNER_HIGH_RUN_OUTER_ABS
+            ) / 2.0
+            inner_riser = (
+                cq.Workplane("XY")
+                .box(
+                    inner_high_length,
+                    TUNNEL_CLEAR_WIDTH,
+                    EAR_TUNNEL_REAR_Z + TUNNEL_CLEAR_HEIGHT - TUNNEL_REAR_Z,
+                    centered=(True, True, False),
+                )
+                .translate((inner_high_centre, TUNNEL_CENTRE_Y, TUNNEL_REAR_Z))
+            )
+
+            ear_high_length = TUNNEL_OUTER_ABS - EAR_RISER_INNER_ABS
+            ear_high_centre = sign * (
+                EAR_RISER_INNER_ABS + TUNNEL_OUTER_ABS
+            ) / 2.0
+            ear_high = (
+                cq.Workplane("XY")
+                .box(
+                    ear_high_length,
+                    TUNNEL_CLEAR_WIDTH,
+                    TUNNEL_CLEAR_HEIGHT,
+                    centered=(True, True, False),
+                )
+                .translate((ear_high_centre, TUNNEL_CENTRE_Y, EAR_TUNNEL_REAR_Z))
+            )
+            ear_riser_length = EAR_HIGH_RUN_INNER_ABS - EAR_RISER_INNER_ABS
+            ear_riser_centre = sign * (
+                EAR_RISER_INNER_ABS + EAR_HIGH_RUN_INNER_ABS
+            ) / 2.0
+            ear_riser = (
+                cq.Workplane("XY")
+                .box(
+                    ear_riser_length,
+                    TUNNEL_CLEAR_WIDTH,
+                    EAR_TUNNEL_REAR_Z + TUNNEL_CLEAR_HEIGHT - TUNNEL_REAR_Z,
+                    centered=(True, True, False),
+                )
+                .translate((ear_riser_centre, TUNNEL_CENTRE_Y, TUNNEL_REAR_Z))
+            )
+            passage = passage.union(inner_riser).union(ear_riser).union(ear_high)
+        passages.append(passage.combine(clean=True))
     return passages
 
 
@@ -82,7 +144,7 @@ def tunnel_housings():
             RACEWAY_HEIGHT,
             RACEWAY_REAR_Z,
             4.0,
-        ).translate((centre_x, v19.head.WING_CENTRE_Y, 0.0))
+        ).translate((centre_x, TUNNEL_CENTRE_Y, 0.0))
         housings.append(housing)
     return housings
 
@@ -157,12 +219,14 @@ if not shape.isValid() or len(solids) != 1:
 
 
 def export():
-    structure_stl = HERE / "piflex-codex-v23-centered-usb-tunnels-structure.stl"
-    structure_step = HERE / "piflex-codex-v23-centered-usb-tunnels-structure.step"
-    rear_stl = HERE / "piflex-codex-v23-centered-usb-tunnels-rear-local.stl"
-    tunnel_voids_stl = HERE / "piflex-codex-v23-usb-tunnel-voids-local.stl"
+    stem = f"piflex-codex-{DESIGN_VERSION}-{DESIGN_SLUG}"
+    structure_stl = HERE / f"{stem}-structure.stl"
+    structure_step = HERE / f"{stem}-structure.step"
+    rear_stl = HERE / f"{stem}-rear-local.stl"
+    tunnel_voids_stl = HERE / f"piflex-codex-{DESIGN_VERSION}-usb-tunnel-voids-local.stl"
     registered_tunnel_voids_stl = (
-        HERE / "piflex-codex-v23-usb-tunnel-voids-structure-coordinates.stl"
+        HERE
+        / f"piflex-codex-{DESIGN_VERSION}-usb-tunnel-voids-structure-coordinates.stl"
     )
 
     cq.exporters.export(
@@ -197,7 +261,7 @@ def export():
 
     screw_clearances = opening_screw_clearances()
     report = {
-        "design": "PiFlex Codex V23 centred enclosed USB tunnels",
+        "design": f"PiFlex Codex {DESIGN_VERSION.upper()} enclosed USB tunnels",
         "visual_baseline": "PiFlex Codex V21 opening on frozen V19 exterior",
         "valid": shape.isValid(),
         "solids": len(solids),
@@ -219,18 +283,44 @@ def export():
             [round(TUNNEL_INNER_ABS, 3), round(TUNNEL_OUTER_ABS, 3)],
         ],
         "tunnel_clear_section_mm": [TUNNEL_CLEAR_WIDTH, TUNNEL_CLEAR_HEIGHT],
-        "tunnel_centre_y_mm": v19.head.WING_CENTRE_Y,
+        "tunnel_centre_y_mm": TUNNEL_CENTRE_Y,
+        "tunnel_y_range_mm": [
+            round(TUNNEL_CENTRE_Y - TUNNEL_CLEAR_WIDTH / 2.0, 3),
+            round(TUNNEL_CENTRE_Y + TUNNEL_CLEAR_WIDTH / 2.0, 3),
+        ],
         "tunnel_z_range_mm": [
             round(TUNNEL_REAR_Z, 3),
             round(TUNNEL_REAR_Z + TUNNEL_CLEAR_HEIGHT, 3),
         ],
+        "ear_cavity_z_range_mm": [
+            round(EAR_CAVITY_REAR_Z, 3),
+            round(EAR_CAVITY_FRONT_Z, 3),
+        ],
+        "ear_cavity_centre_z_mm": round(EAR_CAVITY_CENTRE_Z, 3),
+        "ear_tunnel_z_range_mm": [
+            round(EAR_TUNNEL_REAR_Z, 3),
+            round(EAR_TUNNEL_REAR_Z + TUNNEL_CLEAR_HEIGHT, 3),
+        ],
+        "ear_centred_dogleg": EAR_CENTRED_DOGLEG,
         "tunnel_drop_below_old_route_mm": TUNNEL_DROP_BELOW_OLD_ROUTE,
         "raceway_outer_section_mm": [RACEWAY_WIDTH, RACEWAY_HEIGHT],
+        "raceway_y_range_mm": [
+            round(TUNNEL_CENTRE_Y - RACEWAY_WIDTH / 2.0, 3),
+            round(TUNNEL_CENTRE_Y + RACEWAY_WIDTH / 2.0, 3),
+        ],
+        "ear_y_range_mm": [
+            round(v19.head.WING_CENTRE_Y - v19.head.WING_HEIGHT / 2.0, 3),
+            round(v19.head.WING_CENTRE_Y + v19.head.WING_HEIGHT / 2.0, 3),
+        ],
         "raceway_wall_mm": RACEWAY_WALL,
         "raceway_roof_overlap_mm": RACEWAY_ROOF_OVERLAP,
         "raceway_rear_limit_mm": round(RACEWAY_REAR_Z, 3),
         "tunnel_entry": "3 mm overlap into each V21 opening side wall at x +/-89 mm",
-        "tunnel_termination": "true hollow-ear centre at x +/-143.077 mm",
+        "tunnel_termination": (
+            "true hollow-ear centres at x +/-143.077 mm, y 0 mm, z 2.34 mm"
+            if EAR_CENTRED_DOGLEG
+            else "true hollow-ear X centre at x +/-143.077 mm"
+        ),
         "blue_screen_frame_cut_for_usb": False,
         "routing_form": "roofed internal tunnel, never an open canal",
         "preserved": [
@@ -245,7 +335,7 @@ def export():
             "fit-check the selected female USB-A extension body and cable bend radius"
         ),
     }
-    (HERE / "inspection-codex-v23-centered-usb-tunnels.json").write_text(
+    (HERE / f"inspection-codex-{DESIGN_VERSION}-{DESIGN_SLUG}.json").write_text(
         json.dumps(report, indent=2), encoding="utf-8"
     )
     return report
