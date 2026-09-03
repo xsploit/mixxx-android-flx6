@@ -35,6 +35,16 @@ HOLLOW_EAR_INTERIOR = os.environ.get("PIFLEX_HOLLOW_EAR_INTERIOR") == "1"
 EXTEND_ORIGINAL_SCREW_TOWERS = (
     os.environ.get("PIFLEX_EXTEND_ORIGINAL_SCREW_TOWERS") == "1"
 )
+FILL_FLUSH_SCREEN_BAY_JOIN = (
+    os.environ.get("PIFLEX_FILL_FLUSH_SCREEN_BAY_JOIN") == "1"
+)
+SCREEN_BAY_JOIN_Z0 = float(
+    os.environ.get("PIFLEX_SCREEN_BAY_JOIN_Z0", "-10.0")
+)
+SCREEN_BAY_JOIN_TOP_Z = float(
+    os.environ.get("PIFLEX_SCREEN_BAY_JOIN_TOP_Z", "-9.0")
+)
+SCREEN_SHELL_UNDERSIDE_Z = -v19.head.SCREEN_DEPTH / 2.0
 SCREW_TOWER_EXTENSION_Z0 = float(
     os.environ.get("PIFLEX_SCREW_TOWER_EXTENSION_Z0", "-11.2")
 )
@@ -361,6 +371,83 @@ def original_screw_tower_extensions():
     return extensions
 
 
+def original_screw_bores(z0, top_z):
+    """The untouched four source bores over an arbitrary local Z interval."""
+    depth = top_z - z0
+    return [
+        (
+            cq.Workplane("XY")
+            .center(x, y)
+            .circle(v19.head.BACK_SCREW_CLEARANCE / 2.0)
+            .extrude(depth)
+            .translate((0.0, 0.0, z0))
+        )
+        for x in v19.HOLE_X
+        for y in v19.HOLE_Y
+    ]
+
+
+def flush_screen_bay_join_web():
+    """Fill the orange second step with one flush, screw-safe join web.
+
+    The existing case does not move.  The web continues its inner orange wall
+    from the old opening plane to the underside of the blue source shell.  Its
+    inner surface follows the source bay bevel, its outer surface follows the
+    established V21 opening, and all four source screw bores remain untouched.
+    """
+    if not FILL_FLUSH_SCREEN_BAY_JOIN:
+        return None
+    depth = SCREEN_BAY_JOIN_TOP_Z - SCREEN_BAY_JOIN_Z0
+    if depth <= 0.0:
+        raise ValueError("Screen/bay join top must be above its base")
+    if abs(SCREEN_BAY_JOIN_TOP_Z - SCREEN_SHELL_UNDERSIDE_Z) > 0.001:
+        raise ValueError("Screen/bay join must finish at the blue shell underside")
+
+    # Refill the exact V21 service-opening footprint.  A broad rectangular web
+    # created a visible horizontal shelf; using the existing octagonal opening
+    # keeps the raised wall narrow and follows both angled sides exactly.
+    slab = (
+        cq.Workplane("XY")
+        .polyline(v21.OPENING_POINTS)
+        .close()
+        .extrude(depth)
+        .translate((0.0, 0.0, SCREEN_BAY_JOIN_Z0))
+    )
+    # Continue the existing Pi-bay inner bevel itself up to the blue shell.
+    # Matching only the lower profile made a vertical insert with a visible
+    # kink.  Interpolating both ends from the source loft produces one straight
+    # inner face from the original orange wall to the blue underside.
+    inner_back_z = -v19.v16.BAY_TOTAL_DEPTH + v19.v16.BAY_WALL
+    inner_mouth_z = 1.0
+    def inner_profile(z):
+        amount = (z - inner_back_z) / (inner_mouth_z - inner_back_z)
+        return (
+            (v19.v16.BAY_BACK_WIDTH - 2.0 * v19.v16.BAY_WALL)
+            + amount * (v19.v16.BAY_MOUTH_WIDTH - v19.v16.BAY_BACK_WIDTH),
+            (v19.v16.BAY_BACK_HEIGHT - 2.0 * v19.v16.BAY_WALL)
+            + amount * (v19.v16.BAY_MOUTH_HEIGHT - v19.v16.BAY_BACK_HEIGHT),
+            (v19.v16.BAY_BACK_RADIUS - v19.v16.BAY_WALL)
+            + amount * (v19.v16.BAY_MOUTH_RADIUS - v19.v16.BAY_BACK_RADIUS),
+        )
+
+    lower_width, lower_height, lower_radius = inner_profile(SCREEN_BAY_JOIN_Z0)
+    upper_width, upper_height, upper_radius = inner_profile(SCREEN_BAY_JOIN_TOP_Z)
+    continued_inner_void = v19.head.rounded_loft(
+        lower_width,
+        lower_height,
+        SCREEN_BAY_JOIN_Z0,
+        lower_radius,
+        upper_width,
+        upper_height,
+        SCREEN_BAY_JOIN_TOP_Z,
+        upper_radius,
+    )
+    web = slab.cut(continued_inner_void)
+    for bore in original_screw_bores(SCREEN_BAY_JOIN_Z0 - 0.5, SCREEN_BAY_JOIN_TOP_Z + 0.5):
+        web = web.cut(bore)
+    return web.combine(clean=True)
+
+
 def build_centered_tunnel_rear_local():
     # V18 contains the obsolete short cuts. Restore their exact cutter volumes
     # before making the approved V21 opening and the corrected longer tunnels.
@@ -371,8 +458,12 @@ def build_centered_tunnel_rear_local():
         polished = polished.union(housing)
     for extension in original_screw_tower_extensions():
         polished = polished.union(extension)
-
     polished = polished.cut(v21.bay_merged_service_throat())
+    # Add the raised straight wall after cutting the historical V21 throat;
+    # otherwise that larger cutter would recreate the ledge we are filling.
+    join_web = flush_screen_bay_join_web()
+    if join_web is not None:
+        polished = polished.union(join_web)
     for tunnel in routing_cutters():
         polished = polished.cut(tunnel)
     for ear_usb in deepened_ear_usb_cutters():
@@ -585,6 +676,44 @@ def export():
                 "added_ring_or_case_step": False,
             }
             if EXTEND_ORIGINAL_SCREW_TOWERS
+            else None
+        ),
+        "flush_screen_bay_join": (
+            {
+                "z_range_mm": [SCREEN_BAY_JOIN_Z0, SCREEN_BAY_JOIN_TOP_Z],
+                "thickness_mm": round(
+                    SCREEN_BAY_JOIN_TOP_Z - SCREEN_BAY_JOIN_Z0, 3
+                ),
+                "top_plane_mm": SCREEN_BAY_JOIN_TOP_Z,
+                "blue_shell_underside_mm": SCREEN_SHELL_UNDERSIDE_Z,
+                "raised_to_blue_shell": True,
+                "raised_inner_opening_mm": [
+                    round(
+                        v19.v16.BAY_BACK_WIDTH
+                        - 2.0 * v19.v16.BAY_WALL
+                        + (
+                            (SCREEN_BAY_JOIN_Z0 - (-v19.v16.BAY_TOTAL_DEPTH + v19.v16.BAY_WALL))
+                            / (1.0 - (-v19.v16.BAY_TOTAL_DEPTH + v19.v16.BAY_WALL))
+                        )
+                        * (v19.v16.BAY_MOUTH_WIDTH - v19.v16.BAY_BACK_WIDTH),
+                        3,
+                    ),
+                    round(
+                        v19.v16.BAY_BACK_HEIGHT
+                        - 2.0 * v19.v16.BAY_WALL
+                        + (
+                            (SCREEN_BAY_JOIN_Z0 - (-v19.v16.BAY_TOTAL_DEPTH + v19.v16.BAY_WALL))
+                            / (1.0 - (-v19.v16.BAY_TOTAL_DEPTH + v19.v16.BAY_WALL))
+                        )
+                        * (v19.v16.BAY_MOUTH_HEIGHT - v19.v16.BAY_BACK_HEIGHT),
+                        3,
+                    ),
+                ],
+                "horizontal_inner_ledge_removed": True,
+                "source_screw_bores_recut": True,
+                "raised_ring_or_extra_step": False,
+            }
+            if FILL_FLUSH_SCREEN_BAY_JOIN
             else None
         ),
         "remaining_nominal_ear_wall_mm": round(v19.head.WING_WALL, 3),

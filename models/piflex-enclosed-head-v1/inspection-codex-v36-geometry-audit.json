@@ -1,0 +1,123 @@
+{
+  "design": "PiFlex Codex V36 automated geometry audit",
+  "cad_solid": {
+    "valid": true,
+    "solids": 1,
+    "ear_cavity_blocked_volume_mm3": [
+      0.0,
+      0.0
+    ],
+    "original_screw_bore_obstruction_mm3": []
+  },
+  "mesh_gap_and_topology_checks": [
+    {
+      "file": "piflex-codex-v36-flush-inner-join-structure.stl",
+      "triangles": 18324,
+      "degenerate_triangles": 0,
+      "duplicate_triangles": 0,
+      "boundary_edges": 0,
+      "non_manifold_edges": 0,
+      "minimum_triangle_area_mm2": 0.0004598557,
+      "bounds_mm": [
+        [
+          -161.2734,
+          -5.0,
+          -162.077
+        ],
+        [
+          50.0,
+          129.4031,
+          162.077
+        ]
+      ],
+      "passed": true
+    },
+    {
+      "file": "piflex-codex-v36-printable-screen-shell.stl",
+      "triangles": 20932,
+      "degenerate_triangles": 0,
+      "duplicate_triangles": 0,
+      "boundary_edges": 0,
+      "non_manifold_edges": 0,
+      "minimum_triangle_area_mm2": 5.9867e-06,
+      "bounds_mm": [
+        [
+          -126.577,
+          -85.771,
+          -6.84
+        ],
+        [
+          126.577,
+          85.771,
+          6.84
+        ]
+      ],
+      "passed": true
+    },
+    {
+      "file": "piflex-codex-v36-printable-rear-mount.stl",
+      "triangles": 18324,
+      "degenerate_triangles": 0,
+      "duplicate_triangles": 0,
+      "boundary_edges": 0,
+      "non_manifold_edges": 0,
+      "minimum_triangle_area_mm2": 0.000459133,
+      "bounds_mm": [
+        [
+          -180.706,
+          117.4,
+          -5.0
+        ],
+        [
+          143.448,
+          328.6734,
+          129.4031
+        ]
+      ],
+      "passed": true
+    },
+    {
+      "file": "piflex-codex-v36-printable-monolithic.stl",
+      "triangles": 41034,
+      "degenerate_triangles": 0,
+      "duplicate_triangles": 0,
+      "boundary_edges": 0,
+      "non_manifold_edges": 0,
+      "minimum_triangle_area_mm2": 3.74e-07,
+      "bounds_mm": [
+        [
+          -180.706,
+          117.4423,
+          -5.0906
+        ],
+        [
+          143.448,
+          328.7157,
+          140.8951
+        ]
+      ],
+      "passed": true
+    }
+  ],
+  "rounded_usb_ear_protrusion_check": {
+    "raw_square_overflow_mm3": 76.469607,
+    "v36_clipped_overflow_mm3": 0.0,
+    "passed": true
+  },
+  "flush_inner_join_check": {
+    "thickness_mm": 3.16,
+    "flush_top_plane_mm": -6.84,
+    "blue_shell_underside_mm": -6.84,
+    "flush_plane_error_mm": 0.0,
+    "volume_mm3": 3953.4,
+    "source_screw_bore_obstruction_mm3": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "horizontal_inner_ledge_removed": true,
+    "passed": true
+  },
+  "passed": true
+}

@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import math
+import os
 import sys
 from pathlib import Path
 
@@ -71,6 +72,13 @@ USB_OPENING_X = 16.4
 USB_OPENING_Z = 9.2
 USB_OPENING_CENTRE_Z = 1.5
 USB_REINFORCEMENT_Y = 25.0
+
+# Later revisions can clip the rectangular USB support back to the rounded ear
+# envelope.  The historical models keep their exact geometry unless the
+# revision wrapper explicitly enables this repair.
+CLIP_USB_REINFORCEMENT_TO_EAR = (
+    os.environ.get("PIFLEX_CLIP_USB_REINFORCEMENT_TO_EAR") == "1"
+)
 
 MOUNT_CLEARANCE = 3.6
 MOUNT_BOSS_RADIUS = 5.5
@@ -312,6 +320,11 @@ def build_rear_shell_local():
                 )
             )
         )
+        if CLIP_USB_REINFORCEMENT_TO_EAR:
+            # The support is internal, so it must never change the rounded
+            # outside silhouette.  Intersecting with the existing ear removes
+            # the small square corner that formerly poked through the curve.
+            reinforcement = reinforcement.intersect(wing_outer)
         top_edge_opening = (
             cq.Workplane("XY")
             .box(USB_OPENING_X, 12.0, USB_OPENING_Z)
